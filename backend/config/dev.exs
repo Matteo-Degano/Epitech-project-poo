@@ -1,11 +1,11 @@
 import Config
 
 # Configure your database
-config :bootstrap, Todolist.Repo,
+config :poo, TimeManager.Repo,
   username: "postgres",
   password: "postgres",
-  hostname: "localhost",
-  database: "bootstrap_dev",
+  hostname: "db",
+  database: "poo_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
@@ -16,17 +16,17 @@ config :bootstrap, Todolist.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
-config :bootstrap, TodolistWeb.Endpoint,
+config :poo, TimeManagerWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {127, 0, 0, 1}, port: 4000],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "dyYBnhVZWJ/s3CSZ5a/hyqNIauAigTa5uTSFt/8OlE5yIi0Pb+TqrOU4TxyUOlm5",
+  secret_key_base: "h07voXXw+3DU/RTpn2QohbX6NX6NfN9FDx/nzAEHZT1l6cobYAsRB2Ka3GmChUsB",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:bootstrap, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:bootstrap, ~w(--watch)]}
+    esbuild: {Esbuild, :install_and_run, [:poo, ~w(--sourcemap=inline --watch)]},
+    tailwind: {Tailwind, :install_and_run, [:poo, ~w(--watch)]}
   ]
 
 # ## SSL Support
@@ -53,7 +53,7 @@ config :bootstrap, TodolistWeb.Endpoint,
 # different ports.
 
 # Enable dev routes for dashboard and mailbox
-config :bootstrap, dev_routes: true
+config :poo, dev_routes: true
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"

@@ -1,5 +1,5 @@
-defmodule Todolist.Repo do
+defmodule TimeManager.Repo do
   use Ecto.Repo,
-    otp_app: :bootstrap,
+    otp_app: :poo,
     adapter: Ecto.Adapters.Postgres
 end

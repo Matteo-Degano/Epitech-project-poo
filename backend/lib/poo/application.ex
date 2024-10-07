@@ -1,4 +1,4 @@
-defmodule Todolist.Application do
+defmodule TimeManager.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
@@ -8,21 +8,21 @@ defmodule Todolist.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      TodolistWeb.Telemetry,
-      Todolist.Repo,
-      {DNSCluster, query: Application.get_env(:bootstrap, :dns_cluster_query) || :ignore},
-      {Phoenix.PubSub, name: Todolist.PubSub},
+      TimeManagerWeb.Telemetry,
+      TimeManager.Repo,
+      {DNSCluster, query: Application.get_env(:poo, :dns_cluster_query) || :ignore},
+      {Phoenix.PubSub, name: TimeManager.PubSub},
       # Start the Finch HTTP client for sending emails
-      {Finch, name: Todolist.Finch},
-      # Start a worker by calling: Todolist.Worker.start_link(arg)
-      # {Todolist.Worker, arg},
+      {Finch, name: TimeManager.Finch},
+      # Start a worker by calling: TimeManager.Worker.start_link(arg)
+      # {TimeManager.Worker, arg},
       # Start to serve requests, typically the last entry
-      TodolistWeb.Endpoint
+      TimeManagerWeb.Endpoint
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: Todolist.Supervisor]
+    opts = [strategy: :one_for_one, name: TimeManager.Supervisor]
     Supervisor.start_link(children, opts)
   end
 
@@ -30,7 +30,7 @@ defmodule Todolist.Application do
   # whenever the application is updated.
   @impl true
   def config_change(changed, _new, removed) do
-    TodolistWeb.Endpoint.config_change(changed, removed)
+    TimeManagerWeb.Endpoint.config_change(changed, removed)
     :ok
   end
 end

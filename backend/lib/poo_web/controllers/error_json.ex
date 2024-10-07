@@ -1,4 +1,4 @@
-defmodule TodolistWeb.ErrorJSON do
+defmodule TimeManagerWeb.ErrorJSON do
   @moduledoc """
   This module is invoked by your endpoint in case of errors on JSON requests.
 
