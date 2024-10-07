@@ -1,0 +1,136 @@
+swagger: "2.0"
+basePath: "/api"
+info:
+  version: "1.0.0"
+  title: "T-POO-700"
+  description: "T-POO-700 API"
+tags:
+- name: "USER"
+  description: "CRUD operations for users"
+- name: "WORKING TIME"
+  description: "CRUD operations for working times"
+- name: "CLOCK"
+  description: "CRUD operations for clocks"
+paths:
+  /users:
+    post:
+      tags:
+      - "USER"
+      summary: "Post a user"
+      description: "Post a user"
+      parameters:
+        - name: "email"
+          description: "The email of the user"
+          required: true
+          type: "string"
+        - name : "username"
+          description: "The username of the user"
+          required: true
+          type: "string"
+      responses:
+        200: 
+          description: "Successful operation"
+          schema: 
+            type: "array"
+            items: 
+              $ref: "#/definitions/users"
+    get:
+      tags:
+      - "USER"
+      summary: "Get user by email & username"
+      description: "Get user by email & username"
+      parameters:
+        - name: "email"
+          in: "query"
+          description: "The email of the user"
+          required: false
+          type: "string"
+        - name: "username"
+          in: "query"
+          description: "The username of the user"
+          required: false
+          type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/users"
+        404: 
+          description: "User not found"
+  /users/{id}:
+    get:
+      tags:
+      - "USER"
+      summary: "Get user by id"
+      description: "Get user by id"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "The id of the user"
+          required: true
+          type: "integer"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/users"
+        404: 
+          description: "User not found"
+    delete:
+      tags:
+      - "USER"
+      summary: "Delete user by id"
+      description: "Delete user by id"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "The id of the user"
+          required: true
+          type: "integer"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/users"
+        404: 
+          description: "User not found"
+    put:
+      tags:
+      - "USER"
+      summary: "Update user by id"
+      description: "Update user by id"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "The id of the user"
+          required: true
+          type: "integer"
+        - name: "email"
+          in: "query"
+          description: "The email of the user"
+          required: false
+          type: "string"
+        - name: "username"
+          in: "query"
+          description: "The username of the user"
+          required: false
+          type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/users"
+        404: 
+          description: "User not found"
+
+
+definitions:
+  users:
+    type: "object"
+    properties:
+      username:
+        type: "string"
+      email:
+        type: "string"
