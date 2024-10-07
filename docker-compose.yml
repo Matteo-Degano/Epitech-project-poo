@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: db-poo
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: ecto://postgres:postgres@db/my_database
+      SECRET_KEY_BASE: your_secret_key
+      MIX_ENV: prod
+    depends_on:
+      - db
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./backend:/app
+    command: ["./bin/your_app_name", "start"]
+
+volumes:
+  db_data:
