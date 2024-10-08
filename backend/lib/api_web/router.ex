@@ -7,6 +7,10 @@ defmodule ApiWeb.Router do
 
   scope "/api", ApiWeb do
     pipe_through :api
+
+    get "/clocks/:userID", ClocksController, :show
+
+    post "/clocks/:userID", ClocksController, :create
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
