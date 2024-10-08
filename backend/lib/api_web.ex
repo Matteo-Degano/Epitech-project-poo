@@ -1,12 +1,12 @@
-defmodule TimeManagerWeb do
+defmodule ApiWeb do
   @moduledoc """
   The entrypoint for defining your web interface, such
   as controllers, components, channels, and so on.
 
   This can be used in your application as:
 
-      use TimeManagerWeb, :controller
-      use TimeManagerWeb, :html
+      use ApiWeb, :controller
+      use ApiWeb, :html
 
   The definitions below will be executed for every controller,
   component, etc, so keep them short and clean, focused
@@ -39,10 +39,10 @@ defmodule TimeManagerWeb do
     quote do
       use Phoenix.Controller,
         formats: [:html, :json],
-        layouts: [html: TimeManagerWeb.Layouts]
+        layouts: [html: ApiWeb.Layouts]
 
       import Plug.Conn
-      import TimeManagerWeb.Gettext
+      import ApiWeb.Gettext
 
       unquote(verified_routes())
     end
@@ -51,9 +51,9 @@ defmodule TimeManagerWeb do
   def verified_routes do
     quote do
       use Phoenix.VerifiedRoutes,
-        endpoint: TimeManagerWeb.Endpoint,
-        router: TimeManagerWeb.Router,
-        statics: TimeManagerWeb.static_paths()
+        endpoint: ApiWeb.Endpoint,
+        router: ApiWeb.Router,
+        statics: ApiWeb.static_paths()
     end
   end
 

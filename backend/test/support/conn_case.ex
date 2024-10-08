@@ -1,4 +1,4 @@
-defmodule TimeManagerWeb.ConnCase do
+defmodule ApiWeb.ConnCase do
   @moduledoc """
   This module defines the test case to be used by
   tests that require setting up a connection.
@@ -11,7 +11,7 @@ defmodule TimeManagerWeb.ConnCase do
   we enable the SQL sandbox, so changes done to the database
   are reverted at the end of every test. If you are using
   PostgreSQL, you can even run database tests asynchronously
-  by setting `use TimeManagerWeb.ConnCase, async: true`, although
+  by setting `use ApiWeb.ConnCase, async: true`, although
   this option is not recommended for other databases.
   """
 
@@ -20,19 +20,19 @@ defmodule TimeManagerWeb.ConnCase do
   using do
     quote do
       # The default endpoint for testing
-      @endpoint TimeManagerWeb.Endpoint
+      @endpoint ApiWeb.Endpoint
 
-      use TimeManagerWeb, :verified_routes
+      use ApiWeb, :verified_routes
 
       # Import conveniences for testing with connections
       import Plug.Conn
       import Phoenix.ConnTest
-      import TimeManagerWeb.ConnCase
+      import ApiWeb.ConnCase
     end
   end
 
   setup tags do
-    TimeManager.DataCase.setup_sandbox(tags)
+    Api.DataCase.setup_sandbox(tags)
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 end
