@@ -1,10 +1,21 @@
-# Use an official Elixir image as a base
-FROM elixir:1.17-alpine AS build
+FROM elixir
 
-RUN mix archive.install hex phx_new
-RUN mix phx.new . --no-html --app bootstrap --module Todolist --no-html
+WORKDIR /app
+COPY . .
+ENV DEBIAN_FRONTEND=noninteractive
 
-CMD ["./bin/your_app_name", "start"]
+RUN apt update && \
+  apt install -y \
+  build-essential \
+  inotify-tools \
+  postgresql-client
 
-# Expose port for Phoenix (default is 4000)
+RUN mix local.hex --force && \
+  mix local.rebar --force
+
+RUN mix deps.get \
+  mix deps.compile
+
+CMD mix phx.server
+
 EXPOSE 4000
