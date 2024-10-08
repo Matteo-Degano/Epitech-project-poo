@@ -1,0 +1,298 @@
+swagger: "2.0"
+basePath: "/api"
+info:
+  version: "1.0.0"
+  title: "T-POO-700"
+  description: "T-POO-700 API, \n ⚠️ Les responses attendues ne sont sûrement pas celles que le code renverra, ne pas se baser sur ce swagger pour le debuggage ⚠️"
+
+# TAGS
+tags:
+- name: "USER"
+  description: "CRUD operations for users"
+- name: "WORKING TIME"
+  description: "CRUD operations for working times"
+- name: "CLOCK"
+  description: "CRUD operations for clocks"
+
+paths:
+
+# PATHS POUR LES USERS 
+
+  /users:
+    post:
+      tags:
+      - "USER"
+      summary: "Post a user"
+      parameters:
+        - name: "user"
+          in: "body"
+          description: "The username and email of the user"
+          required: false
+          schema:
+           $ref: "#/definitions/users"
+      responses:
+        200: 
+          description: "Successful operation"
+          schema: 
+            type: "array"
+            items: 
+              $ref: "#/definitions/users"
+    get:
+      tags:
+      - "USER"
+      summary: "Get user by email & username"
+      parameters:
+        - name: "email"
+          in: "query"
+          description: "The email of the user"
+          required: true
+          type: "string"
+        - name: "username"
+          in: "query"
+          description: "The username of the user"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/users"
+        404: 
+          description: "User not found"
+  /users/{id}:
+    get:
+      tags:
+      - "USER"
+      summary: "Get user by id"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "The id of the user"
+          required: true
+          type: "integer"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/users"
+        404: 
+          description: "User not found"
+    delete:
+      tags:
+      - "USER"
+      summary: "Delete user by id"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "The id of the user"
+          required: true
+          type: "integer"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/users"
+        404: 
+          description: "User not found"
+    put:
+      tags:
+      - "USER"
+      summary: "Update user by id"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "The id of the user"
+          required: true
+          type: "integer"
+        - name: "user"
+          in: "body"
+          description: "The new username or email of the user"
+          required: false
+          schema:
+           $ref: "#/definitions/users"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/users"
+        404: 
+          description: "User not found"
+
+  # PATH POUR LES WORKING TIMES
+  /workingtime/{userId}/{id}:
+    get:
+      tags: 
+        - "WORKING TIME"
+      summary: "Get a working time of a user based on the id"
+      parameters:
+        - name : "userId"
+          in: path
+          description: The is of the user
+          required: true
+          type: "integer"
+        - name : "id"
+          in: path
+          description: The id of the working time
+          required: true
+          type: "integer"
+      responses: 
+        200:
+          description: "Successful Operation"
+          schema:
+            $ref: "#/definitions/workingtime"
+        404:
+          description: "User not found"
+
+
+  /workingtime/{userId}?start=XXX&end=XXX:
+    get:
+      tags:
+      - "WORKING TIME"
+      summary: "Get working time of a user based on the start and end time"
+      parameters:
+        - name: "start"
+          in: "query"
+          description: "The start of the working time"
+          required: true
+          type: "string"
+        - name: "end"
+          in: "query"
+          description: "The end of the working time"
+          required: true
+          type: "string"
+      responses:
+        200: 
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/workingtime"
+  
+  /workingtime/{userId}:
+    post: 
+      tags: 
+      - "WORKING TIME"
+      summary: "Post a new working time for a user with the userId"
+      parameters:
+       - name: "working time"
+         in: body
+         description: "The start of the working time"
+         required: true
+         schema:
+           $ref: "#/definitions/workingtime"
+      responses:
+       200:
+         description: "Successful operation"
+         schema:
+           $ref: "#/definitions/workingtime"
+  
+  /workingtime/{id}:
+    put:
+      tags:
+      - "WORKING TIME"
+      summary: "Put a working time with the id"
+      parameters:
+       - name: "working time"
+         in: body
+         required: true
+         schema:
+          $ref: "#/definitions/workingtime_no_user"
+      responses:
+        200:
+          description: "Successful Operation"
+          schema:
+            $ref: "#/definitions/workingtime"
+    
+    delete:
+      tags:
+      - "WORKING TIME"
+      summary: "Delete a working time with the id"
+      parameters:
+       - name: "id"
+         in: query
+         type: integer
+         required: true
+      responses:
+        200:
+          description: "Successful Operation"
+          schema:
+            $ref: "#/definitions/workingtime"
+
+  /clocks/{userId}:
+    get:
+      tags:
+      - "CLOCK"
+      summary: "Get a clock by user id"
+      parameters:
+      - name: "userId"
+        in: query
+        type: integer
+        required: true
+      responses:
+        200:
+          description: "Successful Operation"
+          schema:
+            $ref: "#/definitions/clocks"
+
+    post:
+      tags:
+      - "CLOCK"
+      summary: "Post a clock for a userId"
+      parameters:
+        - name: "userId"
+          in: query
+          type: integer
+          required: true
+        - name: clock
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/clocks_no_user"
+
+
+definitions:
+
+  users:
+    type: "object"  
+    properties:
+      username:
+        type: "string"
+      email:
+        type: "string"
+
+  workingtime:
+    type: "object"
+    properties:
+      start: 
+        type: "string"
+      end: 
+        type: "string"
+      user:
+        $ref: "#/definitions/users"
+
+  workingtime_no_user:
+    type: "object"
+    properties:
+      start: 
+        type: "string"
+      end: 
+        type: "string"
+
+  clocks:
+    type: "object"
+    properties:
+      time:
+        type: "string"
+      status:
+        type : "string"
+      user":
+        $ref: "#/definitions/users"
+
+  clocks_no_user:
+    type: "object"
+    properties:
+      time:
+        type: "string"
+      status:
+        type : "string"
+    
