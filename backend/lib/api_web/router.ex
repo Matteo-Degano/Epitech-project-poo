@@ -28,6 +28,8 @@ defmodule ApiWeb.Router do
 
     # DELETE - Delete a working time entry
     delete "/workingtime/:id", WorkingtimeController, :delete
+
+    resources "/users", UserController, except: [:new, :edit]
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
