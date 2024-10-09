@@ -60,7 +60,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "5000:8080"
+      - "5001:8080"
     environment:
       SWAGGER_JSON: /swagger/swagger.yaml
     volumes:
