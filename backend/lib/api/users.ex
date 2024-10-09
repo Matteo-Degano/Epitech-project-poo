@@ -17,8 +17,16 @@ defmodule Api.Users do
       [%User{}, ...]
 
   """
-  def list_users do
+  def list_users() do
     Repo.all(User)
+  end
+
+  def list_users_by_username_and_email(username, email) do
+    Repo.all(
+      from(u in User,
+        where: u.username == ^username and u.email == ^email
+      )
+    )
   end
 
   @doc """
