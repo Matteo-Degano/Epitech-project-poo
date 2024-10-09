@@ -11,6 +11,21 @@ defmodule ApiWeb.Router do
     get "/clocks/:userID", ClocksController, :show
 
     post "/clocks/:userID", ClocksController, :create
+
+        # GET (ALL) - Fetch all working time entries for a user
+    get "/workingtime/:userID", WorkingtimeController, :index
+
+    # GET (ONE) - Fetch a single working time entry
+    get "/workingtime/:userID/:id", WorkingtimeController, :show
+
+    # POST - Create a new working time entry
+    post "/workingtime/:userID", WorkingtimeController, :create
+
+    # PUT - Update a working time entry
+    put "/workingtime/:id", WorkingtimeController, :update
+
+    # DELETE - Delete a working time entry
+    delete "/workingtime/:id", WorkingtimeController, :delete
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
