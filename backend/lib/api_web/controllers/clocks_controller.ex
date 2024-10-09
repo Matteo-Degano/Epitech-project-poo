@@ -1,4 +1,5 @@
 defmodule ApiWeb.ClocksController do
+  require Logger
   use ApiWeb, :controller
 
   alias Api.Clocking
@@ -11,7 +12,9 @@ defmodule ApiWeb.ClocksController do
     render(conn, :index, clocks: clocks)
   end
 
-  def create(conn, %{"userId" => user, "clocks" => clocks_params}) do
+  def create(conn, %{"status" => status, "time" => time}) do
+    clocks_params = %{"user" => conn.params["user"], "status" => status, "time" => time}
+
     with {:ok, %Clocks{} = clocks} <- Clocking.create_clocks(clocks_params) do
       conn
       |> put_status(:created)
@@ -20,8 +23,7 @@ defmodule ApiWeb.ClocksController do
     end
   end
 
-  def show(conn, %{"userId" => user}) do
+  def show(conn, %{"user" => user}) do
     clocks = Clocking.get_clocks!(user)
-    render(conn, :show, clocks: clocks)
   end
 end

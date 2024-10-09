@@ -19,7 +19,8 @@ defmodule ApiWeb.ClocksJSON do
     %{
       id: clocks.id,
       time: clocks.time,
-      status: clocks.status
+      status: clocks.status,
+      user: clocks.user
     }
   end
 end

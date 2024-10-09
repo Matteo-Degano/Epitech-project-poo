@@ -8,9 +8,11 @@ defmodule ApiWeb.Router do
   scope "/api", ApiWeb do
     pipe_through :api
 
-    get "/clocks/:userID", ClocksController, :show
+    get "/clocks/:user", ClocksController, :show
 
-    post "/clocks/:userID", ClocksController, :create
+    post "/clocks/:user", ClocksController, :create
+
+    resources "/users", UserController, except: [:new, :edit]
 
         # GET (ALL) - Fetch all working time entries for a user
     get "/workingtime/:userID", WorkingtimeController, :index
@@ -26,7 +28,6 @@ defmodule ApiWeb.Router do
 
     # DELETE - Delete a working time entry
     delete "/workingtime/:id", WorkingtimeController, :delete
-    resources "/users", UserController, except: [:new, :edit]
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
