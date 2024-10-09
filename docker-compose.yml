@@ -10,7 +10,6 @@ services:
       - db_data:/var/lib/postgresql/data
     networks:
       - network
-      - network
 
   backend:
     build:
@@ -25,6 +24,18 @@ services:
       - "4000:4000"
     volumes:
       - ./backend:/app
+    networks:
+      - network
+
+  adminer:
+    container_name: adminer
+    image: adminer
+    environment:
+      - ADMINER_DESIGN=pepa-linha
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database
     networks:
       - network
 
@@ -58,8 +69,6 @@ services:
 volumes:
   db_data:
   node_modules:
-  node_modules:
 
 networks:
-  network:
   network:
