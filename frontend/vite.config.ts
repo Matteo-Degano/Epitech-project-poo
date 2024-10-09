@@ -10,11 +10,12 @@ export default defineConfig({
     vue(),
     vueJsx(),
   ],
+  
   server: {
     host: true,
     port: 5173,
     proxy: {
-      "/api": "http://backend",
+      "/api": "http://backend:4000",
     },
     watch: {
       usePolling: true,
@@ -24,5 +25,6 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
-  }
+  },
+  
 })

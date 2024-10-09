@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import WorkingTimes from "@/components/charts/WorkingTimes.vue";
-
-const userId: string = "1";
+import UserComponent from "../components/UserComponent.vue";
 </script>
 
 <template>
   <main>
-    <WorkingTimes :userId="userId" />
+    <UserComponent />
   </main>
 </template>
