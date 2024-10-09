@@ -10,6 +10,7 @@ services:
       - db_data:/var/lib/postgresql/data
     networks:
       - network
+      - network
 
   backend:
     build:
@@ -39,36 +40,10 @@ services:
     networks:
       - network
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: frontend
-    depends_on:
-      - backend
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    networks:
-     - network
-
-  swagger-ui:
-    image: swaggerapi/swagger-ui
-    container_name: swagger-ui
-    depends_on:
-      - backend
-    ports:
-      - "5000:8080"
-    environment:
-      SWAGGER_JSON: /swagger/swagger.yaml
-    volumes:
-      - ./docs/swagger.yaml:/swagger/swagger.yaml
-
 volumes:
   db_data:
   node_modules:
 
 networks:
+  network:
   network:
