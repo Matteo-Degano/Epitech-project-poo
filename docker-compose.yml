@@ -27,6 +27,21 @@ services:
     networks:
       - poo
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+     - poo
+
   swagger-ui:
     image: swaggerapi/swagger-ui
     container_name: swagger-ui
@@ -41,6 +56,7 @@ services:
 
 volumes:
   db_data:
+  node_modules:
 
 networks:
   poo:
