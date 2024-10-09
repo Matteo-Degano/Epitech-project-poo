@@ -9,7 +9,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     networks:
-      - poo
+      - network
 
   backend:
     build:
@@ -25,10 +25,22 @@ services:
     volumes:
       - ./backend:/app
     networks:
-      - poo
+      - network
+
+  adminer:
+    container_name: adminer
+    image: adminer
+    environment:
+      - ADMINER_DESIGN=pepa-linha
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database
+    networks:
+      - network
 
 volumes:
   db_data:
 
 networks:
-  poo:
+  network:
