@@ -1,5 +1,9 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import UserComponent from "../components/UserComponent.vue";
+</script>
 
 <template>
-  <main></main>
+  <main>
+    <UserComponent />
+  </main>
 </template>
