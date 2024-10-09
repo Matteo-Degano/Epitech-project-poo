@@ -5,7 +5,7 @@ defmodule Api.Clocking.Clocks do
   schema "clocks" do
     field :status, :boolean, default: false
     field :time, :naive_datetime
-    field :user, :id
+    field :users, :id
 
     timestamps(type: :utc_datetime)
   end
