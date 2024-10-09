@@ -1,0 +1,24 @@
+meta {
+  name: Update user
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://localhost:4000/api/users/:id
+  body: json
+  auth: none
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "user": {
+      "username": "johndoe",
+      "email": "john@doe.com"
+    }
+  }
+}
