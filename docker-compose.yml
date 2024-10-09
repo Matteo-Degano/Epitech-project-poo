@@ -51,13 +51,9 @@ services:
     ports:
       - "5000:8080"
     environment:
-      - ADMINER_DESIGN=pepa-linha
-    ports:
-      - "8080:8080"
-    depends_on:
-      - database
-    networks:
-      - network
+      SWAGGER_JSON: /swagger/swagger.yaml
+    volumes:
+      - ./docs/swagger.yaml:/swagger/swagger.yaml
 
 volumes:
   db_data:
