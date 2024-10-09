@@ -64,7 +64,7 @@ services:
     environment:
       SWAGGER_JSON: /swagger/swagger.yaml
     volumes:
-      - ./api-docs/swagger.yaml:/swagger/swagger.yaml
+      - ./docs/swagger.yaml:/swagger/swagger.yaml
 
 volumes:
   db_data:
