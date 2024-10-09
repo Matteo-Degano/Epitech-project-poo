@@ -21,7 +21,7 @@ defmodule ApiWeb.ClocksController do
   end
 
   def show(conn, %{"userId" => user}) do
-    clocks = Clocking.get_clocks!(id)
+    clocks = Clocking.get_clocks!(user)
     render(conn, :show, clocks: clocks)
   end
 end
