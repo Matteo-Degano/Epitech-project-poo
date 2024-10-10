@@ -1,9 +1,9 @@
-defmodule Todolist.MixProject do
+defmodule Api.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :bootstrap,
+      app: :api,
       version: "0.1.0",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -18,7 +18,7 @@ defmodule Todolist.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {Todolist.Application, []},
+      mod: {Api.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end
@@ -34,18 +34,21 @@ defmodule Todolist.MixProject do
     [
       {:phoenix, "~> 1.7.14"},
       {:phoenix_ecto, "~> 4.5"},
+      {:phoenix_html, "~> 4.1.1"},
+      {:phoenix_view, "~> 2.0.4"},
+      # {:phoenix_live_view, "~> 0.20.17"},
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
-      {:heroicons,
-       github: "tailwindlabs/heroicons",
-       tag: "v2.1.1",
-       sparse: "optimized",
-       app: false,
-       compile: false,
-       depth: 1},
+      # {:heroicons,
+      #  github: "tailwindlabs/heroicons",
+      #  tag: "v2.1.1",
+      #  sparse: "optimized",
+      #  app: false,
+      #  compile: false,
+      #  depth: 1},
       {:swoosh, "~> 1.5"},
       {:finch, "~> 0.13"},
       {:telemetry_metrics, "~> 1.0"},
@@ -70,10 +73,10 @@ defmodule Todolist.MixProject do
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["tailwind bootstrap", "esbuild bootstrap"],
+      "assets.build": ["tailwind api", "esbuild api"],
       "assets.deploy": [
-        "tailwind bootstrap --minify",
-        "esbuild bootstrap --minify",
+        "tailwind api --minify",
+        "esbuild api --minify",
         "phx.digest"
       ]
     ]

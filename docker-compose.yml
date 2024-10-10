@@ -1,0 +1,74 @@
+services:
+  database:
+    image: postgres:latest
+    container_name: db
+    env_file:
+      - ./backend/.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - database
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./backend:/app
+    networks:
+      - network
+
+  adminer:
+    container_name: adminer
+    image: adminer
+    environment:
+      - ADMINER_DESIGN=pepa-linha
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database
+    networks:
+      - network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+     - network
+
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: swagger-ui
+    depends_on:
+      - backend
+    ports:
+      - "5001:8080"
+    environment:
+      SWAGGER_JSON: /swagger/swagger.yaml
+    volumes:
+      - ./docs/swagger.yaml:/swagger/swagger.yaml
+
+volumes:
+  db_data:
+  node_modules:
+
+networks:
+  network:
