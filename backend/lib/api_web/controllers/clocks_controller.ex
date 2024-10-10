@@ -27,7 +27,10 @@ defmodule ApiWeb.ClocksController do
 
   # Get clockings by user
   def show(conn, %{"user" => user}) do
-    clocks = Clocking.get_clocks_by_user(user)
+    case clocks = Clocking.get_clocks_by_user(user) do
+      [] -> send_resp(conn, :not_found, "No clockings found for user")
+      clocks -> render(conn, :index, clocks: clocks)
+    end
     render(conn, :index, clocks: clocks)
   end
 end
