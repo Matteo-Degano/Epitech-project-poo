@@ -7,20 +7,19 @@ export async function fetchData(
     const response = await fetch(`/api${endpoint}`, {
       method,
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
-      body: method !== "GET" ? JSON.stringify(body) : null,
-    });
+      body: method !== "GET" ? JSON.stringify(body) : null
+    })
 
-    const json = await response.json();
-    
-    return { 
-      "data" : json.data,
-      "status": response.status,
-    } 
+    const json = await response.json()
 
+    return {
+      data: json.data,
+      status: response.status
+    }
   } catch (error) {
-    console.error("Fetch error:", error);
-    throw error;
+    console.error("Fetch error:", error)
+    throw error
   }
 }

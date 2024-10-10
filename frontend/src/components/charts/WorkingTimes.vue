@@ -1,27 +1,28 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed } from "vue"
 
 // Define the userId prop
 const props = defineProps<{
-  userId?: number;
-}>();
+  userId?: number
+}>()
 
 // Chart options
 const options = {
   chart: {
-    id: 'working-times',
+    id: "working-times"
   },
   xaxis: {
     categories: ["1/01", "2/01", "3/01", "4/01", "5/01"]
   }
-};
+}
 
 // Use a computed property to update the series dynamically
-const series = computed(() => [{
-  name: props.userId || 'default user',
-  data: [7.30, 7.30, 7, 8, 6]
-}]);
-
+const series = computed(() => [
+  {
+    name: props.userId || "default user",
+    data: [7.3, 7.3, 7, 8, 6]
+  }
+])
 </script>
 
 <template>
