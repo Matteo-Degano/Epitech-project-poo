@@ -12,6 +12,16 @@ const lastRecord = ref("00:00:00");
 let pausedTime = 0;
 
 async function refresh() {
+
+  const userStore = useUserStore()
+
+  const now = new Date();
+  const currentDate = now.toISOString().split('T')[0]; 
+  const formattedTime = time.value;
+
+  const dateTimeString = `${currentDate} ${formattedTime}`;
+  await fetchData("POST", `/clocks/${userStore.userId}`, {time: dateTimeString})
+
   if (interval) {
     clearInterval(interval);
     interval = null;
@@ -22,10 +32,6 @@ async function refresh() {
   time.value = "00:00:00";
   clockIn.value = false;
   pausedTime = 0;
-
-  const userStore = useUserStore()
-  const response: APIResponse = await fetchData("POST", `/clocks/${userStore.userId}`, time)
-  console.log(response)
 }
 
 function clock() {

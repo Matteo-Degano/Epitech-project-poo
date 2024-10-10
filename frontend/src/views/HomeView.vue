@@ -13,4 +13,5 @@ import WorkingTime from "@/components/charts/WorkingTime.vue"
       <div class="row-span-2 border border-black"><WorkingTimes /></div>
       <div class="row-span-2 border border-black"><WorkingTime /></div>
     </div>
+    </main>
 </template>
