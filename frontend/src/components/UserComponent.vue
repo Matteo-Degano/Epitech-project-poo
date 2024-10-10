@@ -2,11 +2,10 @@
 import { ref } from "vue"
 import { fetchData } from "@/services/api"
 import { User } from "lucide-vue-next"
+import { useUserStore } from "@/stores/user"
 import type { APIResponse } from "@/types/api.type"
 
-const props = defineProps<{
-  setUserId: (id: number) => void
-}>()
+const userStore = useUserStore()
 
 // Utilisateur actuel
 const user = ref({ id: 0, username: "null", email: "null" })
@@ -25,8 +24,7 @@ async function getUser() {
   }
   const response: APIResponse = await fetchData("GET", "/users/" + user.value.id)
   user.value = response.data
-  console.log(response)
-  props.setUserId(user.value.id)
+  userStore.setUser(user.value.id, user.value.username, user.value.email)
   mode.value = "view"
 }
 
@@ -36,6 +34,7 @@ async function saveUser() {
   const method = mode.value === "create" ? "POST" : "PUT"
   const response: APIResponse = await fetchData(method, url, { user: userForm.value })
   user.value = response.data
+  userStore.setUserId(user.value.id)
   mode.value = "view"
 }
 
@@ -65,7 +64,7 @@ function toggleMode(newMode: string) {
 </script>
 
 <template>
-  <div class="bg-white p-6 rounded-lg shadow-sm max-w-md mx-auto">
+  <div class="bg-white p-6 rounded-lg w-full h-full">
     <div class="flex items-center gap-2 mb-4">
       <User class="w-5 h-5 text-gray-500" />
       <h1 class="font-medium text-lg text-gray-800">Vous êtes connecté en tant que :</h1>

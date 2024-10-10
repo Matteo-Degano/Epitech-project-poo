@@ -7,10 +7,10 @@ const userStore = useUserStore()
 // Chart options
 const options = {
   chart: {
-    id: "working-times"
+    id: "working-time"
   },
   xaxis: {
-    categories: ["1/01", "2/01", "3/01", "4/01", "5/01"]
+    categories: ["1/01"]
   }
 }
 
@@ -18,7 +18,7 @@ const options = {
 const series = computed(() => [
   {
     name: userStore.userId || "default user",
-    data: [7.3, 7.3, 7, 8, 6]
+    data: [7.3]
   }
 ])
 </script>
@@ -26,7 +26,7 @@ const series = computed(() => [
 <template>
   <div class="flex flex-col gap-6 p-6">
     <div class="flex flex-col">
-      <h2>Working Times</h2>
+      <h2>Working Time</h2>
       <p>User ID: {{ userStore.userId }}</p>
     </div>
     <div class="">
