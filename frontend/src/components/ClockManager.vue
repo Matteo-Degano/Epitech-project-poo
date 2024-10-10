@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { ref, onBeforeUnmount } from 'vue';
+import { fetchData } from "@/services/api"
+import { User } from "lucide-vue-next"
+import { useUserStore } from "@/stores/user"
+import type { APIResponse } from "@/types/api.type"
 
 const time = ref("00:00:00");
 const clockIn = ref(false);
@@ -7,7 +11,7 @@ let interval: ReturnType<typeof setInterval> | null = null;
 const lastRecord = ref("00:00:00");
 let pausedTime = 0;
 
-function refresh() {
+async function refresh() {
   if (interval) {
     clearInterval(interval);
     interval = null;
@@ -18,6 +22,10 @@ function refresh() {
   time.value = "00:00:00";
   clockIn.value = false;
   pausedTime = 0;
+
+  const userStore = useUserStore()
+  const response: APIResponse = await fetchData("POST", `/clocks/${userStore.userId}`, time)
+  console.log(response)
 }
 
 function clock() {
@@ -55,93 +63,134 @@ onBeforeUnmount(() => {
 
 <template>
   <div id="clock" class="greetings">
-    <div class="clock-content">
+    <div :class="['clock-content', { 'clock-active': clockIn }]">
       <h1>{{ time }}</h1>
       <p class="last-record">Last record: {{ lastRecord }}</p>
     </div>
     <div class="button-content">
       <button v-if="!clockIn" @click="clock" class="button-clock button-start-pause">Start</button>
-      <button v-if="clockIn" @click="pause" class="button-clock button-start-pause">Pause</button>
-      <button @click="refresh" class="button-clock button-stop">Stop</button>
+      <button v-if="clockIn" @click="pause" :class="['button-clock', clockIn ? 'button-pause-active' : 'button-start-pause']">Pause</button>
+      <button @click="refresh" :class="['button-clock', clockIn ? 'button-stop-active' : 'button-stop']">Stop</button>
     </div>
   </div>
 </template>
-
 
 <style scoped>
 
 #clock{
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
 }
 
-.button-clock{
-  color: #fff;
+.button-clock {
+  color: #1f2937;
   width: 80px;
   height: 80px;
   border-radius: 80px;
-  border: 2px solid #00ffcc;
+  border: 2px solid #999999; 
   box-shadow: 
-    0 0 5px rgba(0, 255, 204, 0.5),  
-    0 0 15px rgba(0, 255, 204, 0.3), 
-    0 0 30px rgba(0, 255, 204, 0.1);
+    0 0 5px rgba(153, 153, 153, 0.5),  
+    0 0 15px rgba(153, 153, 153, 0.3), 
+    0 0 30px rgba(153, 153, 153, 0.1); 
   transition: box-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
-  background-color: #222;
+  background-color: #f3f4f6;
 }
 
 .button-start-pause {
-  border: 2px solid #00ffcc;
+  border: 2px solid #999999; 
   box-shadow: 
-    0 0 10px rgba(0, 255, 204, 0.5), 
-    0 0 25px rgba(0, 255, 204, 0.3), 
-    0 0 50px rgba(0, 255, 204, 0.1);
+    0 0 10px rgba(153, 153, 153, 0.5), 
+    0 0 25px rgba(153, 153, 153, 0.3), 
+    0 0 50px rgba(153, 153, 153, 0.1); 
 }
 
 .button-start-pause:hover {
- box-shadow: 
-    0 0 10px rgba(0, 255, 204, 0.7), 
-    0 0 25px rgba(0, 255, 204, 0.5), 
-    0 0 50px rgba(0, 255, 204, 0.3);
+  box-shadow: 
+    0 0 10px rgba(153, 153, 153, 0.7), 
+    0 0 25px rgba(153, 153, 153, 0.5), 
+    0 0 50px rgba(153, 153, 153, 0.3);
 }
 
 .button-stop {
-  border: 2px solid #ff0044;
+  border: 2px solid #999999; 
   box-shadow: 
-    0 0 5px rgba(255, 0, 68, 0.5),  
-    0 0 15px rgba(255, 0, 68, 0.3), 
-    0 0 30px rgba(255, 0, 68, 0.1);
+    0 0 10px rgba(153, 153, 153, 0.5), 
+    0 0 25px rgba(153, 153, 153, 0.3), 
+    0 0 50px rgba(153, 153, 153, 0.1);
 }
 
 .button-stop:hover {
   box-shadow: 
-    0 0 10px rgba(255, 0, 68, 0.7), 
-    0 0 20px rgba(255, 0, 68, 0.5), 
-    0 0 40px rgba(255, 0, 68, 0.3);
+    0 0 10px rgba(153, 153, 153, 0.7), 
+    0 0 25px rgba(153, 153, 153, 0.5), 
+    0 0 50px rgba(153, 153, 153, 0.3);
 }
 
-.clock-content{
+.button-stop-active {
+  border: 2px solid #00ccff; 
+  box-shadow: 
+    0 0 10px rgba(0, 204, 255, 0.5), 
+    0 0 25px rgba(0, 204, 255, 0.3), 
+    0 0 50px rgba(0, 204, 255, 0.1); 
+}
+
+.button-stop-active:hover {
+  box-shadow: 
+    0 0 10px rgba(0, 204, 255, 0.7), 
+    0 0 25px rgba(0, 204, 255, 0.5), 
+    0 0 50px rgba(0, 204, 255, 0.3);
+}
+
+.button-pause-active {
+  border: 2px solid #00ccff; 
+  box-shadow: 
+    0 0 5px rgba(0, 204, 255, 0.5),  
+    0 0 15px rgba(0, 204, 255, 0.3), 
+    0 0 30px rgba(0, 204, 255, 0.1); 
+  background-color: #f3f4f6;
+}
+
+.button-pause-active:hover {
+  box-shadow: 
+    0 0 10px rgba(0, 204, 255, 0.7), 
+    0 0 25px rgba(0, 204, 255, 0.5), 
+    0 0 50px rgba(0, 204, 255, 0.3);
+}
+
+.clock-content {
   width: 250px;
   height: 250px;
   border-radius: 250px;
-  border: 2px solid #00ffcc;
+  border: 2px solid #999999;
   box-shadow: 
-    0 0 10px rgba(0, 255, 204, 0.5), 
-    0 0 25px rgba(0, 255, 204, 0.3), 
-    0 0 50px rgba(0, 255, 204, 0.1);
-  transition: box-shadow 0.3s ease-in-out;
+    0 0 10px rgba(153, 153, 153, 0.5), 
+    0 0 25px rgba(153, 153, 153, 0.3), 
+    0 0 50px rgba(153, 153, 153, 0.1); 
+  transition: box-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background-color: #222;
+  background-color: #f3f4f6;
+}
+
+.clock-active {
+  border: 2px solid #00ccff; 
+  box-shadow: 
+    0 0 10px rgba(0, 204, 255, 0.5), 
+    0 0 25px rgba(0, 204, 255, 0.3), 
+    0 0 50px rgba(0, 204, 255, 0.1); 
 }
 
 h1 {
   font-size: 24pt;
-  color: #fff;
+  color: #1f2937;
 }
 
-.button-content{
+.button-content {
   width: 250px;
   display: flex;
   justify-content: space-around;
@@ -150,14 +199,7 @@ h1 {
 
 .last-record {
   font-size: 12pt;
-  color: #fff;
-}
-
-.button-content{
-  width: 250px;
-  display: flex;
-  justify-content: space-around;
-  margin-top: -50px;
+  color: #1f2937;
 }
 
 .greetings h1 {
@@ -169,4 +211,5 @@ h1 {
     text-align: left;
   }
 }
+
 </style>
