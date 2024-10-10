@@ -7,13 +7,15 @@ defmodule ApiWeb.ClocksController do
 
   action_fallback ApiWeb.FallbackController
 
+  # List all clockings
   def index(conn, _params) do
     clocks = Clocking.list_clocks()
     render(conn, :index, clocks: clocks)
   end
 
-  def create(conn, %{"status" => status, "time" => time}) do
-    clocks_params = %{"user" => conn.params["user"], "status" => status, "time" => time}
+  # Create a clocking entry
+  def create(conn, %{"time" => time}) do
+    clocks_params = %{"user" => conn.params["user"], "status" => true, "time" => time}
 
     with {:ok, %Clocks{} = clocks} <- Clocking.create_clocks(clocks_params) do
       conn
@@ -23,7 +25,9 @@ defmodule ApiWeb.ClocksController do
     end
   end
 
+  # Get clockings by user
   def show(conn, %{"user" => user}) do
-    clocks = Clocking.get_clocks!(user)
+    clocks = Clocking.get_clocks_by_user(user)
+    render(conn, :index, clocks: clocks)
   end
 end
