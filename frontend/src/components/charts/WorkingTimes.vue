@@ -3,7 +3,7 @@ import { computed } from 'vue';
 
 // Define the userId prop
 const props = defineProps<{
-  userId?: string;
+  userId?: number;
 }>();
 
 // Chart options

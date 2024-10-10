@@ -12,11 +12,13 @@ export async function fetchData(
       body: method !== "GET" ? JSON.stringify(body) : null,
     });
 
-    if (!response.ok) {
-      throw new Error(`Error: ${response.statusText}`);
-    }
+    const json = await response.json();
+    
+    return { 
+      "data" : json.data,
+      "status": response.status,
+    } 
 
-    return await response.json();
   } catch (error) {
     console.error("Fetch error:", error);
     throw error;
