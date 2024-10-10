@@ -1,8 +1,6 @@
 name: Runs frontend tests
 
 on:
-  push:
-    branches: [feat/poo15/ci-vitest]
   pull_request:
     branches: [dev]
 
