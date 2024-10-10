@@ -12,6 +12,6 @@ import WorkingTime from "@/components/charts/WorkingTime.vue"
       <div class="row-span-1 border border-black"></div>
       <div class="row-span-2 border border-black"><WorkingTimes /></div>
       <div class="row-span-2 border border-black"><WorkingTime /></div>
+      <div class="row-span-2 border border-black"><ClockManager /></div>
     </div>
-  </main>
 </template>
