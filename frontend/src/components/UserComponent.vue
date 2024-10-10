@@ -1,7 +1,12 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { fetchData } from '@/services/api';
 import { User } from 'lucide-vue-next';
+import type { APIResponse } from '@/types/api.type';
+
+const props = defineProps<{
+  setUserId: (id: number) => void;
+}>();
 
 // Utilisateur actuel
 const user = ref({ id: 0, username: 'null', email: 'null' });
@@ -18,8 +23,10 @@ async function getUser() {
         alert("Please enter an ID");
         return;
     }
-    const response = await fetchData("GET", "/users/" + user.value.id);
+    const response: APIResponse = await fetchData("GET", "/users/" + user.value.id);
     user.value = response.data;
+    console.log(response);
+    props.setUserId(user.value.id);
     mode.value = 'view'; 
 }
 
@@ -27,20 +34,20 @@ async function getUser() {
 async function saveUser() {
     const url = mode.value === 'create' ? "/users" : "/users/" + user.value.id;
     const method = mode.value === 'create' ? "POST" : "PUT";
-    const response = await fetchData(method, url, { user: userForm.value });
+    const response: APIResponse = await fetchData(method, url, { user: userForm.value });
     user.value = response.data;
     mode.value = 'view'; 
 }
 
 // DELETE un user
 async function deleteUser() {
-    const response = await fetchData("DELETE", "/users/" + user.value.id);
+    const response: APIResponse = await fetchData("DELETE", "/users/" + user.value.id);
     user.value = { id: 0, username: 'null', email: 'null' };
     mode.value = 'view';
 }
 
 // Toggle entre les modes vue (les infos quoi, et les boutons d'action), édition et création
-function toggleMode(newMode) {
+function toggleMode(newMode: string) {
     if(newMode === mode.value){
         mode.value = 'view';
         return;
