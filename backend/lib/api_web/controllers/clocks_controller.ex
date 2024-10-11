@@ -14,8 +14,8 @@ defmodule ApiWeb.ClocksController do
   end
 
   # Create a clocking entry
-  def create(conn, %{"time" => time}) do
-    clocks_params = %{"user" => conn.params["user"], "status" => true, "time" => time}
+  def create(conn, %{"time" => time, "status" => status}) do
+    clocks_params = %{"user" => conn.params["user"], "status" => status, "time" => time}
 
     with {:ok, %Clocks{} = clocks} <- Clocking.create_clocks(clocks_params) do
       conn
