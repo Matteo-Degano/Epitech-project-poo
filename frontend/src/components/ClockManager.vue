@@ -34,10 +34,11 @@ async function refresh() {
 }
 
 async function clock() {
+  const userStore = useUserStore()
   if (clockIn.value) return;
+  if(userStore.userId === 0) return;
   clockIn.value = true;
   const startDateTime = new Date().getTime() - pausedTime; 
-  const userStore = useUserStore()
   const dateNow = new Date().toISOString();
   startTime = new Date().toISOString();
   await fetchData("POST", `/clocks/${userStore.userId}`, {time: dateNow, status: clockIn.value})
@@ -79,155 +80,43 @@ function formatDate(timestamp: number): string {
 </script>
 
 <template>
-  <div id="clock" class="greetings">
-    <div :class="['clock-content', { 'clock-active': clockIn }]">
-      <p>{{ formatDate(Date.now()) }}</p>
-      <h1>{{ time }}</h1>
-      <p class="last-record">Last record: {{ lastRecord }}</p>
+  <div class="flex flex-col justify-center items-center p-2.5">
+    <div :class="['w-64 h-64 rounded-full flex flex-col justify-center items-center bg-gray-100 transition-all duration-300', {'custom-border shadow-md-custom': clockIn, 'border-2 border-gray-400 shadow-md': !clockIn}]">
+      <p class="text-gray-800">{{ formatDate(Date.now()) }}</p>
+      <h1 class="text-3xl text-gray-800">{{ time }}</h1>
+      <p class="text-lg text-gray-800">Last record: {{ lastRecord }}</p>
     </div>
-    <div class="button-content">
-      <button v-if="!clockIn" @click="clock" class="button-clock button-start-pause">Start</button>
-      <button v-if="clockIn" @click="pause" :class="['button-clock', clockIn ? 'button-pause-active' : 'button-start-pause']">Pause</button>
-      <button @click="refresh" :class="['button-clock', clockIn ? 'button-stop-active' : 'button-stop']">Stop</button>
+    <div class="flex justify-around w-64" style="margin-top: -50px;">
+      <button 
+        v-if="!clockIn" 
+        @click="clock"
+        class="w-20 h-20 rounded-full border-2 border-gray-400 bg-gray-100 shadow-md transition-shadow duration-300 hover:bg-gray-300 hover:shadow-lg text-gray-800 cursor-pointer">
+        Start
+      </button>
+      <button 
+        v-if="clockIn" 
+        @click="pause"
+        :class="['w-20 h-20 rounded-full bg-gray-100 text-gray-800 cursor-pointer hover:bg-gray-300', clockIn ? 'custom-border shadow-md-custom' : 'border-gray-400 shadow-md hover:shadow-lg']">
+        Pause
+      </button>
+      <button 
+        @click="refresh"
+        :class="['w-20 h-20 rounded-full bg-gray-100 text-gray-800 cursor-pointer hover:bg-gray-300', clockIn ? 'custom-border shadow-md-custom' : 'border-2 border-gray-400 shadow-md hover:shadow-lg']">
+        Stop
+      </button>
     </div>
   </div>
 </template>
 
-<style scoped>
-
-#clock{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 10px;
-}
-
-.button-clock {
-  color: #1f2937;
-  width: 80px;
-  height: 80px;
-  border-radius: 80px;
-  border: 2px solid #999999; 
-  box-shadow: 
-    0 0 5px rgba(153, 153, 153, 0.5),  
-    0 0 15px rgba(153, 153, 153, 0.3), 
-    0 0 30px rgba(153, 153, 153, 0.1); 
-  transition: box-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
-  background-color: #f3f4f6;
-}
-
-.button-start-pause {
-  border: 2px solid #999999; 
-  box-shadow: 
-    0 0 10px rgba(153, 153, 153, 0.5), 
-    0 0 25px rgba(153, 153, 153, 0.3), 
-    0 0 50px rgba(153, 153, 153, 0.1); 
-}
-
-.button-start-pause:hover {
-  box-shadow: 
-    0 0 10px rgba(153, 153, 153, 0.7), 
-    0 0 25px rgba(153, 153, 153, 0.5), 
-    0 0 50px rgba(153, 153, 153, 0.3);
-}
-
-.button-stop {
-  border: 2px solid #999999; 
-  box-shadow: 
-    0 0 10px rgba(153, 153, 153, 0.5), 
-    0 0 25px rgba(153, 153, 153, 0.3), 
-    0 0 50px rgba(153, 153, 153, 0.1);
-}
-
-.button-stop:hover {
-  box-shadow: 
-    0 0 10px rgba(153, 153, 153, 0.7), 
-    0 0 25px rgba(153, 153, 153, 0.5), 
-    0 0 50px rgba(153, 153, 153, 0.3);
-}
-
-.button-stop-active {
-  border: 2px solid #00ccff; 
+<style>
+.shadow-md-custom {
   box-shadow: 
     0 0 10px rgba(0, 204, 255, 0.5), 
     0 0 25px rgba(0, 204, 255, 0.3), 
     0 0 50px rgba(0, 204, 255, 0.1); 
 }
 
-.button-stop-active:hover {
-  box-shadow: 
-    0 0 10px rgba(0, 204, 255, 0.7), 
-    0 0 25px rgba(0, 204, 255, 0.5), 
-    0 0 50px rgba(0, 204, 255, 0.3);
+.custom-border {
+  border: 2px solid #00ccff;
 }
-
-.button-pause-active {
-  border: 2px solid #00ccff; 
-  box-shadow: 
-    0 0 5px rgba(0, 204, 255, 0.5),  
-    0 0 15px rgba(0, 204, 255, 0.3), 
-    0 0 30px rgba(0, 204, 255, 0.1); 
-  background-color: #f3f4f6;
-}
-
-.button-pause-active:hover {
-  box-shadow: 
-    0 0 10px rgba(0, 204, 255, 0.7), 
-    0 0 25px rgba(0, 204, 255, 0.5), 
-    0 0 50px rgba(0, 204, 255, 0.3);
-}
-
-.clock-content {
-  width: 250px;
-  height: 250px;
-  border-radius: 250px;
-  border: 2px solid #999999;
-  box-shadow: 
-    0 0 10px rgba(153, 153, 153, 0.5), 
-    0 0 25px rgba(153, 153, 153, 0.3), 
-    0 0 50px rgba(153, 153, 153, 0.1); 
-  transition: box-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  background-color: #f3f4f6;
-}
-
-.clock-active {
-  border: 2px solid #00ccff; 
-  box-shadow: 
-    0 0 10px rgba(0, 204, 255, 0.5), 
-    0 0 25px rgba(0, 204, 255, 0.3), 
-    0 0 50px rgba(0, 204, 255, 0.1); 
-}
-
-h1 {
-  font-size: 24pt;
-  color: #1f2937;
-}
-
-.button-content {
-  width: 250px;
-  display: flex;
-  justify-content: space-around;
-  margin-top: -40px;
-}
-
-p, .last-record {
-  font-size: 12pt;
-  color: #1f2937;
-}
-
-.greetings h1 {
-  text-align: center;
-}
-
-@media (min-width: 1024px) {
-  .greetings h1 {
-    text-align: left;
-  }
-}
-
 </style>
