@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { ref, onBeforeUnmount } from 'vue';
 import { fetchData } from "@/services/api"
-import { User } from "lucide-vue-next"
 import { useUserStore } from "@/stores/user"
-import type { APIResponse } from "@/types/api.type"
 
 const time = ref("00:00:00");
 const clockIn = ref(false);
@@ -12,15 +10,7 @@ const lastRecord = ref("00:00:00");
 let pausedTime = 0;
 
 async function refresh() {
-
-  const userStore = useUserStore()
-
-  const now = new Date();
-  const currentDate = now.toISOString().split('T')[0]; 
-  const formattedTime = time.value;
-
-  const dateTimeString = `${currentDate} ${formattedTime}`;
-  await fetchData("POST", `/clocks/${userStore.userId}`, {time: dateTimeString})
+  clockIn.value = false;
 
   if (interval) {
     clearInterval(interval);
@@ -32,12 +22,18 @@ async function refresh() {
   time.value = "00:00:00";
   clockIn.value = false;
   pausedTime = 0;
+
+  const userStore = useUserStore()
+  await fetchData("POST", `/clocks/${userStore.userId}`, {time: Date.now(), status: clockIn.value})
 }
 
-function clock() {
+async function clock() {
   if (clockIn.value) return;
   clockIn.value = true;
   const startDateTime = new Date().getTime() - pausedTime; 
+
+  const userStore = useUserStore()
+  await fetchData("POST", `/clocks/${userStore.userId}`, {time: Date.now(), status: clockIn.value})
 
   interval = setInterval(() => {
     const currentTime = new Date().getTime();
@@ -65,11 +61,20 @@ onBeforeUnmount(() => {
     clearInterval(interval);
   }
 });
+
+function formatDate(timestamp: number): string {
+  const date = new Date(timestamp);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+}
 </script>
 
 <template>
   <div id="clock" class="greetings">
     <div :class="['clock-content', { 'clock-active': clockIn }]">
+      <p>{{ formatDate(Date.now()) }}</p>
       <h1>{{ time }}</h1>
       <p class="last-record">Last record: {{ lastRecord }}</p>
     </div>
@@ -203,7 +208,7 @@ h1 {
   margin-top: -40px;
 }
 
-.last-record {
+p, .last-record {
   font-size: 12pt;
   color: #1f2937;
 }
