@@ -23,8 +23,9 @@ async function refresh() {
   clockIn.value = false;
   pausedTime = 0;
 
+  const dateNow = new Date().toISOString();
   const userStore = useUserStore()
-  await fetchData("POST", `/clocks/${userStore.userId}`, {time: Date.now(), status: clockIn.value})
+  await fetchData("POST", `/clocks/${userStore.userId}`, {time: dateNow, status: clockIn.value})
 }
 
 async function clock() {
@@ -33,7 +34,8 @@ async function clock() {
   const startDateTime = new Date().getTime() - pausedTime; 
 
   const userStore = useUserStore()
-  await fetchData("POST", `/clocks/${userStore.userId}`, {time: Date.now(), status: clockIn.value})
+  const dateNow = new Date().toISOString();
+  await fetchData("POST", `/clocks/${userStore.userId}`, {time: dateNow, status: clockIn.value})
 
   interval = setInterval(() => {
     const currentTime = new Date().getTime();
