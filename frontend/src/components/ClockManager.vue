@@ -5,11 +5,17 @@ import { useUserStore } from "@/stores/user"
 
 const time = ref("00:00:00");
 const clockIn = ref(false);
+let startTime: string;
+let endTime: string;
 let interval: ReturnType<typeof setInterval> | null = null;
 const lastRecord = ref("00:00:00");
 let pausedTime = 0;
 
 async function refresh() {
+  const userStore = useUserStore()
+  endTime = new Date().toISOString();
+  // TODO: Send working time to backend
+  // await fetchData("POST", `/workingtime/${userStore.userId}`, {workingtime: {start: startTime, end: endTime}})
   clockIn.value = false;
 
   if (interval) {
@@ -24,7 +30,6 @@ async function refresh() {
   pausedTime = 0;
 
   const dateNow = new Date().toISOString();
-  const userStore = useUserStore()
   await fetchData("POST", `/clocks/${userStore.userId}`, {time: dateNow, status: clockIn.value})
 }
 
@@ -32,9 +37,9 @@ async function clock() {
   if (clockIn.value) return;
   clockIn.value = true;
   const startDateTime = new Date().getTime() - pausedTime; 
-
   const userStore = useUserStore()
   const dateNow = new Date().toISOString();
+  startTime = new Date().toISOString();
   await fetchData("POST", `/clocks/${userStore.userId}`, {time: dateNow, status: clockIn.value})
 
   interval = setInterval(() => {
