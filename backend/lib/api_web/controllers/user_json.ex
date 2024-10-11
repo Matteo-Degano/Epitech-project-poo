@@ -19,7 +19,9 @@ defmodule ApiWeb.UserJSON do
     %{
       id: user.id,
       username: user.username,
-      email: user.email
+      email: user.email,
+      team: user.team,
+      role: user.role,
     }
   end
 end
