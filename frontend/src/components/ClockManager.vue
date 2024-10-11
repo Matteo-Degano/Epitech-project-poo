@@ -14,8 +14,7 @@ let pausedTime = 0;
 async function refresh() {
   const userStore = useUserStore()
   endTime = new Date().toISOString();
-  // TODO: Send working time to backend
-  // await fetchData("POST", `/workingtime/${userStore.userId}`, {workingtime: {start: startTime, end: endTime}})
+  await fetchData("POST", `/workingtime/${userStore.userId}`, {start: startTime, end: endTime})
   clockIn.value = false;
 
   if (interval) {
