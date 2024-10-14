@@ -52,9 +52,8 @@ watch(
 // Function to handle the submission (create or update)
 async function submitWorkingTime() {
   const requestData = {
-    date: selectedDate.value ? selectedDate.value.toDate(getLocalTimeZone()) : null,
-    start: timeRange.value.start,
-    end: timeRange.value.end
+    start: `${selectedDate.value ? (selectedDate.value.toDate()).toISOString().split('T')[0] : null}T${timeRange.value.start}:00Z`,
+    end: `${selectedDate.value ? (selectedDate.value.toDate()).toISOString().split('T')[0] : null}T${timeRange.value.end}:00Z` 
   }
 
   if (props.mode === "create") {
