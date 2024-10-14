@@ -29,6 +29,9 @@ defmodule ApiWeb.Router do
     # DELETE - Delete a working time entry
     delete "/workingtime/:id", WorkingtimeController, :delete
 
+    # TEST - Chartmanager get user charts
+    get "chartmanager/:userID", ChartManagerController, :show
+
     resources "/users", UserController, except: [:new, :edit]
   end
 

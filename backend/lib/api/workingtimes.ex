@@ -109,7 +109,7 @@ defmodule Api.Workingtimes do
   alias Api.Workingtimes.Workingtime
 
   def get_workingtime!(id), do: Repo.get!(Workingtime, id)
-  
+
   # Get all working times for a user with optional start and end dates
   def list_workingtimes_by_user(user_id, start_date \\ nil, end_date \\ nil) do
     query =
