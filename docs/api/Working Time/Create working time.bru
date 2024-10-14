@@ -1,0 +1,22 @@
+meta {
+  name: Create working time
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/workingtime/:user
+  body: json
+  auth: none
+}
+
+params:path {
+  user: 1
+}
+
+body:json {
+  {
+    "start": "2024-10-12 09:30:00",
+    "end": "2024-10-12 17:30:00"
+  }
+}

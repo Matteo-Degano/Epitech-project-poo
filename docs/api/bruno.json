@@ -8,6 +8,6 @@
   ],
   "presets": {
     "requestType": "http",
-    "requestUrl": "http://localhost:4000/api"
+    "requestUrl": "{{baseUrl}}/"
   }
 }
