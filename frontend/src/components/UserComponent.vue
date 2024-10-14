@@ -4,6 +4,7 @@ import { fetchData } from "@/services/api"
 import { User } from "lucide-vue-next"
 import { useUserStore } from "@/stores/user"
 import type { APIResponse } from "@/types/api.type"
+import NavigationMenu from '@/components/ui/navigationMenu/NavigationMenu.vue'
 
 const userStore = useUserStore()
 
@@ -64,6 +65,7 @@ function toggleMode(newMode: string) {
 </script>
 
 <template>
+  <NavigationMenu />
   <div class="bg-white p-6 rounded-lg w-full h-full">
     <div class="flex items-center gap-2 mb-4">
       <User class="w-5 h-5 text-gray-500" />

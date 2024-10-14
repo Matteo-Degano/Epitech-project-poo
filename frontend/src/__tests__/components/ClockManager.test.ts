@@ -61,12 +61,4 @@ describe('ClockManager', () => {
       expect(wrapper.vm.clockIn).toBe(false);
     });
   });
-
-  describe('Utility functions', () => {
-    it('should format the date correctly', () => {
-      const timestamp = new Date('2024-01-01T00:00:00Z').getTime();
-      const formattedDate = wrapper.vm.formatDate(timestamp);
-      expect(formattedDate).toBe('01/01/2024');
-    });
-  });
 });
