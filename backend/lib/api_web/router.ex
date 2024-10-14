@@ -2,34 +2,22 @@ defmodule ApiWeb.Router do
   use ApiWeb, :router
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug(:accepts, ["json"])
   end
 
   scope "/api", ApiWeb do
-    pipe_through :api
+    pipe_through(:api)
 
-    resources "/users", UserController, except: [:new, :edit]
+    resources("/users", UserController, except: [:new, :edit])
 
-    get "/clocks/:user", ClocksController, :show
+    get("workingtime/:user", WorkingtimeController, :index)
+    get("workingtime/:user/:id", WorkingtimeController, :show)
+    post("workingtime/:user", WorkingtimeController, :create)
+    put("workingtime/:id", WorkingtimeController, :update)
+    delete("workingtime/:id", WorkingtimeController, :delete)
 
-    post "/clocks/:user", ClocksController, :create
-
-        # GET (ALL) - Fetch all working time entries for a user
-    get "/workingtime/:userID", WorkingtimeController, :index
-
-    # GET (ONE) - Fetch a single working time entry
-    get "/workingtime/:userID/:id", WorkingtimeController, :show
-
-    # POST - Create a new working time entry
-    post "/workingtime/:userID", WorkingtimeController, :create
-
-    # PUT - Update a working time entry
-    put "/workingtime/:id", WorkingtimeController, :update
-
-    # DELETE - Delete a working time entry
-    delete "/workingtime/:id", WorkingtimeController, :delete
-
-    resources "/users", UserController, except: [:new, :edit]
+    get("/clocks/:user", ClocksController, :show)
+    post("/clocks/:user", ClocksController, :create)
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
@@ -42,10 +30,10 @@ defmodule ApiWeb.Router do
     import Phoenix.LiveDashboard.Router
 
     scope "/dev" do
-      pipe_through [:fetch_session, :protect_from_forgery]
+      pipe_through([:fetch_session, :protect_from_forgery])
 
-      live_dashboard "/dashboard", metrics: ApiWeb.Telemetry
-      forward "/mailbox", Plug.Swoosh.MailboxPreview
+      live_dashboard("/dashboard", metrics: ApiWeb.Telemetry)
+      forward("/mailbox", Plug.Swoosh.MailboxPreview)
     end
   end
 end

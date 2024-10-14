@@ -6,6 +6,11 @@ defmodule ApiWeb.UserController do
 
   action_fallback ApiWeb.FallbackController
 
+  def index(conn, %{"username" => username, "email" => email}) do
+    users = Users.list_users_by_username_and_email(username, email)
+    render(conn, :index, users: users)
+  end
+
   def index(conn, _params) do
     users = Users.list_users()
     render(conn, :index, users: users)

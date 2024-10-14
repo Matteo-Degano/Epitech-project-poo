@@ -3,9 +3,9 @@ defmodule Api.Workingtimes.Workingtime do
   import Ecto.Changeset
 
   schema "workingtimes" do
-    field :start, :utc_datetime
-    field :end, :utc_datetime
-    field :user_id, :integer
+    field(:start, :naive_datetime)
+    field(:end, :naive_datetime)
+    field(:user_id, :id)
 
     timestamps(type: :utc_datetime)
   end
@@ -14,6 +14,7 @@ defmodule Api.Workingtimes.Workingtime do
   def changeset(workingtime, attrs) do
     workingtime
     |> cast(attrs, [:start, :end, :user_id])
+    |> foreign_key_constraint(:user_id)
     |> validate_required([:start, :end, :user_id])
   end
 end

@@ -1,0 +1,16 @@
+meta {
+  name: Get working time
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/workingtime/:user/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  user: 2
+  id: 28
+}

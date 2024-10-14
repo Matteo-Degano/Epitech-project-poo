@@ -1,0 +1,20 @@
+meta {
+  name: Get working times
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/workingtime/:user?start=2024-10-11 09:30:00&end=2024-10-12 17:30:00
+  body: none
+  auth: none
+}
+
+params:query {
+  start: 2024-10-11 09:30:00
+  end: 2024-10-12 17:30:00
+}
+
+params:path {
+  user: 1
+}
