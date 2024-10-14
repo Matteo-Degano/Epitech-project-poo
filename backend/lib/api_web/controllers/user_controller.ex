@@ -16,7 +16,9 @@ defmodule ApiWeb.UserController do
     render(conn, :index, users: users)
   end
 
-  def create(conn, %{"user" => user_params}) do
+  def create(conn, %{"username" => username, "email" => email, "role" => role, "team" => team}) do
+    user_params = %{"username"=> username, "email" => email, "role" => role, "team" => team}
+
     with {:ok, %User{} = user} <- Users.create_user(user_params) do
       conn
       |> put_status(:created)
@@ -30,8 +32,9 @@ defmodule ApiWeb.UserController do
     render(conn, :show, user: user)
   end
 
-  def update(conn, %{"id" => id, "user" => user_params}) do
+  def update(conn, %{"id" => id, "username" => username, "email" => email, "role" => role, "team" => team}) do
     user = Users.get_user!(id)
+    user_params = %{"username" => username, "email" => email, "role" => role, "team" => team}
 
     with {:ok, %User{} = user} <- Users.update_user(user, user_params) do
       render(conn, :show, user: user)

@@ -10,12 +10,14 @@ defmodule ApiWeb.Router do
 
     resources("/users", UserController, except: [:new, :edit])
 
-    # resources("/workingtime", WorkingtimeController, except: [:new, :edit])
     get("workingtime/:user", WorkingtimeController, :index)
     get("workingtime/:user/:id", WorkingtimeController, :show)
     post("workingtime/:user", WorkingtimeController, :create)
     put("workingtime/:id", WorkingtimeController, :update)
     delete("workingtime/:id", WorkingtimeController, :delete)
+
+    get("/clocks/:user", ClocksController, :show)
+    post("/clocks/:user", ClocksController, :create)
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

@@ -1,11 +1,21 @@
-import './assets/main.css'
+import "./assets/main.css"
+import { createApp } from "vue"
+import App from "./App.vue"
+import router from "./router"
+import VueApexCharts from "vue3-apexcharts"
+import { createPinia } from "pinia"
+import "vuetify/styles"
 
-import { createApp } from 'vue'
-import App from './App.vue'
-import router from './router'
-
+// Create the app instance
 const app = createApp(App)
 
-app.use(router)
+// Create Pinia instance for the store
+const pinia = createPinia()
 
-app.mount('#app')
+// Use the necessary plugins
+app.use(router)
+app.use(pinia)
+app.use(VueApexCharts)
+
+// Mount the app
+app.mount("#app")
