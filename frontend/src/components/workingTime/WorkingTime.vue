@@ -21,6 +21,8 @@ const props = defineProps({
   data: Object // Working time data when updating
 })
 
+console.log(props.data)
+
 const emit = defineEmits(["close"])
 
 // Modal visibility state
@@ -29,8 +31,8 @@ const isModalOpen = ref(false)
 // Reactive state for date and time range
 const selectedDate = ref(null) // Date picker state
 const timeRange = ref({
-  start: props.data?.start || "",
-  end: props.data?.end || ""
+  start: props.data?.start.split('T')[1].split('.')[0] || "",
+  end: props.data?.end.split('T')[1].split('.')[0] || ""
 })
 
 // DateFormatter to format the selected date
@@ -58,7 +60,7 @@ async function submitWorkingTime() {
 
   if (props.mode === "create") {
     // POST request for creating a new working time
-    await fetchData("POST", `/workingtime`, requestData)
+    await fetchData("POST", `/workingtime/`, requestData)
   } else {
     // PUT request for updating an existing working time
     await fetchData("PUT", `/workingtime/${props.data.id}`, requestData)
