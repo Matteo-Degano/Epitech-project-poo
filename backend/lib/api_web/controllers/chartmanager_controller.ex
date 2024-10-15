@@ -6,49 +6,56 @@ defmodule ApiWeb.ChartManagerController do
 
   # /!\ TOUS LES GRAPHIQUES ONT DES DATES DEBUT ET FIN DE 30 JOURS A PARTIR DE L'APPEL API PAR DEFAUT /!\
 
-  def show(conn, %{"userID" => userID}) do
+  def show(conn, %{"userID" => userID, "start" => start_date_str, "end" => end_date_str}) do
 
+    with {:ok, start_date, _} <- DateTime.from_iso8601(start_date_str),
+         {:ok, end_date, _} <- DateTime.from_iso8601(end_date_str) do
 
-    time_jump = 20
-    start_date = DateTime.utc_now() |> DateTime.add(-30 + time_jump, :day)
-    end_date = DateTime.utc_now() |> DateTime.add(time_jump, :day)
+      case Users.get_user!(userID) do
+        nil ->
+          conn
+          |> put_status(:notfound)
+          |> json(%{error: "Utilisateur non trouvé"})
 
-    case Users.get_user!(userID) do
-      nil ->
+        user ->
+          workingtime_params = %{
+            "user_id" => user.id,
+            "start" => DateTime.to_iso8601(start_date),
+            "end" => DateTime.to_iso8601(end_date)
+          }
+
+          workingtimes = Workingtimes.list_workingtimes_by_start_and_end(workingtime_params)
+
+          donut_chart_data = calc_donut_chart(start_date, end_date, workingtimes)
+          line_chart_data = calc_line_chart(workingtimes)
+
+          response = %{
+            start_date: DateTime.to_iso8601(start_date),
+            end_date: DateTime.to_iso8601(end_date),
+            total_days: Date.diff(end_date, start_date),
+            donut_chart: donut_chart_data,
+            line_chart: line_chart_data
+          }
+
+          conn
+          |> put_status(:ok)
+          |> json(response)
+      end
+    else
+      _ ->
         conn
-        |> put_status(:notfound)
-        |> json(%{error: "Utilisateur non trouvé"})
-      user ->
-
-        workingtime_params = %{
-          "user_id" => user.id,
-          "start" => DateTime.to_iso8601(start_date),
-          "end" => DateTime.to_iso8601(end_date)
-        }
-
-        workingtimes = Workingtimes.list_workingtimes_by_start_and_end(workingtime_params)
-
-        # IO.inspect(workingtimes)
-
-        donut_chart_data = calc_donut_chart(start_date, end_date, workingtimes)
-        line_chart_data = calc_line_chart(workingtimes)
-
-        response = %{
-          start_date: DateTime.to_iso8601(start_date),
-          end_date: DateTime.to_iso8601(end_date),
-          total_days: Date.diff(end_date, start_date),
-          donut_chart: donut_chart_data,
-          line_chart: line_chart_data
-        }
-
-        conn
-        |> put_status(:ok)
-        |> json(response)
-
+        |> put_status(:bad_request)
+        |> json(%{error: "Les dates doivent être au format ISO8601."})
     end
-
   end
 
+  def show(conn, %{"userID" => userID}) do
+
+    start_date = DateTime.utc_now() |> DateTime.add(-30, :day)
+    end_date = DateTime.utc_now()
+    show(conn, %{"userID" => userID, "start" => DateTime.to_iso8601(start_date), "end" => DateTime.to_iso8601(end_date)})
+
+  end
 
   # Calcule le temps travaillé par jour en secondes pour chaque jour de la période
   def calc_line_chart(workingtimes) do
@@ -71,14 +78,8 @@ defmodule ApiWeb.ChartManagerController do
 
   end
 
-  # Différente manière de calculer la présence de l'employé sur un mois :
-  # Passer toutes les dates une par une dans une fonction qui détermine si oui ou non l'employé était présent pour le jour correspondant à la date,
-  # puis additionner le nombre de jours où l'employé était présent et diviser par le nombre de jours dans le mois, SAUF qu'en faisant ça
-  # on part du principe qu'il n'atteindra jamais 100% de présence car il y a des jours où il ne travaille pas tels que les week-endet les jours fériés.
-  # donc il faudrait récupérer via une api les jours fériés et les week-end pour les soustraire du nombre de jours dans le mois.
-  # et bah, y'a du taff, mais c'est faisable.
-  # TODO: Implémenter la récupération des jours fériés pour améliorer la précision du calcul du ratio de présence de l'employé
 
+  # TODO: Implémenter la récupération des jours fériés pour améliorer la précision du calcul du ratio de présence de l'employé
   def calc_donut_chart(start_date, end_date, workingtimes) do
 
     # Ici c'est toutes les dates entre start_date et end_date
