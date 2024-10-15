@@ -17,6 +17,7 @@ import {
   TableRow
 } from "@/components/ui/table"
 import WorkingTime from "./WorkingTime.vue"
+import DeleteWorkingTimeModal from "./DeleteWorkingTimeModal.vue"
 
 // Define the structure of your working time
 type WorkingTimeType = {
@@ -29,7 +30,7 @@ type WorkingTimeType = {
 // Sample data
 const data: WorkingTimeType[] = reactive([
   {
-    id: 27,
+    id: 3,
     start: "2024-10-11T09:30:00",
     end: "2024-10-11T17:30:00",
     user_id: 1
@@ -148,9 +149,7 @@ async function deleteWorkingTime(id: number) {
               }}</TableCell>
               <TableCell class="flex gap-2">
                 <WorkingTime :mode="'update'" :data="row.original" />
-                <Button @click="deleteWorkingTime(row.original.id)" variant="destructive" size="sm"
-                  >Delete</Button
-                >
+                <DeleteWorkingTimeModal :id="row.original.id" :function="deleteWorkingTime"/>
               </TableCell>
             </TableRow>
           </TableBody>

@@ -61,6 +61,12 @@ const isSaveDisabled = computed(() => {
   return !selectedDate.value || !timeRange.value.start || !timeRange.value.end;
 });
 
+function clearInputs() {
+  selectedDate.value = null;
+  timeRange.value.start = "";
+  timeRange.value.end = "";
+}
+
 // Function to handle the submission (create or update)
 async function submitWorkingTime() {
   const requestData = {
@@ -70,12 +76,13 @@ async function submitWorkingTime() {
 
   if (props.mode === "create") {
     // POST request for creating a new working time
-    await fetchData("POST", `/workingtime/`, requestData)
+    await fetchData("POST", `/workingtime/1`, requestData)
   } else {
     // PUT request for updating an existing working time
     await fetchData("PUT", `/workingtime/${props.data.id}`, requestData)
   }
 
+  clearInputs()
   // Emit close event and close modal
   emit("close")
   isModalOpen.value = false
@@ -131,7 +138,7 @@ async function submitWorkingTime() {
       <!-- Dialog footer with save and close buttons -->
       <DialogFooter class="sm:justify-start">
         <DialogClose as-child>
-          <Button type="button" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600" @click="submitWorkingTime" :disabled="isSaveDisabled"> Save </Button>
+          <Button type="button" variant="outline" @click="submitWorkingTime" :disabled="isSaveDisabled"> Save </Button>
         </DialogClose>
       </DialogFooter>
     </DialogContent>
