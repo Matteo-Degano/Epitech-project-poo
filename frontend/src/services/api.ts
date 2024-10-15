@@ -4,12 +4,15 @@ export async function fetchData(
   body?: any
 ): Promise<any> {
   try {
+    const headers: HeadersInit = {
+      "Content-Type": "application/json"
+    }
+
     const response = await fetch(`/api${endpoint}`, {
       method,
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: method !== "GET" ? JSON.stringify(body) : null
+      headers,
+      body: method !== "GET" ? JSON.stringify(body) : null,
+      credentials: "include" // Important: send cookies with the request
     })
 
     const json = await response.json()
