@@ -12,9 +12,9 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog"
 
-// Props for mode and data
+// Props
 const props = defineProps({
-  id: Number, // Working time data when updating
+  id: Number, // Working time id
   function: Function // Function to delete the working time
 })
 

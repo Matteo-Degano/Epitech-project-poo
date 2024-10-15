@@ -100,7 +100,7 @@ async function submitWorkingTime() {
     <DialogContent class="sm:max-w-md">
       <DialogHeader>
         <DialogTitle>{{
-          props.mode === "create" ? "Create New Working Time" : "Update Working Time"
+          props.mode === "create" ? "Create Working Time" : "Update Working Time"
         }}</DialogTitle>
       </DialogHeader>
       <div class="flex flex-col gap-4">
