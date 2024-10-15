@@ -12,19 +12,19 @@ const routes = [
   { path: "/login", component: LoginView },
   {
     path: "/",
-    component: HomeView,
-    beforeEnter: (
-      to: RouteLocationNormalized,
-      from: RouteLocationNormalized,
-      next: NavigationGuardNext
-    ) => {
-      const authStore = useAuthStore()
-      if (!authStore.user) {
-        next("/login")
-      } else {
-        next()
-      }
-    }
+    component: HomeView
+    // beforeEnter: (
+    //   to: RouteLocationNormalized,
+    //   from: RouteLocationNormalized,
+    //   next: NavigationGuardNext
+    // ) => {
+    //   const authStore = useAuthStore()
+    //   if (!authStore.user) {
+    //     next("/login")
+    //   } else {
+    //     next()
+    //   }
+    // }
   }
 ]
 
