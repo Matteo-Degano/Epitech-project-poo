@@ -1,13 +1,6 @@
 <script setup lang="ts">
 import { Button } from "@/components/ui/button"
-import {
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from "@/components/ui/form"
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { toast } from "@/components/ui/toast"
 import { toTypedSchema } from "@vee-validate/zod"
@@ -39,14 +32,13 @@ const { value: password } = useField<string>("password")
 </script>
 
 <template>
-  <form class="w-2/3 space-y-6" @submit.prevent="onSubmit">
+  <form class="flex flex-col w-full gap-6 p-2" @submit.prevent="onSubmit">
     <FormField v-slot="{ componentField, errors }" name="username">
       <FormItem>
-        <FormLabel>Username</FormLabel>
+        <FormLabel>Email</FormLabel>
         <FormControl>
           <Input type="email" placeholder="email" v-bind="componentField" v-model="username" />
         </FormControl>
-        <FormDescription> Your email address </FormDescription>
         <FormMessage v-if="errors">{{ errors }}</FormMessage>
       </FormItem>
     </FormField>
@@ -61,11 +53,10 @@ const { value: password } = useField<string>("password")
             v-model="password"
           />
         </FormControl>
-        <FormDescription> Your password </FormDescription>
         <FormMessage v-if="errors">{{ errors }}</FormMessage>
       </FormItem>
     </FormField>
 
-    <Button type="submit"> Submit </Button>
+    <Button class="w-auto ml-auto" type="submit"> Login </Button>
   </form>
 </template>
