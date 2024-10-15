@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import { fetchData } from "@/services/api"
 import { Button } from "@/components/ui/button"
 import {
@@ -31,7 +31,7 @@ function getInitialDate() {
   const date = props.data?.start.split('T')[0];
   if (date) {
     let [year, month, day] = date.split('-');
-    return new CalendarDate('AD',year, month, day);
+    return new CalendarDate('AD', year, month, day);
   }
 }
 
@@ -56,6 +56,10 @@ watch(
     }
   }
 )
+
+const isSaveDisabled = computed(() => {
+  return !selectedDate.value || !timeRange.value.start || !timeRange.value.end;
+});
 
 // Function to handle the submission (create or update)
 async function submitWorkingTime() {
@@ -127,7 +131,7 @@ async function submitWorkingTime() {
       <!-- Dialog footer with save and close buttons -->
       <DialogFooter class="sm:justify-start">
         <DialogClose as-child>
-          <Button type="button" variant="default" @click="submitWorkingTime"> Save </Button>
+          <Button type="button" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600" @click="submitWorkingTime" :disabled="isSaveDisabled"> Save </Button>
         </DialogClose>
       </DialogFooter>
     </DialogContent>
