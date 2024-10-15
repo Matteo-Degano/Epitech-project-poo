@@ -5,7 +5,7 @@ const noSpecialChars = z.string().refine(
     return !/[*;]/.test(value)
   },
   {
-    message: "Password cannot contain special characters like '*' or ';'"
+    message: "Cannot contain special characters like '*' or ';'"
   }
 )
 
@@ -13,7 +13,8 @@ export const formSchema = z.object({
   username: z
     .string()
     .email("Username must be a valid email address")
-    .max(50, "Username cannot exceed 50 characters"),
+    .max(50, "Username cannot exceed 50 characters")
+    .and(noSpecialChars),
 
   password: z
     .string()
