@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
-import { DateFormatter, getLocalTimeZone } from "@internationalized/date"
+import { DateFormatter, getLocalTimeZone, CalendarDate } from "@internationalized/date"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 
@@ -21,15 +21,21 @@ const props = defineProps({
   data: Object // Working time data when updating
 })
 
-console.log(props.data)
-
 const emit = defineEmits(["close"])
 
 // Modal visibility state
 const isModalOpen = ref(false)
 
 // Reactive state for date and time range
-const selectedDate = ref(null) // Date picker state
+function getInitialDate() {
+  const date = props.data?.start.split('T')[0];
+  if (date) {
+    let [year, month, day] = date.split('-');
+    return new CalendarDate('AD',year, month, day);
+  }
+}
+
+const selectedDate = ref(getInitialDate() || null) // Date picker state
 const timeRange = ref({
   start: props.data?.start.split('T')[1].split('.')[0] || "",
   end: props.data?.end.split('T')[1].split('.')[0] || ""
@@ -122,7 +128,6 @@ async function submitWorkingTime() {
       <DialogFooter class="sm:justify-start">
         <DialogClose as-child>
           <Button type="button" variant="default" @click="submitWorkingTime"> Save </Button>
-          <Button type="button" variant="secondary"> Close </Button>
         </DialogClose>
       </DialogFooter>
     </DialogContent>
