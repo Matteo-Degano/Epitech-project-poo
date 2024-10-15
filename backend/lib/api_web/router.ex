@@ -18,6 +18,10 @@ defmodule ApiWeb.Router do
 
     get("/clocks/:user", ClocksController, :show)
     post("/clocks/:user", ClocksController, :create)
+
+    # TEST - Chartmanager get user charts
+    get "chartmanager/:userID", ChartManagerController, :show
+
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
