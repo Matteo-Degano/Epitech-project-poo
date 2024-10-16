@@ -1,13 +1,5 @@
-<script setup lang="ts">
-import UserComponent from "@/components/UserComponent.vue"
-import WorkingTimes from "@/components/workingTime/WorkingTimes.vue"
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <main class="w-full h-screen">
-    <div class="grid grid-cols-2 grid-rows-3 min-w-full min-h-full">
-      <div class="row-span-1 border border-black"><UserComponent /></div>
-      <div class="row-span-2 col-span-2 border border-black"><WorkingTimes /></div>
-    </div>
-  </main>
+  <h1>Welcome !</h1>
 </template>
