@@ -5,14 +5,14 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/workingtime/:user?start=2024-10-11 09:30:00&end=2024-10-12 17:30:00
+  url: {{base_url}}/workingtime/:user
   body: none
-  auth: none
+  auth: inherit
 }
 
 params:query {
-  start: 2024-10-11 09:30:00
-  end: 2024-10-12 17:30:00
+  ~start: 2024-10-11 09:30:00
+  ~end: 2024-10-14 17:30:00
 }
 
 params:path {
