@@ -10,6 +10,13 @@ defmodule Api.Workingtimes.Workingtime do
     timestamps(type: :utc_datetime)
   end
 
+  defimpl Jason.Encoder, for: Api.Workingtimes.Workingtime do
+    def encode(struct, opts) do
+      Jason.Encode.map(Map.take(struct, [:id, :start, :end, :user_id, :inserted_at, :updated_at]), opts)
+    end
+  end
+
+
   @doc false
   def changeset(workingtime, attrs) do
     workingtime
