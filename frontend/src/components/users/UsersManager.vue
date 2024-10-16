@@ -32,15 +32,9 @@ const data: UserType[] = reactive([
 
 const columns: ColumnDef<UserType>[] = [
   {
-    accessorKey: 'id',
-    header: () => h('div', { class: 'text-left' }, 'ID'),
-    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, row.getValue('id')),
-  },
-  {
     accessorKey: 'username',
     header: () => h('div', { class: 'text-left' }, 'Name'),
-    cell: ({ row }) => { h('div', { class: 'text-left font-medium' }, row.getValue('username'))
-    },
+    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, row.getValue('username')),
   },
   {
     accessorKey: 'email',
