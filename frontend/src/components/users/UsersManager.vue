@@ -1,22 +1,15 @@
 <script setup lang="ts">
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from "@/components/ui/table"
-import { reactive } from "vue";
-import UserModal from "@/components/users/UserModal.vue"
-
+import { h, reactive } from "vue";
+import DataTable from "@/components/data-table/DataTable.vue"
+import type { ColumnDef } from "@tanstack/vue-table";
+import UserModal from "@/components/users/UserModal.vue";
 
 type UserType = {
     id: number
     username: string
     email: string
-    role: string
-    teams: string[]
+    role_id: number
+    team_id: number[]
 }
 
 // Sample data
@@ -25,42 +18,57 @@ const data: UserType[] = reactive([
     id: 1,
     username: "John Doe",
     email: "john.doe@mail.com",
-    role: "Admin",
-    teams: ["Team A", "Team B"]
+    role_id: 1,
+    team_id: [1, 2]
   },
   {
     id: 2,
     username: "Paul Dupont",
     email: "paul.dupont@mail.com",
-    role: "Employee",
-    teams: ["Team B"]
+    role_id: 2,
+    team_id: [2]
   }
 ])
+
+const columns: ColumnDef<UserType>[] = [
+  {
+    accessorKey: 'id',
+    header: () => h('div', { class: 'text-left' }, 'ID'),
+    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, row.getValue('id')),
+  },
+  {
+    accessorKey: 'username',
+    header: () => h('div', { class: 'text-left' }, 'Name'),
+    cell: ({ row }) => { h('div', { class: 'text-left font-medium' }, row.getValue('username'))
+    },
+  },
+  {
+    accessorKey: 'email',
+    header: () => h('div', { class: 'text-left' }, 'Email'),
+    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, row.getValue('email')),
+  },
+  {
+    accessorKey: 'role_id',
+    header: () => h('div', { class: 'text-left' }, 'Role'),
+    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, row.getValue('role_id')),
+  },
+  {
+    accessorKey: 'team_id',
+    header: () => h('div', { class: 'text-left' }, 'Teams'),
+    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, (row.getValue('team_id') as number[]).join(", ")),
+  },
+  {
+    id: 'actions',
+    enableHiding: false,
+    cell: ({ row }) => {
+      return h('div', { class: 'relative' }, h(UserModal, { data : row.original, mode: 'update' }))
+    }
+  }
+]
 
 </script>
 
 <template>
   <h1>Users</h1>
-    <Table>
-        <TableHeader>
-            <TableRow>
-                <TableHead>Username</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Teams</TableHead>
-                <TableHead>Actions</TableHead>
-            </TableRow>
-        </TableHeader>
-        <TableBody>
-            <TableRow v-for="user in data" :key="user.id">
-                <TableCell>{{ user.username }}</TableCell>
-                <TableCell>{{ user.email }}</TableCell>
-                <TableCell>{{ user.role }}</TableCell>
-                <TableCell>{{ user.teams.join(", ") }}</TableCell>
-                <TableCell>
-                    <UserModal mode="update" :data="user"/>
-                </TableCell>
-            </TableRow>
-        </TableBody>
-    </Table>
+    <DataTable :columns="columns" :data="data"/>
 </template>
