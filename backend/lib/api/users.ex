@@ -77,6 +77,8 @@ defmodule Api.Users do
 
   def create_user(attrs \\ %{}) do
     %User{}
+    |> Repo.preload(:role)
+    |> Repo.preload(:team)
     |> User.changeset(attrs)
     |> Repo.insert()
   end
