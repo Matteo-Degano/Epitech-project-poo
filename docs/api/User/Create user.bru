@@ -5,16 +5,17 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/users
+  url: it{{base_url}}/users
   body: json
-  auth: none
+  auth: inherit
 }
 
 body:json {
   {
-    "user": {
       "username": "johndoe",
-      "email": "john@doe.com"
-    }
+      "email": "john@doe.com",
+      "password": "password",
+      "role": "user",
+      "team": "test"
   }
 }
