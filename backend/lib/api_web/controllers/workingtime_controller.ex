@@ -18,8 +18,8 @@ defmodule ApiWeb.WorkingtimeController do
     render(conn, :index, workingtimes: workingtimes)
   end
 
-  def index(conn, _params) do
-    workingtimes = Workingtimes.list_workingtimes()
+  def index(conn, %{"user" => user_id}) do
+    workingtimes = Workingtimes.list_workingtimes_by_user(user_id)
     render(conn, :index, workingtimes: workingtimes)
   end
 

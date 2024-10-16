@@ -6,7 +6,7 @@ help:
 	@echo ""
 
 migrate: ## Run migrations
-	# docker exec -it backend mix ecto.reset;
+	docker exec -it backend mix ecto.rollback --all;
 	docker exec -it backend mix ecto.migrate;
 
 migrations: ## List migrations
