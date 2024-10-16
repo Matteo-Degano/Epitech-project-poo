@@ -9,6 +9,10 @@ migrate: ## Run migrations
 	docker exec -it backend mix ecto.rollback --all;
 	docker exec -it backend mix ecto.migrate;
 
+seed: ## Run migrations and seed db
+	make migrate;
+	docker exec -it backend mix run priv/repo/seeds.exs;
+
 migrations: ## List migrations
 	docker exec -it backend mix ecto.migrations
 
