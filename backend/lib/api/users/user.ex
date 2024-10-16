@@ -5,8 +5,8 @@ defmodule Api.Users.User do
   schema "users" do
     field :username, :string
     field :email, :string
-    field :team , :string
-    field :role, :string
+    belongs_to :team, Api.Teams.Team
+    belongs_to :role, Api.Roles.Role
 
     timestamps(type: :utc_datetime)
   end
@@ -14,7 +14,7 @@ defmodule Api.Users.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:username, :email, :team, :role])
+    |> cast(attrs, [:username, :email, :team_id, :role_id])
     |> validate_required([:username, :email])
   end
 end
