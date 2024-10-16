@@ -10,7 +10,12 @@ migrate: ## Run migrations
 	docker exec -it backend mix ecto.migrate;
 
 migrations: ## List migrations
-	docker exec -it backend mix ecto.migrations;
+	docker exec -it backend mix ecto.migrations
+
+force-migrate: ## Force run migrations
+	docker exec -it backend mix ecto.drop --force-drop
+	docker exec -it backend mix ecto.create
+	docker exec -it backend mix ecto.migrate
 
 install: ## Install dependecies
 	docker exec -it backend mix deps.get;
