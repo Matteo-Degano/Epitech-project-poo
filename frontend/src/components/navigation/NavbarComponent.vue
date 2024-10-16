@@ -24,6 +24,16 @@ import ClockManager from "../ClockManager.vue"
           </NavigationMenuLink>
         </NavigationMenuItem>
         <NavigationMenuItem>
+          <NavigationMenuLink href="/users" :class="navigationMenuTriggerStyle()">
+            Users
+          </NavigationMenuLink>
+        </NavigationMenuItem>
+        <NavigationMenuItem>
+          <NavigationMenuLink href="/charts" :class="navigationMenuTriggerStyle()">
+            Charts
+          </NavigationMenuLink>
+        </NavigationMenuItem>
+        <NavigationMenuItem>
           <NavigationMenuLink href="/login" :class="navigationMenuTriggerStyle()">
             Login
           </NavigationMenuLink>

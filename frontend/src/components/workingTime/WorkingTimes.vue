@@ -87,12 +87,6 @@ const table = useVueTable({
   }
 })
 
-// Reactive state for time range (used in modal)
-const timeRange = ref({
-  start: "",
-  end: ""
-})
-
 // Function to handle working time deletion
 async function deleteWorkingTime(id: number) {
   try {

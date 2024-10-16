@@ -9,6 +9,8 @@ import HomeView from "../views/HomeView.vue"
 import LoginView from "../views/LoginView.vue"
 import WorkingTimesView from "@/views/WorkingTimesView.vue"
 import NavbarLayout from "@/components/navigation/NavbarLayout.vue"
+import UsersView from "@/views/UsersView.vue"
+import ChartsView from "@/views/ChartsView.vue"
 
 const routes = [
   { path: "/login", component: LoginView },
@@ -47,6 +49,14 @@ const routes = [
         //     next()
         //   }
         // }
+      },
+      {
+        path: "users",
+        component: UsersView
+      },
+      {
+        path: "charts",
+        component: ChartsView
       }
     ]
   }
