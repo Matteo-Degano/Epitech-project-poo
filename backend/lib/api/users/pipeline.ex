@@ -7,7 +7,7 @@ defmodule Api.Users.Pipeline do
   plug(Guardian.Plug.VerifyHeader,
     refresh_from_cookie: true,
     claims: %{"typ" => "access"},
-    ttl: {8, :hours},
+    ttl: {8, :hours}
   )
 
   plug(Guardian.Plug.EnsureAuthenticated)
