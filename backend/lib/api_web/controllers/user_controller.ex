@@ -23,15 +23,15 @@ defmodule ApiWeb.UserController do
         "username" => username,
         "email" => email,
         "password" => password,
-        "role" => role,
-        "team" => team
+        "role_id" => role_id,
+        "team_id" => team_id
       }) do
     user_params = %{
       "username" => username,
       "email" => email,
       "password" => password,
-      "role" => role,
-      "team" => team
+      "role_id" => role_id,
+      "team_id" => team_id
     }
 
     # Vérifiez si l'utilisateur courant a le droit de créer un utilisateur (par exemple, s'il est un general_manager ou un admin)
@@ -57,15 +57,13 @@ defmodule ApiWeb.UserController do
     render(conn, :show, user: user)
   end
 
-  def update(conn, %{
-        "id" => id,
-        "username" => username,
-        "email" => email,
-        "role" => role,
-        "team" => team
-      }) do
+  def update(conn, %{"id" => id} = params) do
     user = Users.get_user!(id)
-    user_params = %{"username" => username, "email" => email, "role" => role, "team" => team}
+
+    user_params =
+      params
+      |> Enum.filter(fn {key, _value} -> key in ["username", "email", "role_id", "team_id"] end)
+      |> Enum.into(%{})
 
     # Vérifiez si l'utilisateur courant est le manager de l'utilisateur à modifier ou s'il est un general_manager
     if user_to_update.manager_id == current_user.id or current_user.role == "general_manager" or current_user.role == "admin" do
