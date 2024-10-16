@@ -6,7 +6,7 @@ defmodule ApiWeb.UserController do
   alias Api.Users.User
   alias Api.Repo
 
-  action_fallback ApiWeb.FallbackController
+  action_fallback(ApiWeb.FallbackController)
 
   def index(conn, %{"username" => username, "email" => email}) do
     users = Users.list_users_by_username_and_email(username, email)
@@ -19,8 +19,20 @@ defmodule ApiWeb.UserController do
     render(conn, :index, users: users)
   end
 
-  def create(conn, %{"username" => username, "email" => email, "role" => role, "team" => team}) do
-    current_user = conn.assigns.current_user
+  def create(conn, %{
+        "username" => username,
+        "email" => email,
+        "password" => password,
+        "role" => role,
+        "team" => team
+      }) do
+    user_params = %{
+      "username" => username,
+      "email" => email,
+      "password" => password,
+      "role" => role,
+      "team" => team
+    }
 
     # Vérifiez si l'utilisateur courant a le droit de créer un utilisateur (par exemple, s'il est un general_manager ou un admin)
     if current_user.role == "manager" or current_user.role == "general_manager" or current_user.role == "admin" do
@@ -45,9 +57,15 @@ defmodule ApiWeb.UserController do
     render(conn, :show, user: user)
   end
 
-  def update(conn, %{"id" => id, "username" => username, "email" => email, "role" => role, "team" => team}) do
-    current_user = conn.assigns.current_user
-    user_to_update = Users.get_user!(id)
+  def update(conn, %{
+        "id" => id,
+        "username" => username,
+        "email" => email,
+        "role" => role,
+        "team" => team
+      }) do
+    user = Users.get_user!(id)
+    user_params = %{"username" => username, "email" => email, "role" => role, "team" => team}
 
     # Vérifiez si l'utilisateur courant est le manager de l'utilisateur à modifier ou s'il est un general_manager
     if user_to_update.manager_id == current_user.id or current_user.role == "general_manager" or current_user.role == "admin" do

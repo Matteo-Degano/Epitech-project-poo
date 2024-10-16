@@ -25,6 +25,10 @@ defmodule ApiWeb.Router do
     plug ApiWeb.Plugs.AuthorizeRole, role: :admin
   end
 
+  pipeline :auth do
+    plug(Api.Users.Pipeline)
+  end
+
   scope "/api", ApiWeb do
     pipe_through :api
     pipe_through :authenticated
