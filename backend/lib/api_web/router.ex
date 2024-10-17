@@ -5,23 +5,31 @@ defmodule ApiWeb.Router do
     plug(:accepts, ["json"])
   end
 
+  pipeline :auth do
+    plug(Api.Users.Pipeline)
+  end
+
   scope "/api", ApiWeb do
-    pipe_through(:api)
+    pipe_through([:api])
+
+    post("/login", AuthController, :login)
+    post("/refresh", AuthController, :refresh)
+    post("/logout", AuthController, :logout)
 
     resources("/users", UserController, except: [:new, :edit])
+  end
 
-    get("workingtime/:user", WorkingtimeController, :index)
-    get("workingtime/:user/:id", WorkingtimeController, :show)
-    post("workingtime/:user", WorkingtimeController, :create)
-    put("workingtime/:id", WorkingtimeController, :update)
-    delete("workingtime/:id", WorkingtimeController, :delete)
+  scope "/api", ApiWeb do
+    pipe_through([:api, :auth])
+
+    get("/workingtime/:user", WorkingtimeController, :index)
+    get("/workingtime/:user/:id", WorkingtimeController, :show)
+    post("/workingtime/:user", WorkingtimeController, :create)
+    put("/workingtime/:id", WorkingtimeController, :update)
+    delete("/workingtime/:id", WorkingtimeController, :delete)
 
     get("/clocks/:user", ClocksController, :show)
     post("/clocks/:user", ClocksController, :create)
-
-    # TEST - Chartmanager get user charts
-    get "chartmanager/:userID", ChartManagerController, :show
-
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

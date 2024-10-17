@@ -12,6 +12,7 @@
   def changeset(role, attrs) do
     role
     |> cast(attrs, [:name])
+    |> unique_constraint(:name)
     |> validate_required([:name])
   end
 end

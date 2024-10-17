@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import { fetchData } from "@/services/api"
 import { Button } from "@/components/ui/button"
 import {
@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
-import { DateFormatter, getLocalTimeZone } from "@internationalized/date"
+import { DateFormatter, getLocalTimeZone, CalendarDate } from "@internationalized/date"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 
@@ -27,10 +27,18 @@ const emit = defineEmits(["close"])
 const isModalOpen = ref(false)
 
 // Reactive state for date and time range
-const selectedDate = ref(null) // Date picker state
+function getInitialDate() {
+  const date = props.data?.start.split('T')[0];
+  if (date) {
+    let [year, month, day] = date.split('-');
+    return new CalendarDate('AD', year, month, day);
+  }
+}
+
+const selectedDate = ref(getInitialDate() || null) // Date picker state
 const timeRange = ref({
-  start: props.data?.start || "",
-  end: props.data?.end || ""
+  start: props.data?.start.split('T')[1].split('.')[0] || "",
+  end: props.data?.end.split('T')[1].split('.')[0] || ""
 })
 
 // DateFormatter to format the selected date
@@ -49,22 +57,32 @@ watch(
   }
 )
 
+const isSaveDisabled = computed(() => {
+  return !selectedDate.value || !timeRange.value.start || !timeRange.value.end;
+});
+
+function clearInputs() {
+  selectedDate.value = null;
+  timeRange.value.start = "";
+  timeRange.value.end = "";
+}
+
 // Function to handle the submission (create or update)
 async function submitWorkingTime() {
   const requestData = {
-    date: selectedDate.value ? selectedDate.value.toDate(getLocalTimeZone()) : null,
-    start: timeRange.value.start,
-    end: timeRange.value.end
+    start: `${selectedDate.value ? (selectedDate.value.toDate()).toISOString().split('T')[0] : null}T${timeRange.value.start}:00Z`,
+    end: `${selectedDate.value ? (selectedDate.value.toDate()).toISOString().split('T')[0] : null}T${timeRange.value.end}:00Z` 
   }
 
   if (props.mode === "create") {
     // POST request for creating a new working time
-    await fetchData("POST", `/workingtime`, requestData)
+    await fetchData("POST", `/workingtime/1`, requestData)
   } else {
     // PUT request for updating an existing working time
     await fetchData("PUT", `/workingtime/${props.data.id}`, requestData)
   }
 
+  clearInputs()
   // Emit close event and close modal
   emit("close")
   isModalOpen.value = false
@@ -82,7 +100,7 @@ async function submitWorkingTime() {
     <DialogContent class="sm:max-w-md">
       <DialogHeader>
         <DialogTitle>{{
-          props.mode === "create" ? "Create New Working Time" : "Update Working Time"
+          props.mode === "create" ? "Create Working Time" : "Update Working Time"
         }}</DialogTitle>
       </DialogHeader>
       <div class="flex flex-col gap-4">
@@ -120,8 +138,7 @@ async function submitWorkingTime() {
       <!-- Dialog footer with save and close buttons -->
       <DialogFooter class="sm:justify-start">
         <DialogClose as-child>
-          <Button type="button" variant="default" @click="submitWorkingTime"> Save </Button>
-          <Button type="button" variant="secondary"> Close </Button>
+          <Button type="button" variant="outline" @click="submitWorkingTime" :disabled="isSaveDisabled"> Save </Button>
         </DialogClose>
       </DialogFooter>
     </DialogContent>

@@ -5,9 +5,9 @@ meta {
 }
 
 put {
-  url: {{baseUrl}}/users/:id
+  url: >{{base_url}}/users/:id
   body: json
-  auth: none
+  auth: inherit
 }
 
 params:path {
@@ -16,9 +16,8 @@ params:path {
 
 body:json {
   {
-    "user": {
-      "username": "janedoe",
-      "email": "jane@doe.com"
-    }
+    "username": "johndoe",
+    "email": "john@doe.com",
+    "team_id": 2
   }
 }

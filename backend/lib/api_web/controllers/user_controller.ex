@@ -1,10 +1,9 @@
 defmodule ApiWeb.UserController do
   use ApiWeb, :controller
 
-  alias Api.Users
-  alias Api.Users.User
+  alias Api.{Users, Users.User}
 
-  action_fallback ApiWeb.FallbackController
+  action_fallback(ApiWeb.FallbackController)
 
   def index(conn, %{"username" => username, "email" => email}) do
     users = Users.list_users_by_username_and_email(username, email)
@@ -16,8 +15,20 @@ defmodule ApiWeb.UserController do
     render(conn, :index, users: users)
   end
 
-  def create(conn, %{"username" => username, "email" => email, "role" => role, "team" => team}) do
-    user_params = %{"username"=> username, "email" => email, "role" => role, "team" => team}
+  def create(conn, %{
+        "username" => username,
+        "email" => email,
+        "password" => password,
+        "role_id" => role_id,
+        "team_id" => team_id
+      }) do
+    user_params = %{
+      "username" => username,
+      "email" => email,
+      "password" => password,
+      "role_id" => role_id,
+      "team_id" => team_id
+    }
 
     with {:ok, %User{} = user} <- Users.create_user(user_params) do
       conn
@@ -32,9 +43,13 @@ defmodule ApiWeb.UserController do
     render(conn, :show, user: user)
   end
 
-  def update(conn, %{"id" => id, "username" => username, "email" => email, "role" => role, "team" => team}) do
+  def update(conn, %{"id" => id} = params) do
     user = Users.get_user!(id)
-    user_params = %{"username" => username, "email" => email, "role" => role, "team" => team}
+
+    user_params =
+      params
+      |> Enum.filter(fn {key, _value} -> key in ["username", "email", "role_id", "team_id"] end)
+      |> Enum.into(%{})
 
     with {:ok, %User{} = user} <- Users.update_user(user, user_params) do
       render(conn, :show, user: user)
