@@ -21,34 +21,10 @@ const routes = [
       {
         path: "",
         component: HomeView
-        // beforeEnter: (
-        //   to: RouteLocationNormalized,
-        //   from: RouteLocationNormalized,
-        //   next: NavigationGuardNext
-        // ) => {
-        //   const authStore = useAuthStore()
-        //   if (!authStore.user) {
-        //     next("/login")
-        //   } else {
-        //     next()
-        //   }
-        // }
       },
       {
         path: "working-times",
         component: WorkingTimesView
-        // beforeEnter: (
-        //   to: RouteLocationNormalized,
-        //   from: RouteLocationNormalized,
-        //   next: NavigationGuardNext
-        // ) => {
-        //   const authStore = useAuthStore()
-        //   if (!authStore.user) {
-        //     next("/login")
-        //   } else {
-        //     next()
-        //   }
-        // }
       },
       {
         path: "users",
@@ -66,5 +42,25 @@ const router = createRouter({
   history: createWebHistory(),
   routes
 })
+
+// Global navigation guard
+router.beforeEach(
+  (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    const authStore = useAuthStore()
+
+    // If the user is not logged in and trying to access a route other than login
+    if (!authStore.user && to.path !== "/login") {
+      next("/login")
+    }
+    // If the user is logged in and trying to access the login page
+    else if (authStore.user && to.path === "/login") {
+      next("/")
+    }
+    // Otherwise, allow the navigation
+    else {
+      next()
+    }
+  }
+)
 
 export default router
