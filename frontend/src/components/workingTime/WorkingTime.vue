@@ -28,17 +28,17 @@ const isModalOpen = ref(false)
 
 // Reactive state for date and time range
 function getInitialDate() {
-  const date = props.data?.start.split('T')[0];
+  const date = props.data?.start.split("T")[0]
   if (date) {
-    let [year, month, day] = date.split('-');
-    return new CalendarDate('AD', year, month, day);
+    let [year, month, day] = date.split("-")
+    return new CalendarDate("AD", year, month, day)
   }
 }
 
 const selectedDate = ref(getInitialDate() || null) // Date picker state
 const timeRange = ref({
-  start: props.data?.start.split('T')[1].split('.')[0] || "",
-  end: props.data?.end.split('T')[1].split('.')[0] || ""
+  start: props.data?.start.split("T")[1].split(".")[0] || "",
+  end: props.data?.end.split("T")[1].split(".")[0] || ""
 })
 
 // DateFormatter to format the selected date
@@ -58,20 +58,20 @@ watch(
 )
 
 const isSaveDisabled = computed(() => {
-  return !selectedDate.value || !timeRange.value.start || !timeRange.value.end;
-});
+  return !selectedDate.value || !timeRange.value.start || !timeRange.value.end
+})
 
 function clearInputs() {
-  selectedDate.value = null;
-  timeRange.value.start = "";
-  timeRange.value.end = "";
+  selectedDate.value = null
+  timeRange.value.start = ""
+  timeRange.value.end = ""
 }
 
 // Function to handle the submission (create or update)
 async function submitWorkingTime() {
   const requestData = {
-    start: `${selectedDate.value ? (selectedDate.value.toDate()).toISOString().split('T')[0] : null}T${timeRange.value.start}:00Z`,
-    end: `${selectedDate.value ? (selectedDate.value.toDate()).toISOString().split('T')[0] : null}T${timeRange.value.end}:00Z` 
+    start: `${selectedDate.value ? selectedDate.value.toDate().toISOString().split("T")[0] : null}T${timeRange.value.start}:00Z`,
+    end: `${selectedDate.value ? selectedDate.value.toDate().toISOString().split("T")[0] : null}T${timeRange.value.end}:00Z`
   }
 
   if (props.mode === "create") {
@@ -138,7 +138,14 @@ async function submitWorkingTime() {
       <!-- Dialog footer with save and close buttons -->
       <DialogFooter class="sm:justify-start">
         <DialogClose as-child>
-          <Button type="button" variant="outline" @click="submitWorkingTime" :disabled="isSaveDisabled"> Save </Button>
+          <Button
+            type="button"
+            variant="outline"
+            @click="submitWorkingTime"
+            :disabled="isSaveDisabled"
+          >
+            Save
+          </Button>
         </DialogClose>
       </DialogFooter>
     </DialogContent>
