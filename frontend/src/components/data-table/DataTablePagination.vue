@@ -10,6 +10,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
+import {ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight} from 'lucide-vue-next'
+
 interface DataTablePaginationProps {
   table: Table<any>
 }
@@ -17,7 +19,7 @@ defineProps<DataTablePaginationProps>()
 </script>
 
 <template>
-    <div class="flex items-center justify-end">
+    <div class="flex items-center justify-end mt-4">
         <div class="flex items-center space-x-2">
             <p class="text-sm font-medium">
                 Rows per page
@@ -48,7 +50,7 @@ defineProps<DataTablePaginationProps>()
             @click="table.setPageIndex(0)"
             >
             <span class="sr-only">Go to first page</span>
-            <p><<</p>
+            <ChevronsLeft />
             </Button>
             <Button
             variant="outline"
@@ -57,7 +59,7 @@ defineProps<DataTablePaginationProps>()
             @click="table.previousPage()"
             >
             <span class="sr-only">Go to previous page</span>
-            <p><</p>
+            <ChevronLeft/>
             </Button>
             <Button
             variant="outline"
@@ -66,7 +68,7 @@ defineProps<DataTablePaginationProps>()
             @click="table.nextPage()"
             >
             <span class="sr-only">Go to next page</span>
-            <p>></p>
+            <ChevronRight/>
             </Button>
             <Button
             variant="outline"
@@ -75,7 +77,7 @@ defineProps<DataTablePaginationProps>()
             @click="table.setPageIndex(table.getPageCount() - 1)"
             >
             <span class="sr-only">Go to last page</span>
-            <p>>></p>
+            <ChevronsRight/>
             </Button>
         </div>
     </div>
