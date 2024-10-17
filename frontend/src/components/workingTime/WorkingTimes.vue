@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { h, ref, onMounted } from "vue"
+import { h, ref, onMounted, reactive } from "vue"
 import {
   createColumnHelper,
   getCoreRowModel,
   useVueTable,
-  getSortedRowModel
+  getSortedRowModel,
+  type ColumnDef
 } from "@tanstack/vue-table"
 import { Button } from "@/components/ui/button"
 import { fetchData } from "@/services/api"
@@ -18,6 +19,7 @@ import {
 } from "@/components/ui/table"
 import WorkingTime from "./WorkingTime.vue"
 import DeleteWorkingTimeModal from "./DeleteWorkingTimeModal.vue"
+import DataTable from "@/components/data-table/DataTable.vue"
 import { useAuthStore } from "@/stores/auth.store"
 
 const authStore = useAuthStore()
@@ -33,50 +35,55 @@ type WorkingTimeType = {
   user_id: number
 }
 
-const columnHelper = createColumnHelper<WorkingTimeType>()
-
 // Define the columns
-const columns = [
-  columnHelper.accessor("user_id", {
-    header: "User ID",
-    cell: (info) => info.getValue()
-  }),
-  columnHelper.accessor("start", {
-    header: "Start Time",
-    cell: (info) =>
-      new Date(info.getValue()).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-  }),
-  columnHelper.accessor("end", {
-    header: "End Time",
-    cell: (info) =>
-      new Date(info.getValue()).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-  }),
-  columnHelper.display({
-    id: "actions",
+const columns: ColumnDef<WorkingTimeType>[] = [
+  {
+    accessorKey: 'user_id',
+    header: () => h('div', { class: 'text-left' }, 'User'),
+    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, row.getValue('user_id')),
+  },
+  {
+    accessorKey: 'start',
+    header: () => h('div', { class: 'text-left' }, 'Start Time'),
+    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, row.getValue('start')),
+  },
+  {
+    accessorKey: 'end',
+    header: () => h('div', { class: 'text-left' }, 'End Time'),
+    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, row.getValue('end')),
+  },
+  {
+    id: 'actions',
+    enableHiding: false,
     cell: ({ row }) => {
       return h("div", { class: "flex gap-2" }, [
-        h(Button, { variant: "outline", size: "sm" }, "Update"),
+        h(WorkingTime, { mode: "update", data: row.original }),
         h(
-          Button,
-          { variant: "destructive", size: "sm", onClick: () => deleteWorkingTime(row.original.id) },
-          "Delete"
+          DeleteWorkingTimeModal,
+          { workingTime: row.original, function: deleteWorkingTime }
         )
       ])
     }
-  })
+  }
 ]
 
-// Set up the table instance
-const sorting = ref([])
-const table = useVueTable({
-  data: workingTimeData,
-  columns,
-  getCoreRowModel: getCoreRowModel(),
-  getSortedRowModel: getSortedRowModel(),
-  state: {
-    sorting
+// Sample data
+const data: WorkingTimeType[] = reactive([
+  {
+    id: 3,
+    start: "2024-10-11T09:30:00",
+    end: "2024-10-11T17:30:00",
+    user_id: 1
+  },
+  {
+    id: 28,
+    start: "2024-10-11T09:30:00",
+    end: "2024-10-11T17:30:00",
+    user_id: 2
   }
-})
+])
+
+const filterColumns = [{column: 'start', fieldName: 'start time'}, {column: 'end', fieldName: 'end time'}]
 
 // Function to handle working time deletion
 async function deleteWorkingTime(id: number) {
@@ -116,43 +123,6 @@ onMounted(async () => {
       <WorkingTime :mode="'create'" :workingTimeData="null" />
     </div>
 
-    <!-- Table to display the working times -->
-    <div class="w-full overflow-auto">
-      <div class="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Start Time</TableHead>
-              <TableHead>End Time</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow v-for="row in table.getRowModel().rows" :key="row.original.id">
-              <TableCell>{{ row.original.id }}</TableCell>
-              <TableCell>{{ new Date(row.original.start).toLocaleDateString() }}</TableCell>
-              <TableCell>{{
-                new Date(row.original.start).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit"
-                })
-              }}</TableCell>
-              <TableCell>{{
-                new Date(row.original.end).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit"
-                })
-              }}</TableCell>
-              <TableCell class="flex gap-2">
-                <WorkingTime :mode="'update'" :data="row.original" />
-                <DeleteWorkingTimeModal :id="row.original.id" @delete="deleteWorkingTime" />
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </div>
-    </div>
+    <DataTable :columns="columns" :data="data" :filters="filterColumns"/>
   </div>
 </template>
