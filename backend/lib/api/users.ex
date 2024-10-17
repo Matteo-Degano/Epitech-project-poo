@@ -17,10 +17,14 @@ defmodule Api.Users do
     )
   end
 
-  def get_user!(id), do: Repo.get!(User, id)
+  def get_user!(id) do
+    Repo.get!(User, id)
+  end
 
   def create_user(attrs \\ %{}) do
     %User{}
+    |> Repo.preload(:role)
+    |> Repo.preload(:team)
     |> User.changeset(attrs)
     |> Repo.insert()
   end

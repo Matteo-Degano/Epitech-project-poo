@@ -19,15 +19,15 @@ defmodule ApiWeb.UserController do
         "username" => username,
         "email" => email,
         "password" => password,
-        "role" => role,
-        "team" => team
+        "role_id" => role_id,
+        "team_id" => team_id
       }) do
     user_params = %{
       "username" => username,
       "email" => email,
       "password" => password,
-      "role" => role,
-      "team" => team
+      "role_id" => role_id,
+      "team_id" => team_id
     }
 
     with {:ok, %User{} = user} <- Users.create_user(user_params) do
@@ -43,15 +43,13 @@ defmodule ApiWeb.UserController do
     render(conn, :show, user: user)
   end
 
-  def update(conn, %{
-        "id" => id,
-        "username" => username,
-        "email" => email,
-        "role" => role,
-        "team" => team
-      }) do
+  def update(conn, %{"id" => id} = params) do
     user = Users.get_user!(id)
-    user_params = %{"username" => username, "email" => email, "role" => role, "team" => team}
+
+    user_params =
+      params
+      |> Enum.filter(fn {key, _value} -> key in ["username", "email", "role_id", "team_id"] end)
+      |> Enum.into(%{})
 
     with {:ok, %User{} = user} <- Users.update_user(user, user_params) do
       render(conn, :show, user: user)
