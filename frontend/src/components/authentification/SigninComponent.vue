@@ -6,6 +6,13 @@ import { Input } from "@/components/ui/input"
 import { signupFormSchema, teams } from "@/lib/formSchemas/signin.form"
 import { toTypedSchema } from "@vee-validate/zod"
 import { useForm, useField } from "vee-validate"
+import { fetchData } from "@/services/api"
+
+const signinHandler = async (body: any) => {
+  console.log(body)
+  const response = await fetchData("POST", "/users", body)
+  console.log(response)
+}
 
 // Initialize selectedTeams as a reactive array (best for multiple checkboxes)
 const selectedTeams = ref<string[]>([])
@@ -27,9 +34,10 @@ const onSubmit = handleSubmit((values) => {
     username: values.username,
     email: values.email,
     password: values.password,
-    teams: selectedTeams.value
+    team_id: 1,
+    role_id: 1
   }
-  console.log("Form Body:", body)
+  signinHandler(body)
 })
 </script>
 
@@ -115,7 +123,3 @@ const onSubmit = handleSubmit((values) => {
     <Button class="w-auto ml-auto" type="submit"> Signin </Button>
   </form>
 </template>
-
-<style scoped>
-/* Additional styles if needed */
-</style>

@@ -15,7 +15,7 @@ defmodule Api.Users.User do
   defimpl Jason.Encoder, for: Api.Users.User do
     def encode(struct, opts) do
       Jason.Encode.map(
-        Map.take(struct, [:username, :email, :team_id, :role_id]),
+        Map.take(struct, [:id, :username, :email, :team_id, :role_id]),
         opts
       )
     end
