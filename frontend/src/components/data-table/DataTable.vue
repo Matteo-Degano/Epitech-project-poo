@@ -2,7 +2,7 @@
 import type { ColumnDef, ColumnFiltersState, Updater } from '@tanstack/vue-table'
 import { ref, type Ref } from 'vue';
 import { Input } from '@/components/ui/input'
-
+import DataTablePagination from "@/components/data-table/DataTablePagination.vue";
 import {
   Table,
   TableBody,
@@ -16,7 +16,8 @@ import {
   FlexRender,
   getCoreRowModel,
   useVueTable,
-  getFilteredRowModel
+  getFilteredRowModel,
+  getPaginationRowModel,
 } from '@tanstack/vue-table'
 
 function valueUpdater<T extends Updater<any>>(updaterOrValue: T, ref: Ref) {
@@ -37,6 +38,7 @@ const table = useVueTable({
   get data() { return props.data },
   get columns() { return props.columns },
   getCoreRowModel: getCoreRowModel(),
+  getPaginationRowModel: getPaginationRowModel(),
   onColumnFiltersChange: updaterOrValue => valueUpdater(updaterOrValue, columnFilters),
   getFilteredRowModel: getFilteredRowModel(),
   state: {
@@ -48,12 +50,11 @@ const table = useVueTable({
 
 <template>
   <div class="flex items-center py-4 space-x-4">
-
-    <Input v-for="filter in filters" class="max-w-sm" :placeholder="`Filter by ${filter?.fieldName}...`"
-    :model-value="table.getColumn(filter?.column)?.getFilterValue() as string"
+    <Input v-for="filter in filters" class="max-w-sm" :placeholder="`Filter by ${filter.fieldName}...`"
+    :model-value="table.getColumn(filter.column)?.getFilterValue() as string"
     @update:model-value=" table.getColumn(filter.column)?.setFilterValue($event)" />
-
   </div>
+
   <div class="border rounded-md">
     <Table>
       <TableHeader>
@@ -87,4 +88,5 @@ const table = useVueTable({
       </TableBody>
     </Table>
   </div>
+  <DataTablePagination :table="table" />
 </template>

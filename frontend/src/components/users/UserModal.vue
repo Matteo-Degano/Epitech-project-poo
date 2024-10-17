@@ -42,7 +42,7 @@ const data: TeamType[] = reactive([
 
 <template>
   <Dialog>
-    <DialogTrigger>
+    <DialogTrigger class="space-x-4">
       <Button>
         {{ props.mode === "create" ? "Create user" : "Update" }}
       </Button>
