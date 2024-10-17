@@ -20,13 +20,7 @@ config :api, ApiWeb.Endpoint,
     layout: false
   ],
   pubsub_server: Api.PubSub,
-  live_view: [signing_salt: "cmYoR9a+"],
-  secret_key_base: "2D5p3BY3t0OvmAudjSn81sWTTW9npk8QfCqE02/wjotDAa+Pk5F0T/LT4JEcUQGn"
-
-config :api, Api.Users.Guardian,
-  issuer: "api",
-  secret_key: "82Wpj31umGf7mObZhEHw/6hmZ8TbCnsSLEyp7xUTNQJvvHRoOMiGDT6U4PHbT0dp",
-  allowed_algos: ["HS512"]
+  live_view: [signing_salt: "cmYoR9a+"]
 
 config :api, Api.Users.Guardian,
   issuer: "api",
