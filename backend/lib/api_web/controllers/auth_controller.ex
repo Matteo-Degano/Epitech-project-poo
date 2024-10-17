@@ -75,7 +75,7 @@ defmodule ApiWeb.AuthController do
       same_site: "Strict",
       max_age: 7 * 24 * 60 * 60
     )
-    |> json(%{message: "Authenticated successfully."})
+    |> json(%{user: user})
   end
 
   defp login_reply({:error, reason}, conn) do
