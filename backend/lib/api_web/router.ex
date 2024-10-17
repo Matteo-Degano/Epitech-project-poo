@@ -16,6 +16,12 @@ defmodule ApiWeb.Router do
     post("/refresh", AuthController, :refresh)
     post("/logout", AuthController, :logout)
 
+    get("/teams", TeamController, :index)
+    post("/teams", TeamController, :create)
+    get("/teams/:id", TeamController, :show)
+    put("/teams/:id", TeamController, :update)
+    delete("/teams/:id", TeamController, :delete)
+
     resources("/users", UserController, except: [:new, :edit])
   end
 

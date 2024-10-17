@@ -3,6 +3,7 @@ defmodule Api.Users do
   alias Api.Repo
 
   alias Api.Users.User
+  alias Api.TeamsUsers
   alias Argon2
 
   def list_users() do
@@ -13,6 +14,17 @@ defmodule Api.Users do
     Repo.all(
       from(u in User,
         where: u.username == ^username and u.email == ^email
+      )
+    )
+  end
+
+  def list_users_teams(user_id) do
+    Repo.all(
+      from(t in TeamsUsers,
+        join: u in User,
+        on: t.user_id == u.id,
+        where: u.id == ^user_id,
+        select: t.team_id
       )
     )
   end

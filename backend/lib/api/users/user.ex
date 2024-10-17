@@ -1,11 +1,15 @@
 defmodule Api.Users.User do
   use Ecto.Schema
   import Ecto.Changeset
+  # import Ecto.Query
+
+  alias Api.Teams
 
   schema "users" do
     field(:username, :string)
     field(:email, :string)
     field(:password, :string)
+    many_to_many :teams, Api.Teams.Team, join_through: "teams_users", on_replace: :delete
     belongs_to :role, Api.Role
 
     timestamps(type: :utc_datetime)
@@ -29,8 +33,8 @@ defmodule Api.Users.User do
     |> unique_constraint(:username)
     |> unique_constraint(:email)
     |> put_password_hash()
-  end
 
+  end
   defp put_password_hash(
          %Ecto.Changeset{valid?: true, changes: %{password: password}} = changeset
        ) do
