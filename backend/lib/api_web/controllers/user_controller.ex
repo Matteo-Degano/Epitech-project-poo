@@ -65,6 +65,11 @@ defmodule ApiWeb.UserController do
       |> Enum.filter(fn {key, _value} -> key in ["username", "email", "role_id", "team_id"] end)
       |> Enum.into(%{})
 
+    user_params =
+      params
+      |> Enum.filter(fn {key, _value} -> key in ["username", "email", "role_id", "team_id"] end)
+      |> Enum.into(%{})
+
     # Vérifiez si l'utilisateur courant est le manager de l'utilisateur à modifier ou s'il est un general_manager
     if user_to_update.manager_id == current_user.id or current_user.role == "general_manager" or current_user.role == "admin" do
       user_params = %{"username" => username, "email" => email, "role" => role, "team" => team}

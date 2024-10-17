@@ -17,6 +17,7 @@ defmodule Api.Users do
       [%User{}, ...]
 
   """
+  
   def list_users_by_username_and_email(username, email) do
     Repo.all(
       from(u in User,
@@ -82,7 +83,7 @@ defmodule Api.Users do
     |> User.changeset(attrs)
     |> Repo.insert()
   end
-
+  
   def update_user(%User{} = user, attrs) do
     user
     |> User.changeset(attrs)
