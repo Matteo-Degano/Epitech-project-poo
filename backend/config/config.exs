@@ -20,7 +20,8 @@ config :api, ApiWeb.Endpoint,
     layout: false
   ],
   pubsub_server: Api.PubSub,
-  live_view: [signing_salt: "cmYoR9a+"]
+  live_view: [signing_salt: "cmYoR9a+"],
+  secret_key_base: "2D5p3BY3t0OvmAudjSn81sWTTW9npk8QfCqE02/wjotDAa+Pk5F0T/LT4JEcUQGn"
 
 # Configures the mailer
 #

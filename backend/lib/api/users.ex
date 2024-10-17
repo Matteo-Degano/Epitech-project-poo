@@ -5,7 +5,6 @@ defmodule Api.Users do
 
   import Ecto.Query, warn: false
   alias Api.Repo
-
   alias Api.Users.User
 
   @doc """
@@ -21,10 +20,53 @@ defmodule Api.Users do
     Repo.all(User)
   end
 
+  @doc """
+  Returns the list of users by username and email.
+
+  ## Examples
+
+      iex> list_users_by_username_and_email("johndoe", "john@example.com")
+      [%User{}, ...]
+
+  """
   def list_users_by_username_and_email(username, email) do
     Repo.all(
       from(u in User,
         where: u.username == ^username and u.email == ^email
+      )
+    )
+  end
+
+  @doc """
+  Returns the list of users managed by a specific manager.
+
+  ## Examples
+
+      iex> list_users_by_manager(1)
+      [%User{}, ...]
+
+  """
+  def list_users_by_manager(manager_id) do
+    Repo.all(
+      from(u in User,
+        where: u.manager_id == ^manager_id
+      )
+    )
+  end
+
+  @doc """
+  Returns the list of users by team.
+
+  ## Examples
+
+      iex> list_users_by_team("team_a")
+      [%User{}, ...]
+
+  """
+  def list_users_by_team(team) do
+    Repo.all(
+      from(u in User,
+        where: u.team == ^team
       )
     )
   end
