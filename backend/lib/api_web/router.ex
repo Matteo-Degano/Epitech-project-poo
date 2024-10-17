@@ -2,27 +2,7 @@ defmodule ApiWeb.Router do
   use ApiWeb, :router
 
   pipeline :api do
-    plug :accepts, ["json"]
-  end
-
-  pipeline :authenticated do
-    plug ApiWeb.Plugs.AuthenticateUser
-  end
-
-  pipeline :authorize_employee do
-    plug ApiWeb.Plugs.AuthorizeRole, role: :employee
-  end
-
-  pipeline :authorize_manager do
-    plug ApiWeb.Plugs.AuthorizeRole, role: :manager
-  end
-
-  pipeline :authorize_general_manager do
-    plug ApiWeb.Plugs.AuthorizeRole, role: :general_manager
-  end
-
-  pipeline :authorize_admin do
-    plug ApiWeb.Plugs.AuthorizeRole, role: :admin
+    plug(:accepts, ["json"])
   end
 
   pipeline :auth do
@@ -30,52 +10,42 @@ defmodule ApiWeb.Router do
   end
 
   scope "/api", ApiWeb do
-    pipe_through :api
-    pipe_through :authenticated
+    pipe_through([:api])
 
-    # Routes pour les utilisateurs
-    scope "/users" do
-      pipe_through [:authorize_employee, :authorize_manager, :authorize_general_manager, :authorize_admin]
+    post("/login", AuthController, :login)
+    post("/refresh", AuthController, :refresh)
+    post("/logout", AuthController, :logout)
 
-      get("/me", UserController, :show_self)     # Voir ses propres données
-      patch("/me", UserController, :update_self)  # Modifier ses propres données
-      delete("/me", UserController, :delete_self) # Supprimer ses propres données
-    end
+    resources("/users", UserController, except: [:new, :edit])
+  end
 
-    # Routes pour la gestion des utilisateurs
-    scope "/users" do
-      pipe_through [:authorize_manager, :authorize_general_manager, :authorize_admin]
+  scope "/api", ApiWeb do
+    pipe_through([:api, :auth])
 
-      post("/", UserController, :create)          # Créer un utilisateur
-      get("/", UserController, :index)            # Voir tous les utilisateurs
-      get("/:id", UserController, :show)          # Voir un utilisateur spécifique
-      put("/:id", UserController, :update)        # Modifier un utilisateur
-      delete("/:id", UserController, :delete)     # Supprimer un utilisateur
-    end
+    get("/workingtime/:user", WorkingtimeController, :index)
+    get("/workingtime/:user/:id", WorkingtimeController, :show)
+    post("/workingtime/:user", WorkingtimeController, :create)
+    put("/workingtime/:id", WorkingtimeController, :update)
+    delete("/workingtime/:id", WorkingtimeController, :delete)
 
-    # Routes pour les workingtimes
-    scope "/workingtime" do
-      pipe_through [:authorize_manager, :authorize_general_manager, :authorize_admin]
+    get("/clocks/:user", ClocksController, :show)
+    post("/clocks/:user", ClocksController, :create)
+  end
 
-      post("/", WorkingtimeController, :create)      # Créer un workingtime
-      get("/", WorkingtimeController, :index)        # Voir tous les workingtimes
-      get("/:id", WorkingtimeController, :show)      # Voir un workingtime spécifique
-      put("/:id", WorkingtimeController, :update)     # Modifier un workingtime
-      delete("/:id", WorkingtimeController, :delete)  # Supprimer un workingtime
-    end
+  # Enable LiveDashboard and Swoosh mailbox preview in development
+  if Application.compile_env(:api, :dev_routes) do
+    # If you want to use the LiveDashboard in production, you should put
+    # it behind authentication and allow only admins to access it.
+    # If your application does not have an admins-only section yet,
+    # you can use Plug.BasicAuth to set up some basic authentication
+    # as long as you are also using SSL (which you should anyway).
+    import Phoenix.LiveDashboard.Router
 
-    # Routes pour les clocks
-    scope "/clocks" do
-      pipe_through [:authorize_employee, :authorize_manager, :authorize_general_manager, :authorize_admin]
+    scope "/dev" do
+      pipe_through([:fetch_session, :protect_from_forgery])
 
-      post("/", ClocksController, :create)         # Créer un clock pour soi-même
-      put("/:id", ClocksController, :update_self)   # Modifier sa clock
-    end
-
-    # Routes pour les administrateurs
-    scope "/admin" do
-      pipe_through :authorize_admin
-      # Noting yet
+      live_dashboard("/dashboard", metrics: ApiWeb.Telemetry)
+      forward("/mailbox", Plug.Swoosh.MailboxPreview)
     end
   end
 end
