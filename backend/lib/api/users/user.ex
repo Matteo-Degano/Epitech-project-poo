@@ -6,7 +6,6 @@ defmodule Api.Users.User do
     field(:username, :string)
     field(:email, :string)
     field(:password, :string)
-    belongs_to :team, Api.Team
     belongs_to :role, Api.Role
 
     timestamps(type: :utc_datetime)
@@ -15,7 +14,7 @@ defmodule Api.Users.User do
   defimpl Jason.Encoder, for: Api.Users.User do
     def encode(struct, opts) do
       Jason.Encode.map(
-        Map.take(struct, [:username, :email, :team_id, :role_id]),
+        Map.take(struct, [:username, :email, :role_id]),
         opts
       )
     end
@@ -24,9 +23,8 @@ defmodule Api.Users.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:username, :email, :password, :team_id, :role_id])
-    |> validate_required([:username, :email, :password, :team_id, :role_id])
-    |> foreign_key_constraint(:team_id)
+    |> cast(attrs, [:username, :email, :password, :role_id])
+    |> validate_required([:username, :email, :password, :role_id])
     |> foreign_key_constraint(:role_id)
     |> unique_constraint(:username)
     |> unique_constraint(:email)

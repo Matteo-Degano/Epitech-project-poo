@@ -13,7 +13,6 @@
 alias Api.Repo
 # alias Api.Users.Users
 alias Api.Role
-# alias Api.Team
 
 role_data = [
   %{name: "user"},
