@@ -1,6 +1,7 @@
 defmodule Api.Users do
   import Ecto.Query, warn: false
   alias Api.Repo
+
   alias Api.Users.User
   alias Argon2
 
@@ -8,16 +9,6 @@ defmodule Api.Users do
     Repo.all(User)
   end
 
-  @doc """
-  Returns the list of users by username and email.
-
-  ## Examples
-
-      iex> list_users_by_username_and_email("johndoe", "john@example.com")
-      [%User{}, ...]
-
-  """
-  
   def list_users_by_username_and_email(username, email) do
     Repo.all(
       from(u in User,
@@ -26,55 +17,9 @@ defmodule Api.Users do
     )
   end
 
-  @doc """
-  Returns the list of users managed by a specific manager.
-
-  ## Examples
-
-      iex> list_users_by_manager(1)
-      [%User{}, ...]
-
-  """
-  def list_users_by_manager(manager_id) do
-    Repo.all(
-      from(u in User,
-        where: u.manager_id == ^manager_id
-      )
-    )
+  def get_user!(id) do
+    Repo.get!(User, id)
   end
-
-  @doc """
-  Returns the list of users by team.
-
-  ## Examples
-
-      iex> list_users_by_team("team_a")
-      [%User{}, ...]
-
-  """
-  def list_users_by_team(team) do
-    Repo.all(
-      from(u in User,
-        where: u.team == ^team
-      )
-    )
-  end
-
-  @doc """
-  Gets a single user.
-
-  Raises `Ecto.NoResultsError` if the User does not exist.
-
-  ## Examples
-
-      iex> get_user!(123)
-      %User{}
-
-      iex> get_user!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_user!(id), do: Repo.get!(User, id)
 
   def create_user(attrs \\ %{}) do
     %User{}
@@ -83,7 +28,7 @@ defmodule Api.Users do
     |> User.changeset(attrs)
     |> Repo.insert()
   end
-  
+
   def update_user(%User{} = user, attrs) do
     user
     |> User.changeset(attrs)
