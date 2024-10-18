@@ -1,22 +1,8 @@
 <script setup lang="ts">
 import { h, ref, onMounted, reactive } from "vue"
-import {
-  createColumnHelper,
-  getCoreRowModel,
-  useVueTable,
-  getSortedRowModel,
-  type ColumnDef
-} from "@tanstack/vue-table"
+import { type ColumnDef } from "@tanstack/vue-table"
 import { Button } from "@/components/ui/button"
 import { fetchData } from "@/services/api"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from "@/components/ui/table"
 import WorkingTime from "./WorkingTime.vue"
 import DeleteWorkingTimeModal from "./DeleteWorkingTimeModal.vue"
 import DataTable from "@/components/data-table/DataTable.vue"
@@ -35,6 +21,17 @@ type WorkingTimeType = {
   user_id: number
 }
 
+// Function to format date and time
+function formatDate(dateString: string | number | Date) {
+  const options = { year: 'numeric', month: '2-digit', day: 'numeric'};
+  return new Date(dateString).toLocaleDateString(undefined, options);
+}
+
+function formatTime(timeString: string | number | Date) {
+  const options = { hour: '2-digit', minute: '2-digit' };
+  return new Date(timeString).toLocaleTimeString(undefined, options);
+}
+
 // Define the columns
 const columns: ColumnDef<WorkingTimeType>[] = [
   {
@@ -44,13 +41,18 @@ const columns: ColumnDef<WorkingTimeType>[] = [
   },
   {
     accessorKey: 'start',
+    header: () => h('div', { class: 'text-left' }, 'Date'),
+    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, formatDate(row.getValue('start'))),
+  },
+  {
+    accessorKey: 'start',
     header: () => h('div', { class: 'text-left' }, 'Start Time'),
-    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, row.getValue('start')),
+    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, formatTime(row.getValue('start'))),
   },
   {
     accessorKey: 'end',
     header: () => h('div', { class: 'text-left' }, 'End Time'),
-    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, row.getValue('end')),
+    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, formatTime(row.getValue('end'))),
   },
   {
     id: 'actions',
@@ -66,22 +68,6 @@ const columns: ColumnDef<WorkingTimeType>[] = [
     }
   }
 ]
-
-// Sample data
-const data: WorkingTimeType[] = reactive([
-  {
-    id: 3,
-    start: "2024-10-11T09:30:00",
-    end: "2024-10-11T17:30:00",
-    user_id: 1
-  },
-  {
-    id: 28,
-    start: "2024-10-11T09:30:00",
-    end: "2024-10-11T17:30:00",
-    user_id: 2
-  }
-])
 
 const filterColumns = [{column: 'start', fieldName: 'start time'}, {column: 'end', fieldName: 'end time'}]
 
@@ -123,6 +109,9 @@ onMounted(async () => {
       <WorkingTime :mode="'create'" :workingTimeData="null" />
     </div>
 
-    <DataTable :columns="columns" :data="data" :filters="filterColumns"/>
+    <div v-if="isLoading" class="flex justify-center items-center h-full">
+      <p>Loading...</p>
+    </div>
+    <DataTable v-else :columns="columns" :data="workingTimeData" :filters="filterColumns"/>
   </div>
 </template>
