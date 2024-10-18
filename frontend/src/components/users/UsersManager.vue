@@ -5,6 +5,7 @@ import type { ColumnDef } from "@tanstack/vue-table";
 import UserModal from "@/components/users/UserModal.vue";
 import { Button } from "../ui/button";
 import { ArrowUpDown } from "lucide-vue-next";
+import DeleteUserModal from "./DeleteUserModal.vue";
 
 type UserType = {
     id: number
@@ -369,6 +370,9 @@ const data: UserType[] = reactive([
 ]
 )
 
+function deleteUser(id: number) {
+}
+
 const columns: ColumnDef<UserType>[] = [
   {
     accessorKey: 'username',
@@ -414,7 +418,13 @@ const columns: ColumnDef<UserType>[] = [
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      return h('div', { class: 'relative' }, h(UserModal, { data : row.original, mode: 'update' }))
+      return h("div", { class: "flex gap-4" }, [
+        h(UserModal, { mode: "update", data: row.original }),
+        h(
+          DeleteUserModal,
+          { id: row.original.id, function: deleteUser }
+        )
+      ])
     }
   }
 ]
