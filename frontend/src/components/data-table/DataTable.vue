@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="TData, TValue">
-import type { ColumnDef, ColumnFiltersState, Updater } from '@tanstack/vue-table'
+import type { ColumnDef, ColumnFiltersState, Updater, SortingState } from '@tanstack/vue-table'
 import { ref, type Ref } from 'vue';
 import { Input } from '@/components/ui/input'
 import DataTablePagination from "@/components/data-table/DataTablePagination.vue";
@@ -18,6 +18,7 @@ import {
   useVueTable,
   getFilteredRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
 } from '@tanstack/vue-table'
 
 function valueUpdater<T extends Updater<any>>(updaterOrValue: T, ref: Ref) {
@@ -33,6 +34,7 @@ const props = defineProps<{
 }>()
 
 const columnFilters = ref<ColumnFiltersState>([])
+const sorting = ref<SortingState>([])
 
 const table = useVueTable({
   get data() { return props.data },
@@ -41,8 +43,11 @@ const table = useVueTable({
   getPaginationRowModel: getPaginationRowModel(),
   onColumnFiltersChange: updaterOrValue => valueUpdater(updaterOrValue, columnFilters),
   getFilteredRowModel: getFilteredRowModel(),
+  getSortedRowModel: getSortedRowModel(),
+  onSortingChange: updaterOrValue => valueUpdater(updaterOrValue, sorting),
   state: {
     get columnFilters() { return columnFilters.value },
+    get sorting() { return sorting.value },
   },
 })
 

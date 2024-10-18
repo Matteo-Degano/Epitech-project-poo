@@ -3,6 +3,8 @@ import { h, reactive } from "vue";
 import DataTable from "@/components/data-table/DataTable.vue"
 import type { ColumnDef } from "@tanstack/vue-table";
 import UserModal from "@/components/users/UserModal.vue";
+import { Button } from "../ui/button";
+import { ArrowUpDown } from "lucide-vue-next";
 
 type UserType = {
     id: number
@@ -370,22 +372,42 @@ const data: UserType[] = reactive([
 const columns: ColumnDef<UserType>[] = [
   {
     accessorKey: 'username',
-    header: () => h('div', { class: 'text-left' }, 'Name'),
+    header: ({ column }) => {
+      return h(Button, {
+        variant: 'ghost',
+        onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+      }, () => ['Name', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
+    },
     cell: ({ row }) => h('div', { class: 'text-left font-medium' }, row.getValue('username')),
   },
   {
     accessorKey: 'email',
-    header: () => h('div', { class: 'text-left' }, 'Email'),
+    header: ({ column }) => {
+      return h(Button, {
+        variant: 'ghost',
+        onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+      }, () => ['Email', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
+    },
     cell: ({ row }) => h('div', { class: 'text-left font-medium' }, row.getValue('email')),
   },
   {
     accessorKey: 'role_id',
-    header: () => h('div', { class: 'text-left' }, 'Role'),
+    header: ({ column }) => {
+      return h(Button, {
+        variant: 'ghost',
+        onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+      }, () => ['Role', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
+    },
     cell: ({ row }) => h('div', { class: 'text-left font-medium' }, row.getValue('role_id')),
   },
   {
     accessorKey: 'team_id',
-    header: () => h('div', { class: 'text-left' }, 'Teams'),
+    header: ({ column }) => {
+      return h(Button, {
+        variant: 'ghost',
+        onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+      }, () => ['Teams', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
+    },
     cell: ({ row }) => h('div', { class: 'text-left font-medium' }, (row.getValue('team_id') as string[]).join(", ")),
   },
   {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { h, ref, onMounted, reactive } from "vue"
 import { type ColumnDef } from "@tanstack/vue-table"
+import { ArrowUpDown, ChevronDown } from 'lucide-vue-next'
 import { Button } from "@/components/ui/button"
 import { fetchData } from "@/services/api"
 import WorkingTime from "./WorkingTime.vue"
@@ -36,22 +37,42 @@ function formatTime(timeString: string | number | Date) {
 const columns: ColumnDef<WorkingTimeType>[] = [
   {
     accessorKey: 'user_id',
-    header: () => h('div', { class: 'text-left' }, 'User'),
+    header: ({ column }) => {
+      return h(Button, {
+        variant: 'ghost',
+        onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+      }, () => ['User', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
+    },
     cell: ({ row }) => h('div', { class: 'text-left font-medium' }, row.getValue('user_id')),
   },
   {
     accessorKey: 'start',
-    header: () => h('div', { class: 'text-left' }, 'Date'),
-    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, formatDate(row.getValue('start'))),
+    header: ({ column }) => {
+      return h(Button, {
+        variant: 'ghost',
+        onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+      }, () => ['Date', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
+    },
+    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, formatDate(row.getValue('start')),),
   },
   {
     accessorKey: 'start',
-    header: () => h('div', { class: 'text-left' }, 'Start Time'),
+    header: ({ column }) => {
+      return h(Button, {
+        variant: 'ghost',
+        onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+      }, () => ['Start Time', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
+    },
     cell: ({ row }) => h('div', { class: 'text-left font-medium' }, formatTime(row.getValue('start'))),
   },
   {
     accessorKey: 'end',
-    header: () => h('div', { class: 'text-left' }, 'End Time'),
+    header: ({ column }) => {
+      return h(Button, {
+        variant: 'ghost',
+        onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+      }, () => ['End Time', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
+    },
     cell: ({ row }) => h('div', { class: 'text-left font-medium' }, formatTime(row.getValue('end'))),
   },
   {
