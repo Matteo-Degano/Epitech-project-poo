@@ -1,7 +1,6 @@
 defmodule Api.Users do
   import Ecto.Query, warn: false
   alias Api.Repo
-
   alias Api.Users.User
   alias Argon2
 
