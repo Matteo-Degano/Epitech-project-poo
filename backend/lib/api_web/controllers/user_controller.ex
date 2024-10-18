@@ -2,6 +2,7 @@ defmodule ApiWeb.UserController do
   use ApiWeb, :controller
 
   alias Api.{Users, Users.User}
+  alias Api.Repo
 
   action_fallback(ApiWeb.FallbackController)
 
@@ -16,18 +17,18 @@ defmodule ApiWeb.UserController do
   end
 
   def create(conn, %{
-        "username" => username,
-        "email" => email,
-        "password" => password,
-        "role_id" => role_id,
-        "team_id" => team_id
-      }) do
+    "username" => username,
+    "email" => email,
+    "password" => password,
+    "role_id" => role_id,
+    "team_ids" => team_ids
+  }) do
     user_params = %{
       "username" => username,
       "email" => email,
       "password" => password,
       "role_id" => role_id,
-      "team_id" => team_id
+      "team_ids" => team_ids
     }
 
     with {:ok, %User{} = user} <- Users.create_user(user_params) do
@@ -38,17 +39,38 @@ defmodule ApiWeb.UserController do
     end
   end
 
+
   def show(conn, %{"id" => id}) do
-    user = Users.get_user!(id)
-    render(conn, :show, user: user)
+    case Users.get_user_with_teams(id) do
+      nil ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "User not found"})
+
+      user ->
+        teams = Enum.map(user.teams, fn team -> %{id: team.id, name: team.name} end)
+
+        response = %{
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          role_id: user.role_id,
+          teams: teams
+        }
+
+        conn
+        |> put_status(:ok)
+        |> json(response)
+    end
   end
+
 
   def update(conn, %{"id" => id} = params) do
     user = Users.get_user!(id)
 
     user_params =
       params
-      |> Enum.filter(fn {key, _value} -> key in ["username", "email", "role_id", "team_id"] end)
+      |> Enum.filter(fn {key, _value} -> key in ["username", "email", "role_id"] end)
       |> Enum.into(%{})
 
     with {:ok, %User{} = user} <- Users.update_user(user, user_params) do
