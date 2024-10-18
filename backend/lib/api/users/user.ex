@@ -24,7 +24,7 @@ defmodule Api.Users.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:username, :email, :password, :team_id, :role_id])
+    |> cast(attrs, [:id, :username, :email, :password, :team_id, :role_id])
     |> validate_required([:username, :email, :password, :team_id, :role_id])
     |> foreign_key_constraint(:team_id)
     |> foreign_key_constraint(:role_id)
