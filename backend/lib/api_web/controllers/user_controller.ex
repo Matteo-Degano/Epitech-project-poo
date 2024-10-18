@@ -70,7 +70,7 @@ defmodule ApiWeb.UserController do
 
     user_params =
       params
-      |> Enum.filter(fn {key, _value} -> key in ["username", "email", "role_id"] end)
+      |> Enum.filter(fn {key, _value} -> key in ["username", "email", "role_id", "team_ids"] end)
       |> Enum.into(%{})
 
     with {:ok, %User{} = user} <- Users.update_user(user, user_params) do

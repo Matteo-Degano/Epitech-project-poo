@@ -62,10 +62,25 @@ defmodule Api.Users do
   defp associate_teams(_, _), do: :ok
 
   def update_user(%User{} = user, attrs) do
-    user
-    |> User.changeset(attrs)
-    |> Repo.update()
+    team_ids = Map.get(attrs, "team_ids", [])
+
+    user_changeset = user
+    |> User.changeset(Map.drop(attrs, ["team_ids"]))
+
+    case Repo.update(user_changeset) do
+      {:ok, updated_user} ->
+        Repo.delete_all(from(ut in Api.UsersTeams, where: ut.user_id == ^user.id))
+
+        case associate_teams(updated_user, team_ids) do
+          :ok -> {:ok, updated_user}
+          {:error, reason} -> {:error, reason}
+        end
+
+      {:error, changeset} ->
+        {:error, changeset}
+    end
   end
+
 
   def delete_user(%User{} = user) do
     Repo.delete(user)

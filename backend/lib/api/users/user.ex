@@ -12,15 +12,6 @@ defmodule Api.Users.User do
     timestamps(type: :utc_datetime)
   end
 
-  # defimpl Jason.Encoder, for: Api.Users.User do
-  #   def encode(struct, opts) do
-  #     Jason.Encode.map(
-  #       Map.take(struct, [:username, :email, :role_id, :team]),
-  #       opts
-  #     )
-  #   end
-  # end
-
 
   @doc false
   def changeset(user, attrs) do
