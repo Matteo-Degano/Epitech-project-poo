@@ -3,7 +3,7 @@ basePath: "/api"
 info:
   version: "1.0.0"
   title: "T-POO-700"
-  description: "T-POO-700 API, \n ⚠️ Les responses attendues ne sont sûrement pas celles que le code renverra, ne pas se baser sur ce swagger pour le debuggage ⚠️"
+  description: "T-POO-700 API"
 
 # TAGS
 tags:
@@ -26,17 +26,17 @@ paths:
       parameters:
         - name: "user"
           in: "body"
-          description: "The username and email of the user"
+          description: "Datas for post a user"
           required: false
           schema:
-           $ref: "#/definitions/users"
+           $ref: "#/definitions/usersData"
       responses:
         200: 
           description: "Successful operation"
           schema: 
             type: "array"
             items: 
-              $ref: "#/definitions/users"
+              $ref: "#/definitions/usersResponse"
     get:
       tags:
       - "USER"
@@ -58,7 +58,7 @@ paths:
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/users"
+              $ref: "#/definitions/usersResponse"
         404: 
           description: "User not found"
   /users/{id}:
@@ -76,7 +76,7 @@ paths:
         200:
           description: "Successful operation"
           schema:
-            $ref: "#/definitions/users"
+            $ref: "#/definitions/usersResponse"
         404: 
           description: "User not found"
     delete:
@@ -86,14 +86,14 @@ paths:
       parameters:
         - name: "id"
           in: "path"
-          description: "The id of the user"
+          description: "The id of the user (broken because contraint key on clock)"
           required: true
           type: "integer"
       responses:
         200:
           description: "Successful operation"
           schema:
-            $ref: "#/definitions/users"
+            $ref: "#/definitions/usersDeleteResponse"
         404: 
           description: "User not found"
     put:
@@ -111,12 +111,12 @@ paths:
           description: "The new username or email of the user"
           required: false
           schema:
-           $ref: "#/definitions/users"
+           $ref: "#/definitions/usersData"
       responses:
         200:
           description: "Successful operation"
           schema:
-            $ref: "#/definitions/users"
+            $ref: "#/definitions/usersResponse"
         404: 
           description: "User not found"
 
@@ -141,7 +141,7 @@ paths:
         200:
           description: "Successful Operation"
           schema:
-            $ref: "#/definitions/workingtime"
+            $ref: "#/definitions/workingtimeResponse"
         404:
           description: "User not found"
 
@@ -166,7 +166,7 @@ paths:
         200: 
           description: "Successful operation"
           schema:
-            $ref: "#/definitions/workingtime"
+            $ref: "#/definitions/workingtimeResponse"
   
   /workingtime/{userId}:
     post: 
@@ -179,12 +179,12 @@ paths:
          description: "The start of the working time"
          required: true
          schema:
-           $ref: "#/definitions/workingtime"
+           $ref: "#/definitions/workingtimeData"
       responses:
        200:
          description: "Successful operation"
          schema:
-           $ref: "#/definitions/workingtime"
+           $ref: "#/definitions/workingtimeResponse"
   
   /workingtime/{id}:
     put:
@@ -201,7 +201,7 @@ paths:
         200:
           description: "Successful Operation"
           schema:
-            $ref: "#/definitions/workingtime"
+            $ref: "#/definitions/workingtimeResponse"
     
     delete:
       tags:
@@ -216,7 +216,7 @@ paths:
         200:
           description: "Successful Operation"
           schema:
-            $ref: "#/definitions/workingtime"
+            $ref: "#/definitions/workingtimeResponse"
 
   /clocks/{userId}:
     get:
@@ -232,7 +232,7 @@ paths:
         200:
           description: "Successful Operation"
           schema:
-            $ref: "#/definitions/clocks"
+            $ref: "#/definitions/clocksResponse"
 
     post:
       tags:
@@ -247,28 +247,72 @@ paths:
           in: body
           required: true
           schema:
-            $ref: "#/definitions/clocks_no_user"
+            $ref: "#/definitions/clocksData"
 
 
 definitions:
 
-  users:
+  usersData:
     type: "object"  
     properties:
       username:
         type: "string"
       email:
         type: "string"
+      password: 
+        type: "string"
+      team_id:
+        type: "integer"
+        default: 1
+      role_id:
+        type: "integer"
+        default: 1
 
-  workingtime:
+  usersDeleteResponse:
+    type: "object"  
+    properties:
+      id:
+        type: "integer"
+        default: 1
+
+  usersResponse:
+    type: "object"  
+    properties:
+      id:
+        type: "integer"
+        default: 1
+      username:
+        type: "string"
+      email:
+        type: "string"
+      team:
+        type: "integer"
+        default: 1
+      role:
+        type: "integer"
+        default: 1
+
+  workingtimeData:
     type: "object"
     properties:
       start: 
         type: "string"
       end: 
         type: "string"
-      user:
-        $ref: "#/definitions/users"
+
+  workingtimeResponse:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        default: 1
+      start: 
+        type: "string"
+      end: 
+        type: "string"
+      user_id:
+        type: "integer"
+        default: 1
 
   workingtime_no_user:
     type: "object"
@@ -278,21 +322,27 @@ definitions:
       end: 
         type: "string"
 
-  clocks:
+  clocksResponse:
     type: "object"
     properties:
+      id: 
+        type: "integer"
+        default: 1
       time:
         type: "string"
       status:
-        type : "string"
-      user":
-        $ref: "#/definitions/users"
+        type : "boolean"
+        default: true
+      "user":
+        type: "integer"
+        default: 1
 
-  clocks_no_user:
+  clocksData:
     type: "object"
     properties:
       time:
         type: "string"
       status:
-        type : "string"
+        type : "boolean"
+        default: true
     
