@@ -6,27 +6,27 @@ defmodule Api.Users.User do
     field(:username, :string)
     field(:email, :string)
     field(:password, :string)
-    belongs_to :team, Api.Team
     belongs_to :role, Api.Role
+    many_to_many :teams, Api.Teams.Team, join_through: "users_teams"
 
     timestamps(type: :utc_datetime)
   end
 
-  defimpl Jason.Encoder, for: Api.Users.User do
-    def encode(struct, opts) do
-      Jason.Encode.map(
-        Map.take(struct, [:username, :email, :team_id, :role_id]),
-        opts
-      )
-    end
-  end
+  # defimpl Jason.Encoder, for: Api.Users.User do
+  #   def encode(struct, opts) do
+  #     Jason.Encode.map(
+  #       Map.take(struct, [:username, :email, :role_id, :team]),
+  #       opts
+  #     )
+  #   end
+  # end
+
 
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:username, :email, :password, :team_id, :role_id])
-    |> validate_required([:username, :email, :password, :team_id, :role_id])
-    |> foreign_key_constraint(:team_id)
+    |> cast(attrs, [:username, :email, :password, :role_id])
+    |> validate_required([:username, :email, :password,:role_id])
     |> foreign_key_constraint(:role_id)
     |> unique_constraint(:username)
     |> unique_constraint(:email)
