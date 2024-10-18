@@ -29,6 +29,8 @@ defmodule ApiWeb.Router do
   scope "/api", ApiWeb do
     pipe_through([:api])
 
+    options "/*path", Corsica, origins: "*", allow_methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], allow_headers: ["content-type", "authorization", "api_key"]
+
     post("/login", AuthController, :login)
     post("/refresh", AuthController, :refresh)
     post("/logout", AuthController, :logout)
@@ -57,7 +59,6 @@ defmodule ApiWeb.Router do
     # you can use Plug.BasicAuth to set up some basic authentication
     # as long as you are also using SSL (which you should anyway).
     import Phoenix.LiveDashboard.Router
-
     scope "/dev" do
       pipe_through([:fetch_session, :protect_from_forgery])
 

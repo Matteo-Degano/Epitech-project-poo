@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, onBeforeUnmount } from "vue"
 import { fetchData } from "@/services/api"
-import { useUserStore } from "@/stores/user"
 import Button from "@/components/ui/button/Button.vue"
+import { useAuthStore } from "@/stores/auth.store"
 
+const authStore = useAuthStore()
 const time = ref("00:00:00")
 const clockIn = ref(false)
 let startTime: string
@@ -12,9 +13,8 @@ let interval: ReturnType<typeof setInterval> | null = null
 let pausedTime = 0
 
 async function refresh() {
-  const userStore = useUserStore()
   endTime = new Date().toISOString()
-  await fetchData("POST", `/workingtime/${userStore.userId}`, { start: startTime, end: endTime })
+  await fetchData("POST", `/workingtime/${authStore.userId}`, { start: startTime, end: endTime })
   clockIn.value = false
 
   if (interval) {
@@ -26,18 +26,16 @@ async function refresh() {
   pausedTime = 0
 
   const dateNow = new Date().toISOString()
-  await fetchData("POST", `/clocks/${userStore.userId}`, { time: dateNow, status: clockIn.value })
+  await fetchData("POST", `/clocks/${authStore.userId}`, { time: dateNow, status: clockIn.value })
 }
 
 async function clock() {
-  const userStore = useUserStore()
-  if (clockIn.value || userStore.userId === 0) return
   clockIn.value = true
 
   const startDateTime = new Date().getTime() - pausedTime
   startTime = new Date().toISOString()
 
-  await fetchData("POST", `/clocks/${userStore.userId}`, { time: startTime, status: clockIn.value })
+  await fetchData("POST", `/clocks/${authStore.userId}`, { time: startTime, status: clockIn.value })
 
   interval = setInterval(() => {
     const currentTime = new Date().getTime()

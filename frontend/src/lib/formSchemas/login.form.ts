@@ -10,7 +10,7 @@ const noSpecialChars = z.string().refine(
 )
 
 export const formSchema = z.object({
-  username: z
+  email: z
     .string()
     .email("Username must be a valid email address")
     .max(50, "Username cannot exceed 50 characters")

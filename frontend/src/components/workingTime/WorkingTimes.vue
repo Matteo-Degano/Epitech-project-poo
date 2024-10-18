@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { h, ref, reactive } from "vue"
+import { h, ref, onMounted } from "vue"
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -17,6 +17,13 @@ import {
   TableRow
 } from "@/components/ui/table"
 import WorkingTime from "./WorkingTime.vue"
+import DeleteWorkingTimeModal from "./DeleteWorkingTimeModal.vue"
+import { useAuthStore } from "@/stores/auth.store"
+
+const authStore = useAuthStore()
+const workingTimeData = ref<WorkingTimeType[]>([]) // Ensure it's an array
+const isLoading = ref(true)
+const error = ref(null)
 
 // Define the structure of your working time
 type WorkingTimeType = {
@@ -25,22 +32,6 @@ type WorkingTimeType = {
   end: string
   user_id: number
 }
-
-// Sample data
-const data: WorkingTimeType[] = reactive([
-  {
-    id: 27,
-    start: "2024-10-11T09:30:00",
-    end: "2024-10-11T17:30:00",
-    user_id: 1
-  },
-  {
-    id: 28,
-    start: "2024-10-11T09:30:00",
-    end: "2024-10-11T17:30:00",
-    user_id: 2
-  }
-])
 
 const columnHelper = createColumnHelper<WorkingTimeType>()
 
@@ -78,7 +69,7 @@ const columns = [
 // Set up the table instance
 const sorting = ref([])
 const table = useVueTable({
-  data,
+  data: workingTimeData,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getSortedRowModel: getSortedRowModel(),
@@ -93,8 +84,8 @@ async function deleteWorkingTime(id: number) {
     const response = await fetchData("DELETE", `/workingtime/${id}`)
     if (response.status === 200) {
       console.log("Working time deleted successfully")
-      const index = data.findIndex((item) => item.id === id)
-      if (index !== -1) data.splice(index, 1)
+      const index = workingTimeData.value.findIndex((item) => item.id === id)
+      if (index !== -1) workingTimeData.value.splice(index, 1)
     } else {
       console.error("Failed to delete working time")
     }
@@ -102,13 +93,27 @@ async function deleteWorkingTime(id: number) {
     console.error("Error deleting working time", error)
   }
 }
+
+onMounted(async () => {
+  try {
+    // Fetch data when the component is mounted
+    const response = await fetchData("GET", `/workingtime/${authStore.user.id}`)
+    console.log("Working times fetched successfully", response.data.data)
+    workingTimeData.value = response.data.data
+    console.log("Working times fetched successfully", workingTimeData.value)
+  } catch (err) {
+    error.value = err.message || "Error fetching data"
+  } finally {
+    isLoading.value = false
+  }
+})
 </script>
 
 <template>
   <div class="w-full">
     <!-- Add Create button at the top -->
     <div class="flex justify-end mb-4">
-      <WorkingTime :mode="'create'" :data="null" />
+      <WorkingTime :mode="'create'" :workingTimeData="null" />
     </div>
 
     <!-- Table to display the working times -->
@@ -125,7 +130,7 @@ async function deleteWorkingTime(id: number) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow v-for="row in table.getRowModel().rows" :key="row.id">
+            <TableRow v-for="row in table.getRowModel().rows" :key="row.original.id">
               <TableCell>{{ row.original.id }}</TableCell>
               <TableCell>{{ new Date(row.original.start).toLocaleDateString() }}</TableCell>
               <TableCell>{{
@@ -142,9 +147,7 @@ async function deleteWorkingTime(id: number) {
               }}</TableCell>
               <TableCell class="flex gap-2">
                 <WorkingTime :mode="'update'" :data="row.original" />
-                <Button @click="deleteWorkingTime(row.original.id)" variant="destructive" size="sm"
-                  >Delete</Button
-                >
+                <DeleteWorkingTimeModal :id="row.original.id" @delete="deleteWorkingTime" />
               </TableCell>
             </TableRow>
           </TableBody>
