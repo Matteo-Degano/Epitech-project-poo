@@ -2,8 +2,6 @@ defmodule Api.UsersTeams do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Api.Repo
-
   schema "users_teams" do
     field :user_id, :id
     field :team_id, :id

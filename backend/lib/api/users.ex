@@ -1,7 +1,6 @@
 defmodule Api.Users do
   import Ecto.Query, warn: false
   alias Api.Repo
-  alias Api.Teams.Team
   alias Api.Users.User
   alias Api.UsersTeams
   alias Argon2
@@ -10,12 +9,10 @@ defmodule Api.Users do
     Repo.all(User)
   end
 
-  def list_users_by_username_and_email(username, email) do
-    Repo.all(
-      from(u in User,
-        where: u.username == ^username and u.email == ^email
-      )
-    )
+  def list_users_by_username_and_email_with_teams(username, email) do
+    query = from(u in User, where: u.username == ^username and u.email == ^email)
+    Repo.all(query)
+    |> Repo.preload(:teams)
   end
 
   def get_user!(id) do
@@ -36,8 +33,11 @@ defmodule Api.Users do
     case Repo.insert(changeset) do
       {:ok, user} ->
         case associate_teams(user, team_ids) do
-          :ok -> {:ok, user}
-          {:error, reason} -> {:error, reason}
+          :ok ->
+            user_with_teams = Repo.preload(user, :teams)
+            {:ok, user_with_teams}
+          {:error, reason} ->
+            {:error, reason}
         end
 
       {:error, changeset} ->
@@ -62,24 +62,29 @@ defmodule Api.Users do
   defp associate_teams(_, _), do: :ok
 
   def update_user(%User{} = user, attrs) do
-    team_ids = Map.get(attrs, "team_ids", [])
+    team_ids = Map.get(attrs, "team_ids", nil)
 
     user_changeset = user
     |> User.changeset(Map.drop(attrs, ["team_ids"]))
 
     case Repo.update(user_changeset) do
       {:ok, updated_user} ->
-        Repo.delete_all(from(ut in Api.UsersTeams, where: ut.user_id == ^user.id))
+        if team_ids != nil do
+          Repo.delete_all(from(ut in Api.UsersTeams, where: ut.user_id == ^user.id))
 
-        case associate_teams(updated_user, team_ids) do
-          :ok -> {:ok, updated_user}
-          {:error, reason} -> {:error, reason}
+          case associate_teams(updated_user, team_ids) do
+            :ok -> {:ok, updated_user}
+            {:error, reason} -> {:error, reason}
+          end
+        else
+          {:ok, updated_user}
         end
 
       {:error, changeset} ->
         {:error, changeset}
     end
   end
+
 
 
   def delete_user(%User{} = user) do
