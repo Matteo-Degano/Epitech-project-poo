@@ -2,13 +2,27 @@ defmodule ApiWeb.UserController do
   use ApiWeb, :controller
 
   alias Api.{Users, Users.User}
-  alias Api.Repo
 
   action_fallback(ApiWeb.FallbackController)
 
   def index(conn, %{"username" => username, "email" => email}) do
-    users = Users.list_users_by_username_and_email(username, email)
-    render(conn, :index, users: users)
+    users = Users.list_users_by_username_and_email_with_teams(username, email)
+
+    response = Enum.map(users, fn user ->
+      teams = Enum.map(user.teams, fn team -> %{id: team.id, name: team.name} end)
+
+      %{
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role_id: user.role_id,
+        teams: teams
+      }
+    end)
+
+    conn
+    |> put_status(:ok)
+    |> json(response)
   end
 
   def index(conn, _params) do
@@ -23,21 +37,31 @@ defmodule ApiWeb.UserController do
     "role_id" => role_id,
     "team_ids" => team_ids
   }) do
-    user_params = %{
-      "username" => username,
-      "email" => email,
-      "password" => password,
-      "role_id" => role_id,
-      "team_ids" => team_ids
+  user_params = %{
+    "username" => username,
+    "email" => email,
+    "password" => password,
+    "role_id" => role_id,
+    "team_ids" => team_ids
+  }
+
+  with {:ok, %User{} = user} <- Users.create_user(user_params) do
+    teams = Enum.map(user.teams, fn team -> %{id: team.id, name: team.name} end)
+
+    response = %{
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role_id: user.role_id,
+      teams: teams
     }
 
-    with {:ok, %User{} = user} <- Users.create_user(user_params) do
-      conn
-      |> put_status(:created)
-      |> put_resp_header("location", ~p"/api/users/#{user}")
-      |> render(:show, user: user)
-    end
+    conn
+    |> put_status(:created)
+    |> put_resp_header("location", ~p"/api/users/#{user}")
+    |> json(response)
   end
+end
 
 
   def show(conn, %{"id" => id}) do
