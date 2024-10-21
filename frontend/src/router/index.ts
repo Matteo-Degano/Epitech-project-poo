@@ -28,7 +28,15 @@ const routes = [
       },
       {
         path: "users",
-        component: UsersView
+        component: UsersView,
+        beforeEnter (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) {
+          const authStore = useAuthStore()
+          if (authStore.user?.role_id === 1) {
+            next("/")
+          } else {
+            next()
+          }
+        }
       },
       {
         path: "charts",
