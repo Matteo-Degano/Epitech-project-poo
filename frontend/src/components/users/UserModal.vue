@@ -7,7 +7,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
+  DialogDescription
 } from "@/components/ui/dialog"
 import { signupFormSchema, teams } from "@/lib/formSchemas/signin.form"
 import { useForm, useField } from "vee-validate"
@@ -82,11 +83,14 @@ const onSubmit = handleSubmit((values) => {
         {{ props.mode === "create" ? "Create user" : "Update" }}
       </Button>
     </DialogTrigger>
-    <DialogContent>
+    <DialogContent class="max-h-[90dvh] overflow-y-auto">
       <DialogHeader>
         <DialogTitle>
           {{ props.mode === "create" ? "Create user" : "Update user" }}
         </DialogTitle>
+        <DialogDescription>
+          {{ props.mode === "create" ? "Create an user here. Click save when you're done." : "Make changes to an user here. Click save when you're done." }}
+        </DialogDescription>
       </DialogHeader>
       <form class="flex flex-col w-full gap-6 p-2" @submit.prevent="onSubmit">
         <!-- Username Field -->
@@ -94,7 +98,12 @@ const onSubmit = handleSubmit((values) => {
           <FormItem>
             <FormLabel>Username</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="Username" v-bind="componentField" v-model="username" />
+              <Input 
+                type="text" 
+                placeholder="Username" 
+                v-bind="componentField" 
+                v-model="username" 
+                :defaultValue="props.data.username ? props.data.username : ''" />
             </FormControl>
             <FormMessage v-if="errors">{{ errors }}</FormMessage>
           </FormItem>
@@ -110,6 +119,7 @@ const onSubmit = handleSubmit((values) => {
                 placeholder="email@example.com"
                 v-bind="componentField"
                 v-model="email"
+                :defaultValue="props.data.email ? props.data.email : ''"
               />
             </FormControl>
             <FormMessage v-if="errors">{{ errors }}</FormMessage>
@@ -171,8 +181,8 @@ const onSubmit = handleSubmit((values) => {
             <FormLabel>Role</FormLabel>
             <FormControl>
               <select>
-                <option value="1">Admin</option>
-                <option value="2">User</option>
+                <option value="1">Employee</option>
+                <option value="2">Manager</option>
               </select>
             </FormControl>
             <FormMessage v-if="errors">{{ errors }}</FormMessage>
