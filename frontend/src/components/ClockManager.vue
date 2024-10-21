@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog"
 
 const authStore = useAuthStore()
+const isLoading = ref(true)
 const time = ref("00:00:00")
 const isClockRunning = ref(false)
 const clockIn = ref(false)
@@ -90,6 +91,7 @@ async function getClock() {
           updateTimeDisplay(newElapsedTime)
         }, 1000)
       }
+      isLoading.value = false
     }
   } catch (error) {
     console.error("Error fetching clocks:", error)
@@ -118,7 +120,7 @@ onBeforeUnmount(() => {
 <template>
   <div class="flex items-center gap-2">
     <Button
-      v-if="!isClockRunning"
+      v-if="!isClockRunning && !isLoading"
       @click="startClock"
       variant="ghost"
       class="ring-1 ring-red-500 hover:bg-green-500 hover:text-background hover:ring-0 min-w-36"
@@ -128,7 +130,7 @@ onBeforeUnmount(() => {
     <Dialog>
       <DialogTrigger as-child>
         <Button
-          v-if="isClockRunning"
+          v-if="isClockRunning && !isLoading"
           variant="ghost"
           class="bg-green-500 hover:bg-red-500 text-background hover:text-background min-w-36"
         >
