@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref } from "vue"
+import { onMounted, reactive, ref } from "vue"
 import {
   Dialog,
   DialogClose,
@@ -18,8 +18,9 @@ import {fetchData} from "@/services/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useAuthStore } from "@/stores/auth.store"
+import { useToast } from "@/components/ui/toast/use-toast"
 
-const isModalOpen = ref(false)
+const { toast } = useToast()
 const authStore = useAuthStore()
 
 const props = defineProps({
@@ -27,30 +28,53 @@ const props = defineProps({
   data: Object // UserObject
 })
 
-type UserType = {
-  id: number
-  name: string
-  email: string
-  team_id: number
-  role_id: number
-}
-
-type TeamType = {
-    id: number
-    name: string
-}
-
 const signinHandler = async (body: any) => {
-  console.log(body)
-  const response = await fetchData("POST", "/users", body)
-  console.log(response)
+  if (props.mode === "create") {
+    // POST request for creating a new user
+    try{
+      const response = await fetchData("POST", "/users", body)
+      if (response.status === 201) {
+        toast({
+          description: `User successfully created !`
+        })
+      } else {
+        toast({
+          description: `An error occured.`,
+          variant: "destructive"
+        })
+      }
+    } catch (error) {
+      toast({
+        description: `An error occured.`,
+        variant: "destructive"
+      })
+      console.log(error)
+    }
+  } else {
+    // PUT request for updating an existing user
+    try{
+      const response = await fetchData("PUT", `/users/${props.data.id}`, body)
+      if (response.status === 200) {
+        toast({
+          description: `User successfully updated !`
+        })
+      } else {
+        toast({
+          description: `An error occured.`,
+          variant: "destructive"
+        })
+      }
+    } catch (error) {
+      toast({
+        description: `An error occured.`,
+        variant: "destructive"
+      })
+      console.log(error)
+    }
+  }
 }
 
-const teams = async () => {
-  const response = await fetchData("GET", "/teams")
-  console.log(response)
-  return response.data.data
-}
+const teams = ref<string[]>([])
 
 // Define the form using vee-validate for single form fields
 const { handleSubmit, errors } = useForm({
@@ -60,12 +84,13 @@ const { handleSubmit, errors } = useForm({
 // Initialize selectedTeams as a reactive array (best for multiple checkboxes)
 const selectedTeams = ref<string[]>([])
 
+const selectedRole = ref<number>()
+
 // Hooks for field validation (regular form fields)
 const { value: username } = useField<string>("username")
 const { value: email } = useField<string>("email")
 const { value: password } = useField<string>("password")
 const { value: confirmPassword } = useField<string>("confirmPassword")
-const { value : role_id } = useField<string>("role_id")
 
 // Form submission logic
 const onSubmit = handleSubmit((values) => {
@@ -73,10 +98,19 @@ const onSubmit = handleSubmit((values) => {
     username: values.username,
     email: values.email,
     password: values.password,
-    team_ids: selectedTeams,
-    role_id: 1
+    team_ids: selectedTeams.value,
+    role_id: selectedRole.value
   }
   signinHandler(body)
+})
+
+onMounted(async () => {
+  try{
+    const response = await fetchData("GET", "/teams")
+    teams.value = response.data.data
+  } catch (error) {
+    console.log(error)
+  }
 })
 
 </script>
@@ -171,8 +205,8 @@ const onSubmit = handleSubmit((values) => {
               <div class="grid grid-cols-2 gap-4">
                 <div v-for="team in teams" :key="team" class="flex items-center">
                   <!-- Bind to selectedTeams array using v-model -->
-                  <input type="checkbox" :value="team" v-model="selectedTeams" class="mr-2" />
-                  <label>{{ team }}</label>
+                  <input type="checkbox" :value="team.id" v-model="selectedTeams" class="mr-2" />
+                  <label>{{ team.name }}</label>
                 </div>
               </div>
             </FormControl>
@@ -185,10 +219,11 @@ const onSubmit = handleSubmit((values) => {
           <FormItem>
             <FormLabel>Role</FormLabel>
             <FormControl>
-              <select class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+              <select v-model="selectedRole" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                 <option value="1">Employee</option>
                 <option value="2">Manager</option>
                 <option value="3" v-if="authStore.user.role_id === 4">General manager</option>
+                <option value="4" v-if="authStore.user.role_id === 4">Admin</option>
               </select>
             </FormControl>
             <FormMessage v-if="errors">{{ errors }}</FormMessage>
@@ -196,7 +231,9 @@ const onSubmit = handleSubmit((values) => {
         </FormField>
 
         <!-- Submit Button -->
-        <Button :disabled="errors" class="w-auto ml-auto" type="submit"> Save </Button>
+        <DialogClose as-child>
+          <Button class="w-auto ml-auto" type="submit"> Save </Button>
+        </DialogClose>
       </form>
     </DialogContent>
   </Dialog>
