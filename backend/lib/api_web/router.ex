@@ -44,6 +44,12 @@ defmodule ApiWeb.Router do
   scope "/api", ApiWeb do
     pipe_through([:api, :auth, :role_user])
 
+    get("teams/:id", TeamController, :show)
+    get("teams", TeamController, :index)
+    post("/teams", TeamController, :create)
+    put("/teams/:id", TeamController, :update)
+    delete("/teams/:id", TeamController, :delete)
+
     get("/workingtime/:user", WorkingtimeController, :index)
     get("/chartmanager/:userID", ChartManagerController, :show)
     get("/workingtime/:user/:id", WorkingtimeController, :show)
