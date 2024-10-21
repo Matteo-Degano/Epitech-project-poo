@@ -111,6 +111,11 @@ onMounted(async () => {
   } catch (error) {
     console.log(error)
   }
+
+  if (props.mode === "update") {
+    username.value = props.data.username
+    email.value = props.data.email
+  }
 })
 
 </script>
@@ -142,7 +147,7 @@ onMounted(async () => {
                 placeholder="Username" 
                 v-bind="componentField" 
                 v-model="username" 
-                :defaultValue="props.data.username ? props.data.username : ''" />
+                />
             </FormControl>
             <FormMessage v-if="errors">{{ errors }}</FormMessage>
           </FormItem>
@@ -158,7 +163,6 @@ onMounted(async () => {
                 placeholder="email@example.com"
                 v-bind="componentField"
                 v-model="email"
-                :defaultValue="props.data.email ? props.data.email : ''"
               />
             </FormControl>
             <FormMessage v-if="errors">{{ errors }}</FormMessage>
