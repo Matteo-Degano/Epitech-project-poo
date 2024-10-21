@@ -87,4 +87,63 @@
     --vis-secondary-color: 160 81% 40%;
     --vis-text-color: var(--muted-foreground);
   }
+
+  /* Navbar animation */
+
+  .nav-link {
+    position: relative;
+    text-decoration: none;
+    color: inherit;
+    display: inline-block;
+    padding: 4px;
+  }
+
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background-color: hsl(var(--primary));
+    transition:
+      width 0.3s ease-in-out,
+      left 0.3s ease-in-out;
+    transform: translateX(-50%);
+  }
+
+  .nav-link:hover::after {
+    width: 90%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* Navbar animation for logout */
+  .nav-link2 {
+    position: relative;
+    text-decoration: none;
+    color: inherit;
+    display: inline-block;
+    padding: 6px;
+  }
+
+  .nav-link2::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background-color: #dc2626;
+    transition:
+      width 0.3s ease-in-out,
+      left 0.3s ease-in-out;
+    transform: translateX(-50%);
+  }
+
+  .nav-link2:hover::after {
+    width: 90%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
 }
