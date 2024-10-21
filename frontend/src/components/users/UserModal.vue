@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from "vue"
+import { reactive, ref } from "vue"
 import {
   Dialog,
   DialogClose,
@@ -10,7 +10,7 @@ import {
   DialogTrigger,
   DialogDescription
 } from "@/components/ui/dialog"
-import { signupFormSchema } from "@/lib/formSchemas/signin.form"
+import { signupFormSchema, teams } from "@/lib/formSchemas/signin.form"
 import { useForm, useField } from "vee-validate"
 import { toTypedSchema } from "@vee-validate/zod"
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -104,20 +104,6 @@ const onSubmit = handleSubmit((values) => {
   signinHandler(body)
 })
 
-onMounted(async () => {
-  try{
-    const response = await fetchData("GET", "/teams")
-    teams.value = response.data.data
-  } catch (error) {
-    console.log(error)
-  }
-
-  if (props.mode === "update") {
-    username.value = props.data.username
-    email.value = props.data.email
-  }
-})
-
 </script>
 
 <template>
@@ -209,8 +195,8 @@ onMounted(async () => {
               <div class="grid grid-cols-2 gap-4">
                 <div v-for="team in teams" :key="team" class="flex items-center">
                   <!-- Bind to selectedTeams array using v-model -->
-                  <input type="checkbox" :value="team.id" v-model="selectedTeams" class="mr-2" />
-                  <label>{{ team.name }}</label>
+                  <input type="checkbox" :value="team" v-model="selectedTeams" class="mr-2" />
+                  <label>{{ team }}</label>
                 </div>
               </div>
             </FormControl>
