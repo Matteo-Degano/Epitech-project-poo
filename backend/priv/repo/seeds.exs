@@ -13,7 +13,7 @@
 alias Api.Repo
 # alias Api.Users.Users
 alias Api.Role
-# alias Api.Team
+alias Api.Team
 
 role_data = [
   %{name: "user"},
@@ -29,65 +29,27 @@ roles =
 
 IO.inspect(roles, label: "Roles inserted by seeder")
 
-# Roles
-roles = ["Admin", "General Manager", "Manager", "Employee"]
-
-# Insert roles
-Enum.each(roles, fn role -> Api.Repo.insert!(%Api.Role{name: role}) end)
-
-# Teams
-teams = ["Development", "DevOps", "Marketing", "Sales", "Support", "Management", "RH", "Finance"]
+team_data = [
+  %{name: "Development"},
+  %{name: "DevOps"},
+  %{name: "Marketing"},
+  %{name: "Sales"},
+  %{name: "Support"},
+  %{name: "Management"},
+  %{name: "RH"},
+  %{name: "Finance"}
+]
 
 # Insert teams
-Enum.each(teams, fn team -> Api.Repo.insert!(%Api.Team{name: team}) end)
+teams =
+  Enum.each(team_data, fn team ->
+    Repo.insert!(Team.changeset(%Team{}, team))
+  end)
+
+IO.inspect(teams, label: "Teams inserted by seeder")
 
 # Users
 # email, username, team_id, role_id
 users = [
-  {"admin@example.com", "L'Admin", 1, 1},
-  # {"general_manager@example.com", "Le General Manager", 1, 2},
-  # {"manager@example.com", "Le Manager", 2, 3},
-  # {"john.doe@example.com", "John doe", 2, 4},
-  # {"olivia.brown@example.com", "olivia_brown", 3, 4},
-  # {"noah.jones@example.com", "noah_jones", 3, 4},
-  # {"ava.garcia@example.com", "ava_garcia", 4, 4},
-  # {"elijah.martinez@example.com", "elijah_martinez", 4, 4},
-  # {"sophia.rodriguez@example.com", "sophia_rodriguez", 5, 4},
-  # {"lucas.hernandez@example.com", "lucas_hernandez", 5, 4},
-  # {"mia.moore@example.com", "mia_moore", 6, 4}
+  {"L'admin", "admin@epitech.eu", "postgres", 4, [1]},
 ]
-
-# Insert users and generate working times
-Enum.each(users, fn {email, username, team_id, role_id} ->
-  user = Api.Repo.insert!(%Api.Users.User{email: email, username: username, team_id: team_id, role_id: role_id})
-
-  start_date = DateTime.utc_now();
-  {hour, minute, second} = {9, 30, 0}
-  start_date = DateTime.new!(start_date.date, {hour, minute, second}, "Etc/UTC")
-
-  IO.inspect(start_date)
-
-  # Enum.each(0..29, fn day_offset ->
-
-    # date = DateTime.add(start_date, day_offset, :day)
-
-    # if Date.day_of_week(date) not in [6, 7] do
-
-    #   IO.inspect(date)
-
-    #   start_time = DateTime.add(date, (60 * 60 + 30) * 60, :second)
-    #   end_time = DateTime.add(date, (60 * 60 + 30) * 60, :second)
-
-    #   IO.inspect({start_time, end_time})
-
-
-    #   start_time = DateTime.add(start_time, :rand.uniform(60 * 15), :second)
-    #   end_time = DateTime.add(end_time, :rand.uniform(60 * 15), :second)
-
-    #   start_naive = DateTime.to_naive(start_time) |> NaiveDateTime.truncate(:second)
-    #   end_naive = DateTime.to_naive(end_time) |> NaiveDateTime.truncate(:second)
-
-    #   Api.Repo.insert!(%Api.Workingtimes.Workingtime{start: start_naive, end: end_naive, user_id: user.id})
-    # end
-  # end)
-end)
