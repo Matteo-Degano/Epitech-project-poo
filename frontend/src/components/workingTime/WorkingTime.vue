@@ -83,6 +83,7 @@ async function submitWorkingTime() {
       const response = await fetchData("POST", `/workingtime/${authStore.user.id}`, requestData)
       if (response.status === 201) {
         console.log("Working time created successfully")
+        props.workingTimeData.push(response.data.data)
       } else {
         console.error("Failed to create working time")
       }
@@ -91,7 +92,17 @@ async function submitWorkingTime() {
     }
   } else {
     // PUT request for updating an existing working time
-    await fetchData("PUT", `/workingtime/${props.data.id}`, requestData)
+    try{
+      console.log("Updating working time", requestData)
+      const response = await fetchData("PUT", `/workingtime/${props.data.id}`, requestData)
+      if(response.status === 200) {
+        console.log("Working time updated successfully")
+      } else {
+        console.error("Failed to update working time")
+      }
+    } catch (error) {
+      console.log("Error updating working time", error)
+    }
   }
 
   clearInputs()
