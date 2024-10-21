@@ -14,14 +14,17 @@ import {
 import { DateFormatter, getLocalTimeZone, CalendarDate } from "@internationalized/date"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
+import { useAuthStore } from "@/stores/auth.store"
 
 // Props for mode and data
 const props = defineProps({
   mode: String, // 'create' or 'update'
-  data: Object // Working time data when updating
+  data: Object, // Working time data when updating
+  workingTimeData: Array // Array of working time data
 })
 
 const emit = defineEmits(["close"])
+const authStore = useAuthStore()
 
 // Modal visibility state
 const isModalOpen = ref(false)
@@ -76,10 +79,30 @@ async function submitWorkingTime() {
 
   if (props.mode === "create") {
     // POST request for creating a new working time
-    await fetchData("POST", `/workingtime/1`, requestData)
+    try{
+      const response = await fetchData("POST", `/workingtime/${authStore.user.id}`, requestData)
+      if (response.status === 201) {
+        console.log("Working time created successfully")
+        props.workingTimeData.push(response.data.data)
+      } else {
+        console.error("Failed to create working time")
+      }
+    } catch (error) {
+      console.log("Error creating working time", error)
+    }
   } else {
     // PUT request for updating an existing working time
-    await fetchData("PUT", `/workingtime/${props.data.id}`, requestData)
+    try{
+      console.log("Updating working time", requestData)
+      const response = await fetchData("PUT", `/workingtime/${props.data.id}`, requestData)
+      if(response.status === 200) {
+        console.log("Working time updated successfully")
+      } else {
+        console.error("Failed to update working time")
+      }
+    } catch (error) {
+      console.log("Error updating working time", error)
+    }
   }
 
   clearInputs()
@@ -93,8 +116,8 @@ async function submitWorkingTime() {
   <Dialog>
     <DialogTrigger as-child>
       <!-- Trigger button text changes based on mode -->
-      <Button variant="outline">
-        {{ props.mode === "create" ? "Create Working Time" : "Update Working Time" }}
+      <Button variant="default">
+        {{ props.mode === "create" ? "Create Working Time" : "Update" }}
       </Button>
     </DialogTrigger>
     <DialogContent class="sm:max-w-md">

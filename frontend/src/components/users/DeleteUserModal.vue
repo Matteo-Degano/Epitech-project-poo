@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref} from "vue"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -13,8 +13,8 @@ import {
 
 // Props
 const props = defineProps({
-  id: Number, // Working time id
-  function: Function // Function to delete the working time
+  id: Number, // User id
+  function: Function // Function to delete the user
 })
 
 const emit = defineEmits(["close"])
@@ -31,10 +31,10 @@ const isModalOpen = ref(false)
     </DialogTrigger>
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Delete Working Time</DialogTitle>
+        <DialogTitle>Delete User</DialogTitle>
         <DialogClose />
       </DialogHeader>
-      <p>Are you sure you want to delete this working time?</p>
+      <p>Are you sure you want to delete this user?</p>
       <DialogFooter>
         <DialogClose as-child>
             <Button variant="destructive" @click="props.function(props.id); isModalOpen = false">Delete</Button>
