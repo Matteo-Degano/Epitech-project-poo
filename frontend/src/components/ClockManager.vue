@@ -147,15 +147,27 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="flex items-center gap-2">
-    <!-- v-if="!clockIn" -->
-    <Button  @click="startClock" class="bg-green-600 hover:bg-green-500 w-16">
-      Start
-    </Button>
-    <!-- <Button v-if="clockIn" @click="pause" class="bg-orange-500 hover:bg-orange-400 w-16">
-      Pause
-    </Button> -->
-    <p class="text-xl text-center text-gray-800 w-24">{{ time }}</p>
-    <Button @click="stopClock" class="bg-red-600 hover:bg-red-500 w-16"> Stop </Button>
-  </div>
+<div class="flex items-center gap-2">
+  <!-- Start button (disabled when clockIn is true) -->
+  <Button 
+    :disabled="clockIn" 
+    @click="startClock" 
+    class="bg-green-600 hover:bg-green-500 w-16"
+  >
+    Start
+  </Button>
+
+  <!-- Display the time -->
+  <p class="text-xl text-center text-gray-800 w-24">{{ time }}</p>
+
+  <!-- Stop button (disabled when clockIn is false) -->
+  <Button 
+    :disabled="!clockIn" 
+    @click="stopClock" 
+    class="bg-red-600 hover:bg-red-500 w-16"
+  >
+    Stop
+  </Button>
+</div>
+
 </template>
