@@ -4,6 +4,7 @@ import { fetchData } from "@/services/api"
 import { User } from "lucide-vue-next"
 import { useUserStore } from "@/stores/user"
 import type { APIResponse } from "@/types/api.type"
+import NavbarComponent from "@/components/navigation/NavbarComponent.vue"
 
 const userStore = useUserStore()
 
@@ -32,7 +33,8 @@ async function getUser() {
 async function saveUser() {
   const url = mode.value === "create" ? "/users" : "/users/" + user.value.id
   const method = mode.value === "create" ? "POST" : "PUT"
-  const response: APIResponse = await fetchData(method, url, { user: userForm.value })
+  console.log("Saving user", userForm.value)
+  const response: APIResponse = await fetchData(method, url, userForm.value)
   user.value = response.data
   userStore.setUserId(user.value.id)
   mode.value = "view"
@@ -64,6 +66,7 @@ function toggleMode(newMode: string) {
 </script>
 
 <template>
+  <NavbarComponent />
   <div class="bg-white p-6 rounded-lg w-full h-full">
     <div class="flex items-center gap-2 mb-4">
       <User class="w-5 h-5 text-gray-500" />

@@ -1,104 +1,123 @@
 defmodule Api.Users do
-  @moduledoc """
-  The Users context.
-  """
-
   import Ecto.Query, warn: false
   alias Api.Repo
-
   alias Api.Users.User
+  alias Api.UsersTeams
+  alias Argon2
 
-  @doc """
-  Returns the list of users.
-
-  ## Examples
-
-      iex> list_users()
-      [%User{}, ...]
-
-  """
-  def list_users do
+  def list_users() do
     Repo.all(User)
   end
 
-  @doc """
-  Gets a single user.
+  def list_users_by_username_and_email_with_teams(username, email) do
+    query = from(u in User, where: u.username == ^username and u.email == ^email)
 
-  Raises `Ecto.NoResultsError` if the User does not exist.
+    Repo.all(query)
+    |> Repo.preload(:teams)
+  end
 
-  ## Examples
+  def get_user!(id) do
+    Repo.get!(User, id)
+  end
 
-      iex> get_user!(123)
-      %User{}
+  def get_user_with_teams(id) do
+    Repo.get(User, id)
+    |> Repo.preload(:teams)
+  end
 
-      iex> get_user!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_user!(id), do: Repo.get!(User, id)
-
-  @doc """
-  Creates a user.
-
-  ## Examples
-
-      iex> create_user(%{field: value})
-      {:ok, %User{}}
-
-      iex> create_user(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
   def create_user(attrs \\ %{}) do
-    %User{}
-    |> User.changeset(attrs)
-    |> Repo.insert()
+    team_ids = Map.get(attrs, "team_ids", [])
+
+    changeset =
+      %User{}
+      |> User.changeset(Map.drop(attrs, ["team_ids"]))
+
+    case Repo.insert(changeset) do
+      {:ok, user} ->
+        case associate_teams(user, team_ids) do
+          :ok ->
+            user_with_teams = Repo.preload(user, :teams)
+            {:ok, user_with_teams}
+
+          {:error, reason} ->
+            {:error, reason}
+        end
+
+      {:error, changeset} ->
+        {:error, changeset}
+    end
   end
 
-  @doc """
-  Updates a user.
+  defp associate_teams(user, team_ids) when is_list(team_ids) do
+    Enum.each(team_ids, fn team_id ->
+      users_team_changeset =
+        UsersTeams.changeset(%UsersTeams{}, %{
+          user_id: user.id,
+          team_id: team_id
+        })
 
-  ## Examples
+      case Repo.insert(users_team_changeset) do
+        {:ok, _} -> :ok
+        {:error, changeset} -> {:error, changeset}
+      end
+    end)
+  end
 
-      iex> update_user(user, %{field: new_value})
-      {:ok, %User{}}
+  defp associate_teams(_, _), do: :ok
 
-      iex> update_user(user, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
   def update_user(%User{} = user, attrs) do
-    user
-    |> User.changeset(attrs)
-    |> Repo.update()
+    team_ids = Map.get(attrs, "team_ids", nil)
+
+    user_changeset =
+      user
+      |> User.changeset(Map.drop(attrs, ["team_ids"]))
+
+    case Repo.update(user_changeset) do
+      {:ok, updated_user} ->
+        if team_ids != nil do
+          Repo.delete_all(from(ut in Api.UsersTeams, where: ut.user_id == ^user.id))
+
+          case associate_teams(updated_user, team_ids) do
+            :ok ->
+              user_with_teams = Repo.preload(updated_user, :teams)
+              {:ok, user_with_teams}
+
+            {:error, reason} ->
+              {:error, reason}
+          end
+        else
+          user_with_teams = Repo.preload(updated_user, :teams)
+          {:ok, user_with_teams}
+        end
+
+      {:error, changeset} ->
+        {:error, changeset}
+    end
   end
 
-  @doc """
-  Deletes a user.
-
-  ## Examples
-
-      iex> delete_user(user)
-      {:ok, %User{}}
-
-      iex> delete_user(user)
-      {:error, %Ecto.Changeset{}}
-
-  """
   def delete_user(%User{} = user) do
     Repo.delete(user)
   end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking user changes.
-
-  ## Examples
-
-      iex> change_user(user)
-      %Ecto.Changeset{data: %User{}}
-
-  """
   def change_user(%User{} = user, attrs \\ %{}) do
     User.changeset(user, attrs)
+  end
+
+  def authenticate_user(email, plain_text_password) do
+    query = from(u in User, where: u.email == ^email)
+
+    case Repo.one(query)
+         |> Repo.preload(:teams) do
+      nil ->
+        Argon2.no_user_verify()
+        {:error, :invalid_credentials}
+
+      user ->
+        if Argon2.verify_pass(plain_text_password, user.password) do
+          {:ok, user}
+        else
+          {:error, :invalid_credentials}
+        end
+    end
   end
 end

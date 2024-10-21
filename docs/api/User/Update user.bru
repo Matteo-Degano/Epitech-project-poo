@@ -5,9 +5,9 @@ meta {
 }
 
 put {
-  url: http://localhost:4000/api/users/:id
+  url: >{{base_url}}/users/:id
   body: json
-  auth: none
+  auth: inherit
 }
 
 params:path {
@@ -16,9 +16,8 @@ params:path {
 
 body:json {
   {
-    "user": {
-      "username": "johndoe",
-      "email": "john@doe.com"
-    }
+    "username": "johndoe",
+    "email": "john@doe.com",
+    "team_id": 2
   }
 }

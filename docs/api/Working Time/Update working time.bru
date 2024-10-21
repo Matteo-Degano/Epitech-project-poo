@@ -1,0 +1,22 @@
+meta {
+  name: Update working time
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{base_url}}/workingtime/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 40
+}
+
+body:json {
+  {
+    "start": "2024-10-14 07:30:00",
+    "end": "2024-10-14 17:30:00"
+  }
+}

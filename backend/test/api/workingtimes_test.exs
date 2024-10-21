@@ -8,7 +8,7 @@ defmodule Api.WorkingtimesTest do
 
     import Api.WorkingtimesFixtures
 
-    @invalid_attrs %{start: nil, end: nil, user_id: nil}
+    @invalid_attrs %{start: nil, end: nil}
 
     test "list_workingtimes/0 returns all workingtimes" do
       workingtime = workingtime_fixture()
@@ -21,12 +21,11 @@ defmodule Api.WorkingtimesTest do
     end
 
     test "create_workingtime/1 with valid data creates a workingtime" do
-      valid_attrs = %{start: ~U[2024-10-07 09:46:00Z], end: ~U[2024-10-07 09:46:00Z], user_id: 42}
+      valid_attrs = %{start: ~N[2024-10-08 13:35:00], end: ~N[2024-10-08 13:35:00]}
 
       assert {:ok, %Workingtime{} = workingtime} = Workingtimes.create_workingtime(valid_attrs)
-      assert workingtime.start == ~U[2024-10-07 09:46:00Z]
-      assert workingtime.end == ~U[2024-10-07 09:46:00Z]
-      assert workingtime.user_id == 42
+      assert workingtime.start == ~N[2024-10-08 13:35:00]
+      assert workingtime.end == ~N[2024-10-08 13:35:00]
     end
 
     test "create_workingtime/1 with invalid data returns error changeset" do
@@ -35,12 +34,11 @@ defmodule Api.WorkingtimesTest do
 
     test "update_workingtime/2 with valid data updates the workingtime" do
       workingtime = workingtime_fixture()
-      update_attrs = %{start: ~U[2024-10-08 09:46:00Z], end: ~U[2024-10-08 09:46:00Z], user_id: 43}
+      update_attrs = %{start: ~N[2024-10-09 13:35:00], end: ~N[2024-10-09 13:35:00]}
 
       assert {:ok, %Workingtime{} = workingtime} = Workingtimes.update_workingtime(workingtime, update_attrs)
-      assert workingtime.start == ~U[2024-10-08 09:46:00Z]
-      assert workingtime.end == ~U[2024-10-08 09:46:00Z]
-      assert workingtime.user_id == 43
+      assert workingtime.start == ~N[2024-10-09 13:35:00]
+      assert workingtime.end == ~N[2024-10-09 13:35:00]
     end
 
     test "update_workingtime/2 with invalid data returns error changeset" do

@@ -1,0 +1,16 @@
+meta {
+  name: Get users
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/users?email=john@doe.com&username=johndoe
+  body: none
+  auth: inherit
+}
+
+params:query {
+  email: john@doe.com
+  username: johndoe
+}

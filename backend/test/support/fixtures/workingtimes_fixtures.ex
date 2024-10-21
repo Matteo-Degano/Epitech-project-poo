@@ -11,9 +11,8 @@ defmodule Api.WorkingtimesFixtures do
     {:ok, workingtime} =
       attrs
       |> Enum.into(%{
-        end: ~U[2024-10-07 09:46:00Z],
-        start: ~U[2024-10-07 09:46:00Z],
-        user_id: 42
+        end: ~N[2024-10-08 13:35:00],
+        start: ~N[2024-10-08 13:35:00]
       })
       |> Api.Workingtimes.create_workingtime()
 

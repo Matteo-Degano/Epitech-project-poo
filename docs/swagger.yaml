@@ -1,9 +1,10 @@
 swagger: "2.0"
+host: "localhost:4000"
 basePath: "/api"
 info:
   version: "1.0.0"
   title: "T-POO-700"
-  description: "T-POO-700 API, \n ⚠️ Les responses attendues ne sont sûrement pas celles que le code renverra, ne pas se baser sur ce swagger pour le debuggage ⚠️"
+  description: "T-POO-700 API"
 
 # TAGS
 tags:
@@ -14,33 +15,80 @@ tags:
 - name: "CLOCK"
   description: "CRUD operations for clocks"
 
+securityDefinitions:
+  Bearer:
+    type: "apiKey"
+    name: "Authorization"
+    in: "header"
+    description: "Entrer le token au format : Bearer {token}"
+
 paths:
 
 # PATHS POUR LES USERS 
+
+  /login:
+    post:
+      tags:
+      - "LOGIN"
+      summary: "Login"
+      parameters:
+        - name: "login"
+          in: "body"
+          description: "Log a user"
+          required: false
+          schema:
+           $ref: "#/definitions/LoginData"
+      responses:
+        201: 
+          description: "Ok"
+          schema: 
+            type: "array"
+            items: 
+              $ref: "#/definitions/LoginResponse"
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/loginResponseError"
 
   /users:
     post:
       tags:
       - "USER"
       summary: "Post a user"
+      security:
+        - Bearer: []
       parameters:
         - name: "user"
           in: "body"
-          description: "The username and email of the user"
+          description: "Datas for post a user"
           required: false
           schema:
-           $ref: "#/definitions/users"
+           $ref: "#/definitions/usersData"
       responses:
-        200: 
+        201: 
           description: "Successful operation"
           schema: 
             type: "array"
             items: 
-              $ref: "#/definitions/users"
+              $ref: "#/definitions/usersResponse"
+        400:
+          description: "Bad Request"
+        422:
+          description: "Unprocessable Entity"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/usersResponseError"
     get:
       tags:
       - "USER"
       summary: "Get user by email & username"
+      security:
+        - Bearer: []
       parameters:
         - name: "email"
           in: "query"
@@ -58,7 +106,7 @@ paths:
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/users"
+              $ref: "#/definitions/userGetResponse"
         404: 
           description: "User not found"
   /users/{id}:
@@ -66,6 +114,8 @@ paths:
       tags:
       - "USER"
       summary: "Get user by id"
+      security:
+        - Bearer: []
       parameters:
         - name: "id"
           in: "path"
@@ -76,30 +126,34 @@ paths:
         200:
           description: "Successful operation"
           schema:
-            $ref: "#/definitions/users"
+            $ref: "#/definitions/usersResponse"
         404: 
           description: "User not found"
     delete:
       tags:
       - "USER"
       summary: "Delete user by id"
+      security:
+        - Bearer: []
       parameters:
         - name: "id"
           in: "path"
-          description: "The id of the user"
+          description: "The id of the user (broken because contraint key on clock)"
           required: true
           type: "integer"
       responses:
         200:
           description: "Successful operation"
           schema:
-            $ref: "#/definitions/users"
+            $ref: "#/definitions/usersDeleteResponse"
         404: 
           description: "User not found"
     put:
       tags:
       - "USER"
       summary: "Update user by id"
+      security:
+        - Bearer: []
       parameters:
         - name: "id"
           in: "path"
@@ -111,12 +165,12 @@ paths:
           description: "The new username or email of the user"
           required: false
           schema:
-           $ref: "#/definitions/users"
+           $ref: "#/definitions/usersData"
       responses:
         200:
           description: "Successful operation"
           schema:
-            $ref: "#/definitions/users"
+            $ref: "#/definitions/usersResponse"
         404: 
           description: "User not found"
 
@@ -126,6 +180,8 @@ paths:
       tags: 
         - "WORKING TIME"
       summary: "Get a working time of a user based on the id"
+      security:
+        - Bearer: []
       parameters:
         - name : "userId"
           in: path
@@ -141,7 +197,7 @@ paths:
         200:
           description: "Successful Operation"
           schema:
-            $ref: "#/definitions/workingtime"
+            $ref: "#/definitions/workingtimeResponse"
         404:
           description: "User not found"
 
@@ -150,7 +206,9 @@ paths:
     get:
       tags:
       - "WORKING TIME"
-      summary: "Get working time of a user based on the start and end time"
+      summary: "Get all workings times of a user based on the start and end time"
+      security:
+        - Bearer: []
       parameters:
         - name: "start"
           in: "query"
@@ -166,31 +224,44 @@ paths:
         200: 
           description: "Successful operation"
           schema:
-            $ref: "#/definitions/workingtime"
+            $ref: "#/definitions/workingtimesResponse"
+        404:
+          description: "Not Found"
   
   /workingtime/{userId}:
     post: 
       tags: 
       - "WORKING TIME"
       summary: "Post a new working time for a user with the userId"
+      security:
+        - Bearer: []
       parameters:
        - name: "working time"
          in: body
          description: "The start of the working time"
          required: true
          schema:
-           $ref: "#/definitions/workingtime"
+           $ref: "#/definitions/workingtimeData"
       responses:
-       200:
-         description: "Successful operation"
+       201:
+         description: "Created"
          schema:
-           $ref: "#/definitions/workingtime"
+           $ref: "#/definitions/workingtimeResponse"
+       400:
+         description: "Bad Request"
+       422:
+         description: "Unprocessable Entity"
+         schema:
+           $ref: "#/definitions/workingtimeResponseError"
+
   
   /workingtime/{id}:
     put:
       tags:
       - "WORKING TIME"
       summary: "Put a working time with the id"
+      security:
+        - Bearer: []
       parameters:
        - name: "working time"
          in: body
@@ -201,28 +272,36 @@ paths:
         200:
           description: "Successful Operation"
           schema:
-            $ref: "#/definitions/workingtime"
+            $ref: "#/definitions/workingtimeResponse"
+        404:
+          description: "Not Found"
     
     delete:
       tags:
       - "WORKING TIME"
       summary: "Delete a working time with the id"
+      security:
+        - Bearer: []
       parameters:
        - name: "id"
          in: query
          type: integer
          required: true
       responses:
-        200:
-          description: "Successful Operation"
+        204:
+          description: "No content"
           schema:
-            $ref: "#/definitions/workingtime"
+            $ref: "#/definitions/workingtimeResponse"
+        404:
+          description: "Not Found"
 
   /clocks/{userId}:
     get:
       tags:
       - "CLOCK"
       summary: "Get a clock by user id"
+      security:
+        - Bearer: []
       parameters:
       - name: "userId"
         in: query
@@ -232,12 +311,16 @@ paths:
         200:
           description: "Successful Operation"
           schema:
-            $ref: "#/definitions/clocks"
+            $ref: "#/definitions/clocksResponse"
+        404:
+          description: "Not Found"
 
     post:
       tags:
       - "CLOCK"
       summary: "Post a clock for a userId"
+      security:
+        - Bearer: []
       parameters:
         - name: "userId"
           in: query
@@ -247,28 +330,163 @@ paths:
           in: body
           required: true
           schema:
-            $ref: "#/definitions/clocks_no_user"
+            $ref: "#/definitions/clocksData"
+      responses:
+        201:
+          description: "Created"
+          schema:
+            $ref: "#/definitions/clocksResponse"
+        400:
+          description: "Bad Request"
 
 
 definitions:
 
-  users:
+  LoginData:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+      password:
+        type: "string"
+
+  LoginResponse:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+
+  loginResponseError:
+    type: "object"
+    properties:
+      error:
+        type: "string"
+
+  usersData:
     type: "object"  
     properties:
       username:
         type: "string"
       email:
         type: "string"
+      password: 
+        type: "string"
+      team_id:
+        type: "integer"
+        default: 1
+      role_id:
+        type: "integer"
+        default: 1
 
-  workingtime:
+  usersDeleteResponse:
+    type: "object"  
+    properties:
+      id:
+        type: "integer"
+        default: 1
+
+  usersResponse:
+    type: "object"  
+    properties:
+      id:
+        type: "integer"
+        default: 1
+      username:
+        type: "string"
+      email:
+        type: "string"
+      team:
+        type: "integer"
+        default: 1
+      role:
+        type: "integer"
+        default: 1
+
+  userGetResponse:
+    type: "object"  
+    properties:
+      data: "array"
+      properties:
+        id:
+          type: "integer"
+          default: 1
+        username:
+          type: "string"
+        email:
+          type: "string"
+        team:
+          type: "integer"
+          default: 1
+        role:
+          type: "integer"
+          default: 1
+
+  usersResponseError:
+    type: "object"
+    properties: 
+      errors: 
+        type: "object"
+        properties:
+          username:
+            type: "array"
+            items:
+              type: "string"
+
+  workingtimeData:
     type: "object"
     properties:
       start: 
         type: "string"
       end: 
         type: "string"
-      user:
-        $ref: "#/definitions/users"
+
+  workingtimesResponse:
+      type: "object"
+      properties:
+        data:
+          type: "array"
+          propreties:
+            items:
+            type: "object"
+            properties:
+              id:
+                type: "integer"
+                default: 1
+              start: 
+                type: "string"
+              end: 
+                type: "string"
+              user_id:
+                type: "integer"
+                default: 1
+
+  workingtimeResponse:
+    type: "object"
+    properties:
+      data:
+        type: "object"
+        propreties:
+          id:
+            type: "integer"
+            default: 1
+          start: 
+            type: "string"
+          end: 
+            type: "string"
+          user_id:
+            type: "integer"
+            default: 1
+
+  workingtimeResponseError:
+    type: "object"
+    properties: 
+      errors: 
+        type: "object"
+        properties:
+          user_id:
+            type: "array"
+            items:
+              type: "string"
 
   workingtime_no_user:
     type: "object"
@@ -278,21 +496,33 @@ definitions:
       end: 
         type: "string"
 
-  clocks:
+  clocksResponse:
     type: "object"
     properties:
-      time:
-        type: "string"
-      status:
-        type : "string"
-      user":
-        $ref: "#/definitions/users"
+      data:
+        type: "array"
+        properties:
+          item:
+            type: "object"
+            properties:
+              id: 
+                type: "integer"
+                default: 1
+              time:
+                type: "string"
+              status:
+                type : "boolean"
+                default: true
+              "user":
+                type: "integer"
+                default: 1
 
-  clocks_no_user:
+  clocksData:
     type: "object"
     properties:
       time:
         type: "string"
       status:
-        type : "string"
+        type : "boolean"
+        default: true
     

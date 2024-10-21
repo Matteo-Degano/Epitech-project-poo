@@ -32,11 +32,12 @@ defmodule Api.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:corsica, "~> 1.1"},
       {:phoenix, "~> 1.7.14"},
       {:phoenix_ecto, "~> 4.5"},
       {:phoenix_html, "~> 4.1.1"},
-      {:phoenix_view, "~> 2.0.4"},
-      # {:phoenix_live_view, "~> 0.20.17"},
+      # {:phoenix_view, "~> 2.0.4"},
+      {:phoenix_live_view, "~> 0.20.17"},
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
       {:phoenix_live_dashboard, "~> 0.8.3"},
@@ -56,7 +57,9 @@ defmodule Api.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      {:guardian, "~> 2.3.2"},
+      {:argon2_elixir, "~> 4.1"}
     ]
   end
 

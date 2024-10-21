@@ -1,0 +1,15 @@
+meta {
+  name: Delete working time
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{base_url}}/workingtime/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 40
+}
