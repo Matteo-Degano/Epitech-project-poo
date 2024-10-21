@@ -10,23 +10,22 @@ import {
   DialogTrigger,
   DialogDescription
 } from "@/components/ui/dialog"
-import { signupFormSchema, teams } from "@/lib/formSchemas/signin.form"
+import { signupFormSchema } from "@/lib/formSchemas/signin.form"
 import { useForm, useField } from "vee-validate"
 import { toTypedSchema } from "@vee-validate/zod"
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import {fetchData} from "@/services/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Select } from "@/components/ui/select"
+import { useAuthStore } from "@/stores/auth.store"
 
 const isModalOpen = ref(false)
+const authStore = useAuthStore()
 
 const props = defineProps({
   mode: String, // 'create' or 'update'
   data: Object // UserObject
 })
-
-// const teams = await fetchData("GET", "/teams")
 
 type UserType = {
   id: number
@@ -45,6 +44,12 @@ const signinHandler = async (body: any) => {
   console.log(body)
   const response = await fetchData("POST", "/users", body)
   console.log(response)
+}
+
+const teams = async () => {
+  const response = await fetchData("GET", "/teams")
+  console.log(response)
+  return response.data.data
 }
 
 // Define the form using vee-validate for single form fields
@@ -180,9 +185,10 @@ const onSubmit = handleSubmit((values) => {
           <FormItem>
             <FormLabel>Role</FormLabel>
             <FormControl>
-              <select>
+              <select class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                 <option value="1">Employee</option>
                 <option value="2">Manager</option>
+                <option value="3" v-if="authStore.user.role_id === 4">General manager</option>
               </select>
             </FormControl>
             <FormMessage v-if="errors">{{ errors }}</FormMessage>
@@ -190,7 +196,7 @@ const onSubmit = handleSubmit((values) => {
         </FormField>
 
         <!-- Submit Button -->
-        <Button :disabled="errors" class="w-auto ml-auto" type="submit"> Signin </Button>
+        <Button :disabled="errors" class="w-auto ml-auto" type="submit"> Save </Button>
       </form>
     </DialogContent>
   </Dialog>
