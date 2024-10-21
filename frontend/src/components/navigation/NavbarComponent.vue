@@ -21,6 +21,12 @@ const logoutHandler = async () => {
 
 // Function to check if the link is active
 const isActive = (path: string) => route.path === path
+
+const role = authStore.role
+const employee = 1
+const manager = 2
+const generalManager = 3
+const admin = 4
 </script>
 
 <template>
@@ -28,12 +34,13 @@ const isActive = (path: string) => route.path === path
     <div class="flex justify-between items-center w-full">
       <NavigationMenuList class="flex gap-4">
         <NavigationMenuItem>
-          <router-link to="/" :class="[, 'nav-link', { 'text-primary': isActive('/') }]">
+          <router-link to="/" :class="['nav-link', { 'text-primary': isActive('/') }]">
             <NavigationMenuLink as="div">
               <div class="flex gap-1 items-center"><House :size="18" /> Home</div>
             </NavigationMenuLink>
           </router-link>
         </NavigationMenuItem>
+
         <NavigationMenuItem>
           <router-link
             to="/working-times"
@@ -44,13 +51,15 @@ const isActive = (path: string) => route.path === path
             </NavigationMenuLink>
           </router-link>
         </NavigationMenuItem>
-        <NavigationMenuItem>
+
+        <NavigationMenuItem v-if="role === admin || role === generalManager">
           <router-link to="/users" :class="['nav-link', { 'text-primary': isActive('/users') }]">
             <NavigationMenuLink as="div">
               <div class="flex gap-1 items-center"><Users :size="18" /> Users</div>
             </NavigationMenuLink>
           </router-link>
         </NavigationMenuItem>
+
         <NavigationMenuItem>
           <router-link to="/charts" :class="['nav-link', { 'text-primary': isActive('/charts') }]">
             <NavigationMenuLink as="div">
@@ -58,14 +67,16 @@ const isActive = (path: string) => route.path === path
             </NavigationMenuLink>
           </router-link>
         </NavigationMenuItem>
+
         <NavigationMenuItem>
-          <NavigationMenuLink :class="['nav-link2', 'text-red-600']">
+          <NavigationMenuLink :class="['nav-link', 'text-red-600']">
             <button @click="logoutHandler">
               <div class="flex gap-1 items-center"><LogOut :size="18" /> Logout</div>
             </button>
           </NavigationMenuLink>
         </NavigationMenuItem>
       </NavigationMenuList>
+
       <ClockManager />
     </div>
   </NavigationMenu>
