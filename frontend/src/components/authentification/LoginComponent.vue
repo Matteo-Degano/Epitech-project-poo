@@ -6,7 +6,9 @@ import { toTypedSchema } from "@vee-validate/zod"
 import { useForm, useField } from "vee-validate"
 import { formSchema } from "@/lib/formSchemas/login.form"
 import { useAuthStore } from "@/stores/auth.store"
+import { useToast } from "@/components/ui/toast/use-toast"
 
+const { toast } = useToast()
 const authStore = useAuthStore()
 
 // Define the form and its validation schema using useForm from vee-validate
@@ -15,9 +17,18 @@ const { handleSubmit, errors } = useForm({
 })
 
 // Form submission logic
-const onSubmit = handleSubmit((values) => {
-  console.log(values)
-  authStore.login(values.email, values.password)
+const onSubmit = handleSubmit(async (values) => {
+  const response = await authStore.login(values.email, values.password)
+  if (response.status === 200) {
+    toast({
+      description: `Welcome back ${authStore.username} !`
+    })
+  } else {
+    toast({
+      description: `An error occured, please contact your support team`,
+      variant: "destructive"
+    })
+  }
 })
 
 // Hook for field validation

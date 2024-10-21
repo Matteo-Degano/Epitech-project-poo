@@ -1,5 +1,6 @@
 import router from "@/router"
 import { fetchData } from "@/services/api"
+import type { APIResponse } from "@/types/api.type"
 import { defineStore } from "pinia"
 
 export const useAuthStore = defineStore("auth", {
@@ -14,12 +15,14 @@ export const useAuthStore = defineStore("auth", {
   }),
 
   actions: {
-    async login(email: string, password: string) {
+    async login(email: string, password: string): Promise<APIResponse> {
       try {
         const response = await fetchData("POST", "/login", { email, password })
-        if (response.status !== 200) return
+        if (response.status !== 200) {
+          return response
+        }
+
         const { user } = response.data
-        console.log("Login successful", user)
 
         // Store user, role_id, team_id, email, and username in Pinia
         this.user = user
@@ -38,8 +41,10 @@ export const useAuthStore = defineStore("auth", {
         sessionStorage.setItem("username", user.username)
 
         router.push("/")
+        return response
       } catch (error) {
         console.error("Login failed", error)
+        return { status: 500, data: null, message: "Login failed" } as APIResponse
       }
     },
 
