@@ -4,6 +4,7 @@ export async function fetchData(
   body?: any
 ): Promise<any> {
   try {
+    // Default headers with optional custom headers merged in
     const headers: HeadersInit = {
       "Content-Type": "application/json"
     }
@@ -15,10 +16,17 @@ export async function fetchData(
       credentials: "include" // Important: send cookies with the request
     })
 
+    // Check if the response is successful
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || "An error occurred")
+    }
+
+    // Parse and return the response JSON
     const json = await response.json()
 
     return {
-      data: json.data,
+      data: json,
       status: response.status
     }
   } catch (error) {

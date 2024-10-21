@@ -2,11 +2,14 @@
 import { Button } from "@/components/ui/button"
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { toast } from "@/components/ui/toast"
 import { toTypedSchema } from "@vee-validate/zod"
 import { useForm, useField } from "vee-validate"
-import { h } from "vue"
 import { formSchema } from "@/lib/formSchemas/login.form"
+import { useAuthStore } from "@/stores/auth.store"
+import { useToast } from "@/components/ui/toast/use-toast"
+
+const { toast } = useToast()
+const authStore = useAuthStore()
 
 // Define the form and its validation schema using useForm from vee-validate
 const { handleSubmit, errors } = useForm({
@@ -14,30 +17,32 @@ const { handleSubmit, errors } = useForm({
 })
 
 // Form submission logic
-const onSubmit = handleSubmit((values) => {
-  // Display form values in a toast message upon successful submission
-  toast({
-    title: "You submitted the following values:",
-    description: h(
-      "pre",
-      { class: "mt-2 w-[340px] rounded-md bg-slate-950 p-4" },
-      h("code", { class: "text-white" }, JSON.stringify(values, null, 2))
-    )
-  })
+const onSubmit = handleSubmit(async (values) => {
+  const response = await authStore.login(values.email, values.password)
+  if (response.status === 200) {
+    toast({
+      description: `Welcome back ${authStore.username} !`
+    })
+  } else {
+    toast({
+      description: `An error occured, please contact your support team`,
+      variant: "destructive"
+    })
+  }
 })
 
 // Hook for field validation
-const { value: username } = useField<string>("username")
+const { value: email } = useField<string>("email")
 const { value: password } = useField<string>("password")
 </script>
 
 <template>
   <form class="flex flex-col w-full gap-6 p-2" @submit.prevent="onSubmit">
-    <FormField v-slot="{ componentField, errors }" name="username">
+    <FormField v-slot="{ componentField, errors }" name="email">
       <FormItem>
         <FormLabel>Email</FormLabel>
         <FormControl>
-          <Input type="email" placeholder="email" v-bind="componentField" v-model="username" />
+          <Input type="email" placeholder="email" v-bind="componentField" v-model="email" />
         </FormControl>
         <FormMessage v-if="errors">{{ errors }}</FormMessage>
       </FormItem>
