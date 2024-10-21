@@ -70,8 +70,8 @@ const isActive = (path: string) => route.path === path
             <button @click="logoutHandler">
               <div class="flex gap-1 items-center"><LogOut :size="18" /> Logout</div>
             </button>
-          </NavigationMenuLink>
-        </NavigationMenuItem>
+          </NavigationMenuLink></NavigationMenuItem
+        >
       </NavigationMenuList>
       <ClockManager />
     </div>
