@@ -45,6 +45,7 @@ defmodule ApiWeb.Router do
     pipe_through([:api, :auth, :role_user])
 
     get("/workingtime/:user", WorkingtimeController, :index)
+    get("/chartmanager/:userID", ChartManagerController, :show)
     get("/workingtime/:user/:id", WorkingtimeController, :show)
     post("/workingtime/:user", WorkingtimeController, :create)
     put("/workingtime/:id", WorkingtimeController, :update)

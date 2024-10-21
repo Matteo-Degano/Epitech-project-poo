@@ -21,7 +21,6 @@ defmodule ApiWeb.AuthController do
 
     conn
     |> put_resp_cookie("access_token", access_token,
-      http_only: true,
       # secure: true,
       max_age: 8 * 60 * 60
     )
@@ -74,12 +73,10 @@ defmodule ApiWeb.AuthController do
     conn
     |> put_status(200)
     |> put_resp_cookie("access_token", access_token,
-      http_only: false,
       # secure: true,
       max_age: 8 * 60 * 60
     )
     |> put_resp_cookie("refresh_token", refresh_token,
-      http_only: false,
       # secure: true,
       same_site: "Strict",
       max_age: 7 * 24 * 60 * 60
