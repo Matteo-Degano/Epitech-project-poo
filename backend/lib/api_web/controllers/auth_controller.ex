@@ -48,8 +48,10 @@ defmodule ApiWeb.AuthController do
   end
 
   defp login_reply({:ok, user}, conn) do
+    teams = Enum.map(user.teams, fn team -> %{id: team.id, name: team.name} end)
+
     {:ok, access_token, _claims} =
-      Guardian.encode_and_sign(user, %{role: user.role_id, team: user.team_id},
+      Guardian.encode_and_sign(user, %{role: user.role_id, team: teams},
         ttl: {8, :hours},
         token_type: "access"
       )
@@ -59,6 +61,14 @@ defmodule ApiWeb.AuthController do
         ttl: {7, :days},
         token_type: "refresh"
       )
+
+    response = %{
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role_id: user.role_id,
+      teams: teams
+    }
 
     conn
     |> put_status(200)
@@ -71,7 +81,7 @@ defmodule ApiWeb.AuthController do
       same_site: "Strict",
       max_age: 7 * 24 * 60 * 60
     )
-    |> json(user)
+    |> json(response)
   end
 
   defp login_reply({:error, reason}, conn) do

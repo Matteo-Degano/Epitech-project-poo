@@ -11,6 +11,7 @@ defmodule Api.Users do
 
   def list_users_by_username_and_email_with_teams(username, email) do
     query = from(u in User, where: u.username == ^username and u.email == ^email)
+
     Repo.all(query)
     |> Repo.preload(:teams)
   end
@@ -27,8 +28,9 @@ defmodule Api.Users do
   def create_user(attrs \\ %{}) do
     team_ids = Map.get(attrs, "team_ids", [])
 
-    changeset = %User{}
-    |> User.changeset(Map.drop(attrs, ["team_ids"]))
+    changeset =
+      %User{}
+      |> User.changeset(Map.drop(attrs, ["team_ids"]))
 
     case Repo.insert(changeset) do
       {:ok, user} ->
@@ -36,6 +38,7 @@ defmodule Api.Users do
           :ok ->
             user_with_teams = Repo.preload(user, :teams)
             {:ok, user_with_teams}
+
           {:error, reason} ->
             {:error, reason}
         end
@@ -47,10 +50,11 @@ defmodule Api.Users do
 
   defp associate_teams(user, team_ids) when is_list(team_ids) do
     Enum.each(team_ids, fn team_id ->
-      users_team_changeset = UsersTeams.changeset(%UsersTeams{}, %{
-        user_id: user.id,
-        team_id: team_id
-      })
+      users_team_changeset =
+        UsersTeams.changeset(%UsersTeams{}, %{
+          user_id: user.id,
+          team_id: team_id
+        })
 
       case Repo.insert(users_team_changeset) do
         {:ok, _} -> :ok
@@ -64,8 +68,9 @@ defmodule Api.Users do
   def update_user(%User{} = user, attrs) do
     team_ids = Map.get(attrs, "team_ids", nil)
 
-    user_changeset = user
-    |> User.changeset(Map.drop(attrs, ["team_ids"]))
+    user_changeset =
+      user
+      |> User.changeset(Map.drop(attrs, ["team_ids"]))
 
     case Repo.update(user_changeset) do
       {:ok, updated_user} ->
@@ -73,19 +78,22 @@ defmodule Api.Users do
           Repo.delete_all(from(ut in Api.UsersTeams, where: ut.user_id == ^user.id))
 
           case associate_teams(updated_user, team_ids) do
-            :ok -> {:ok, updated_user}
-            {:error, reason} -> {:error, reason}
+            :ok ->
+              user_with_teams = Repo.preload(updated_user, :teams)
+              {:ok, user_with_teams}
+
+            {:error, reason} ->
+              {:error, reason}
           end
         else
-          {:ok, updated_user}
+          user_with_teams = Repo.preload(updated_user, :teams)
+          {:ok, user_with_teams}
         end
 
       {:error, changeset} ->
         {:error, changeset}
     end
   end
-
-
 
   def delete_user(%User{} = user) do
     Repo.delete(user)
@@ -98,7 +106,8 @@ defmodule Api.Users do
   def authenticate_user(email, plain_text_password) do
     query = from(u in User, where: u.email == ^email)
 
-    case Repo.one(query) do
+    case Repo.one(query)
+         |> Repo.preload(:teams) do
       nil ->
         Argon2.no_user_verify()
         {:error, :invalid_credentials}
