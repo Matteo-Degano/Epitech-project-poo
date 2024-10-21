@@ -4,8 +4,7 @@ defmodule ApiWeb.AuthController do
   alias Api.{Users, Users.Guardian}
 
   def refresh(conn, _params) do
-    auth_header = to_string(get_req_header(conn, "authorization"))
-    refresh_token = List.last(String.split(auth_header))
+    refresh_token = Map.get(conn.cookies, "refresh_token")
 
     Guardian.decode_and_verify(refresh_token, %{"typ" => "refresh"})
     |> refresh_reply(conn)
@@ -51,7 +50,7 @@ defmodule ApiWeb.AuthController do
 
   defp login_reply({:ok, user}, conn) do
     {:ok, access_token, _claims} =
-      Guardian.encode_and_sign(user, %{role: user.role_id},
+      Guardian.encode_and_sign(user, %{role: user.role_id, team: user.team_id},
         ttl: {8, :hours},
         token_type: "access"
       )
@@ -65,22 +64,22 @@ defmodule ApiWeb.AuthController do
     conn
     |> put_status(200)
     |> put_resp_cookie("access_token", access_token,
-      http_only: true,
+      http_only: false,
       # secure: true,
       max_age: 8 * 60 * 60
     )
     |> put_resp_cookie("refresh_token", refresh_token,
-      http_only: true,
+      http_only: false,
       # secure: true,
       same_site: "Strict",
       max_age: 7 * 24 * 60 * 60
     )
-    |> json(%{message: "Authenticated successfully."})
+    |> json(user)
   end
 
   defp login_reply({:error, reason}, conn) do
     conn
-    |> put_status(401)
+    |> put_status(400)
     |> json(%{error: reason})
   end
 end

@@ -9,6 +9,9 @@ defmodule Api.Users.ErrorHandler do
 
     conn
     |> put_resp_content_type("application/json")
-    |> send_resp(401, "Type: #{to_string(type)} \nReason:  #{to_string(reason)}")
+    |> send_resp(
+      401,
+      "\{\n\"Type\": \"#{to_string(type)}\",\n  \"Reason\":  \"#{to_string(reason)}\"\n\}"
+    )
   end
 end

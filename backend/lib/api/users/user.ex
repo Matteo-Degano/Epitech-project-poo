@@ -12,12 +12,12 @@ defmodule Api.Users.User do
     timestamps(type: :utc_datetime)
   end
 
-
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:username, :email, :password, :role_id])
-    |> validate_required([:username, :email, :password,:role_id])
+    |> cast(attrs, [:id, :username, :email, :password, :role_id])
+    |> validate_required([:username, :email, :password, :role_id])
+    |> foreign_key_constraint(:team_id)
     |> foreign_key_constraint(:role_id)
     |> unique_constraint(:username)
     |> unique_constraint(:email)

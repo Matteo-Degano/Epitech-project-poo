@@ -1,4 +1,5 @@
 defmodule ApiWeb.Router do
+  alias Api.Plug.AuthorizeRole
   use ApiWeb, :router
 
   pipeline :api do
@@ -6,11 +7,29 @@ defmodule ApiWeb.Router do
   end
 
   pipeline :auth do
-    plug(Api.Users.Pipeline)
+    plug(Api.Plug.CheckCookie)
+  end
+
+  pipeline :role_admin do
+    plug(AuthorizeRole, "admin")
+  end
+
+  pipeline :role_general_manager do
+    plug(AuthorizeRole, "general_manager")
+  end
+
+  pipeline :role_manager do
+    plug(AuthorizeRole, "manager")
+  end
+
+  pipeline :role_user do
+    plug(AuthorizeRole, "user")
   end
 
   scope "/api", ApiWeb do
     pipe_through([:api])
+
+    options "/*path", Corsica, origins: "*", allow_methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], allow_headers: ["content-type", "authorization", "api_key"]
 
     post("/login", AuthController, :login)
     post("/refresh", AuthController, :refresh)
@@ -20,7 +39,7 @@ defmodule ApiWeb.Router do
   end
 
   scope "/api", ApiWeb do
-    pipe_through([:api, :auth])
+    pipe_through([:api, :auth, :role_user])
 
     get("/workingtime/:user", WorkingtimeController, :index)
     get("/workingtime/:user/:id", WorkingtimeController, :show)
@@ -40,7 +59,6 @@ defmodule ApiWeb.Router do
     # you can use Plug.BasicAuth to set up some basic authentication
     # as long as you are also using SSL (which you should anyway).
     import Phoenix.LiveDashboard.Router
-
     scope "/dev" do
       pipe_through([:fetch_session, :protect_from_forgery])
 
