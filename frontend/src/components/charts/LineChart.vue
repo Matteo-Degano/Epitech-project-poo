@@ -4,7 +4,7 @@ import { LineChart as ChartLib } from "@/components/ui/chart-line"
 
 // Accept props
 const props = defineProps<{
-  data: { day: string; time_worked: number }[] // Props structure
+  data: { day: string; time_worked: number }[]
 }>()
 
 // Function to format the day into DAY/MONTH format
@@ -15,7 +15,7 @@ const formatDay = (day: string) => {
 
 // Transform the data, prepend a fake value with 0 hours, and rename 'time_worked' to 'hours'
 const transformedData = computed(() => {
-  const fakeEntry = { day: "", hours: 0 } // Create a fake entry with 0 hours and no date
+  const fakeEntry = { day: "", hours: 0 } // Create a fake entry with 0 hours and no date to be at the begining of the chart
 
   const formattedData = props.data.map((item) => ({
     day: formatDay(item.day), // Format the day to DD/MM

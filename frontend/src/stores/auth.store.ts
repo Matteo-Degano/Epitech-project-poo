@@ -22,8 +22,10 @@ export const useAuthStore = defineStore("auth", {
           return response
         }
 
-        const { user } = response.data
+        console.log("Login response", response)
+        const user = response.data
 
+        console.log("Login successful", user)
         // Store user, role_id, team_id, email, and username in Pinia
         this.user = user
         this.userId = user.id
@@ -55,6 +57,7 @@ export const useAuthStore = defineStore("auth", {
       this.user = null
       this.role = 0
       this.team = 0
+      this.userId = 0
       this.email = ""
       this.username = ""
 
