@@ -434,7 +434,8 @@ const filterColumns = [{column: 'username', fieldName: 'name'}, {column: 'email'
 </script>
 
 <template>
-  <h1>Users</h1>
+  <div class="flex justify-end mb-4">
     <UserModal mode="create" :data="{}" />
-    <DataTable :columns="columns" :data="data" :filters="filterColumns"/>
+  </div>
+  <DataTable :columns="columns" :data="data" :filters="filterColumns"/>
 </template>
