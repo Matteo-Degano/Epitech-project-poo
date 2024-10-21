@@ -32,7 +32,10 @@ roles =
 IO.inspect(roles, label: "Roles inserted by seeder")
 
 team_data = [
-  %{name: "Development"},
+  %{name: "Developpeur Front-end"},
+  %{name: "Développeur Back-end"},
+  %{name: "Développeur Fullstack"},
+  %{name: "Ingénieur Robotique"},
   %{name: "DevOps"},
   %{name: "Marketing"},
   %{name: "Sales"},
@@ -55,12 +58,12 @@ users = [
   %{username: "Le général manager", email: "generalmanager@epitech.eu", password: "password", role_id: 3, team_ids: [1]},
   %{username: "Le manager", email: "manager@epitech.eu", password: "password", role_id: 2, team_ids: [1]},
   %{username: "Le user", email: "user@epitech.eu", password: "password", role_id: 1, team_ids: [1]},
-  %{username: "John Doe", email: "johndoe@epitech.eu", password: "password", role_id: 1, team_ids: [1, 3]},
+  %{username: "John Doe", email: "johndoe@epitech.eu", password: "password", role_id: 1, team_ids: [1, 3, 10]},
   %{username: "Jane Doe", email: "janedoe@epitech.eu", password: "password", role_id: 1, team_ids: [4, 6]},
   %{username: "Jane Smith", email: "janesmith@epitech", password: "password", role_id: 1, team_ids: [7, 8]},
   %{username: "Marie Jane", email: "mariejane@epitech", password: "password", role_id: 1, team_ids: [1, 2, 3, 7, 8]},
-  %{username: "Luke Skywalker", email: "lukeskywalker@epitech", password: "password", role_id: 1, team_ids: [1, 8]},
-  %{username: "Theo Lepage", email: "theolepage@epitech", password: "password", role_id: 1, team_ids: [4,]},
+  %{username: "Luke Skywalker", email: "lukeskywalker@epitech", password: "password", role_id: 1, team_ids: [1, 8, 9]},
+  %{username: "Theo Lepage", email: "theolepage@epitech", password: "password", role_id: 1, team_ids: [4,11]},
   %{username: "Jean Dupont", email: "jeandupont@epitech", password: "password", role_id: 1, team_ids: [3]},
   %{username: "Doriyan Volkiviz", email: "doriyanvolkiviz@epitech.eu", password: "motdepasse", role_id: 1, team_ids: [1, 2, 3]},
 ]
