@@ -10,7 +10,7 @@ import {
   DialogTrigger,
   DialogDescription
 } from "@/components/ui/dialog"
-import { signupFormSchema, teams } from "@/lib/formSchemas/signin.form"
+import { signupFormSchema } from "@/lib/formSchemas/signin.form"
 import { useForm, useField } from "vee-validate"
 import { toTypedSchema } from "@vee-validate/zod"
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -25,7 +25,8 @@ const authStore = useAuthStore()
 
 const props = defineProps({
   mode: String, // 'create' or 'update'
-  data: Object // UserObject
+  data: Object, // UserObject
+  teams: Array
 })
 
 const signinHandler = async (body: any) => {
@@ -73,8 +74,6 @@ const signinHandler = async (body: any) => {
     }
   }
 }
-
-const teams = ref<string[]>([])
 
 // Define the form using vee-validate for single form fields
 const { handleSubmit, errors } = useForm({
@@ -193,10 +192,10 @@ const onSubmit = handleSubmit((values) => {
             <FormLabel>Select Teams</FormLabel>
             <FormControl>
               <div class="grid grid-cols-2 gap-4">
-                <div v-for="team in teams" :key="team" class="flex items-center">
+                <div v-for="team in props.teams" :key="team" class="flex items-center">
                   <!-- Bind to selectedTeams array using v-model -->
-                  <input type="checkbox" :value="team" v-model="selectedTeams" class="mr-2" />
-                  <label>{{ team }}</label>
+                  <input type="checkbox" :value="team.id" v-model="selectedTeams" class="mr-2" />
+                  <label>{{ team.name }}</label>
                 </div>
               </div>
             </FormControl>
