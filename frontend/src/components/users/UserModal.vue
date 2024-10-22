@@ -33,7 +33,8 @@ type User = {
     id: number
     username: string
     email: string
-    role: number
+    role_id: number
+    teams: Team[]
 }
 
 const props = defineProps<{

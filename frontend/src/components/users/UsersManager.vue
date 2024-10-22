@@ -18,7 +18,8 @@ type User = {
     id: number
     username: string
     email: string
-    role: number
+    role_id: number
+    teams: Team[]
 }
 
 type Team = {
@@ -53,7 +54,7 @@ async function fetchUsers(){
     // Fetch data when the component is mounted
     const response = await fetchData("GET", "/users")
     // console.log("Working times fetched successfully", response.data.data)
-    usersData.value = response.data.data
+    usersData.value = response.data
     console.log("Users fetched successfully", usersData.value)
   } catch (error) {
     console.log(error)
@@ -113,25 +114,25 @@ const columns: ColumnDef<User>[] = [
     cell: ({ row }) => h('div', { class: 'text-left font-medium' }, row.getValue('email')),
   },
   {
-    accessorKey: 'role',
+    accessorKey: 'role_id',
     header: ({ column }) => {
       return h(Button, {
         variant: 'ghost',
         onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
       }, () => ['Role', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
     },
-    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, idToStringRole(row.getValue('role'))),
+    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, idToStringRole(row.getValue('role_id'))),
   },
-  // {
-  //   accessorKey: 'team_id',
-  //   header: ({ column }) => {
-  //     return h(Button, {
-  //       variant: 'ghost',
-  //       onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-  //     }, () => ['Teams', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
-  //   },
-  //   cell: ({ row }) => h('div', { class: 'text-left font-medium' }, (row.getValue('team_id') as string[]).join(", ")),
-  // },
+  {
+    accessorKey: 'teams',
+    header: ({ column }) => {
+      return h(Button, {
+        variant: 'ghost',
+        onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+      }, () => ['Teams', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
+    },
+    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, (row.getValue('teams') as Team[]).map(team => team.name).join(', ')),
+  },
   {
     id: 'actions',
     enableHiding: false,
@@ -147,7 +148,7 @@ const columns: ColumnDef<User>[] = [
   }
 ]
 
-const filterColumns = [{column: 'username', fieldName: 'name'}, {column: 'email', fieldName: 'email'}, {column: 'role', fieldName: 'role'}]
+const filterColumns = [{column: 'username', fieldName: 'name'}, {column: 'email', fieldName: 'email'}, {column: 'role', fieldName: 'role'}, {column: 'teams', fieldName: 'teams'}]
 
 
 </script>
