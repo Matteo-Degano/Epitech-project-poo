@@ -32,7 +32,7 @@ type User = {
     id: number
     username: string
     email: string
-    role: string
+    role: number
 }
 
 const props = defineProps<{
@@ -113,6 +113,12 @@ const onSubmit = handleSubmit((values) => {
   }
   submitForm(body)
 })
+
+if(props.mode === "update") {
+  selectedRole.value = props.data.role
+  username.value = props.data.username
+  email.value = props.data.email
+}
 
 </script>
 
