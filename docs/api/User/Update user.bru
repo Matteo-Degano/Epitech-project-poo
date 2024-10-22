@@ -5,19 +5,19 @@ meta {
 }
 
 put {
-  url: >{{base_url}}/users/:id
+  url: {{base_url}}/users/:id
   body: json
   auth: inherit
 }
 
 params:path {
-  id: 1
+  id: 2
 }
 
 body:json {
   {
     "username": "johndoe",
     "email": "john@doe.com",
-    "team_id": 2
+    "team_ids": [1, 2]
   }
 }

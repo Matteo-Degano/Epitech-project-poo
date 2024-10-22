@@ -1,10 +1,9 @@
 defmodule Api.Plug.AuthorizeRole do
   import Plug.Conn
 
-  alias Api.Repo
+  alias Api.Roles
   alias Api.Users.Guardian
   alias Api.Plug.CheckCookie
-  alias Api.Role
 
   def init(opts), do: opts
 
@@ -27,11 +26,7 @@ defmodule Api.Plug.AuthorizeRole do
   defp get_role(conn) do
     {_, token} = CheckCookie.get_tokens(conn)
     {:ok, token_data} = Guardian.decode_and_verify(token)
-    get_role_name(token_data["role"])
-  end
-
-  defp get_role_name(id) do
-    Repo.get!(Role, id).name
+    Roles.get_role!(token_data["role"])
   end
 
   defp is_authorized(role, opts) do

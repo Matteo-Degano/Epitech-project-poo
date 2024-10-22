@@ -12,7 +12,7 @@
 
 alias Api.Repo
 alias Api.Users.User
-alias Api.Role
+alias Api.Roles.Role
 alias Api.Team
 alias Api.Workingtimes.Workingtime
 alias Api.UsersTeams
