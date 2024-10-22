@@ -7,10 +7,27 @@ defmodule Api.Users do
 
   def list_users() do
     Repo.all(User)
+    |> Repo.preload(:teams)
   end
 
-  def list_users_by_username_and_email_with_teams(username, email) do
-    query = from(u in User, where: u.username == ^username and u.email == ^email)
+  def list_users_by_username_or_email_with_teams(attrs \\ %{}) do
+    username = Map.get(attrs, "username", false)
+    email = Map.get(attrs, "email", false)
+
+    query =
+      cond do
+        username && email ->
+          from(u in User, where: u.username == ^username and u.email == ^email)
+
+        !username && email ->
+          from(u in User, where: u.email == ^email)
+
+        username && !email ->
+          from(u in User, where: u.username == ^username)
+
+        true ->
+          from(u in User)
+      end
 
     Repo.all(query)
     |> Repo.preload(:teams)
@@ -37,7 +54,7 @@ defmodule Api.Users do
     case Repo.insert(changeset) do
       {:ok, user} ->
         case associate_teams(user, team_ids) do
-          :ok ->
+          {:ok, _} ->
             user_with_teams = Repo.preload(user, :teams)
             {:ok, user_with_teams}
 
