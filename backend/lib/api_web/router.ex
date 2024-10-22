@@ -1,4 +1,5 @@
 defmodule ApiWeb.Router do
+  # alias ApiWeb.UserController
   alias Api.Plug.AuthorizeRole
   use ApiWeb, :router
 
@@ -34,6 +35,7 @@ defmodule ApiWeb.Router do
   scope "/api", ApiWeb do
     pipe_through([:api])
 
+    # Users
     post("/login", AuthController, :login)
     post("/refresh", AuthController, :refresh)
     post("/logout", AuthController, :logout)
@@ -44,21 +46,24 @@ defmodule ApiWeb.Router do
   scope "/api", ApiWeb do
     pipe_through([:api, :auth, :role_user])
 
-    get("teams/:id", TeamController, :show)
-    get("teams", TeamController, :index)
-    post("/teams", TeamController, :create)
-    put("/teams/:id", TeamController, :update)
-    delete("/teams/:id", TeamController, :delete)
-
+    # Workingtimes
+    get("/workingtime", WorkingtimeController, :show)
     get("/workingtime/:user", WorkingtimeController, :index)
-    get("/chartmanager/:userID", ChartManagerController, :show)
+    get("/chartmanager/:userID", ChartManagerController, :show_user_workingtime)
     get("/workingtime/:user/:id", WorkingtimeController, :show)
     post("/workingtime/:user", WorkingtimeController, :create)
     put("/workingtime/:id", WorkingtimeController, :update)
     delete("/workingtime/:id", WorkingtimeController, :delete)
 
+    # Clocks
     get("/clocks/:user", ClocksController, :show)
     post("/clocks/:user", ClocksController, :create)
+  end
+
+  scope "api", ApiWeb do
+    pipe_through([:api, :auth, :role_general_manager])
+
+    # Users
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

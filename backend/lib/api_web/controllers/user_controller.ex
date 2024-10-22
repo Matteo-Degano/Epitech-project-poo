@@ -73,6 +73,7 @@ defmodule ApiWeb.UserController do
 
       user ->
         teams = Enum.map(user.teams, fn team -> %{id: team.id, name: team.name} end)
+        IO.inspect(user.teams, label: "user teams")
 
         response = %{
           id: user.id,
