@@ -119,7 +119,8 @@ const onSubmit = handleSubmit((values) => {
 })
 
 if(props.mode === "update") {
-  selectedRole.value = props.data.role
+  selectedTeams.value = props.data.teams.map(team => team.id.toString())
+  selectedRole.value = props.data.role_id
   username.value = props.data.username
   email.value = props.data.email
 }
