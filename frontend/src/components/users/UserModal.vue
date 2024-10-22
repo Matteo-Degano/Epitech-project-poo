@@ -38,14 +38,13 @@ type User = {
 }
 
 const props = defineProps<{
-  mode: string // 'create' or 'update'
-  data: User // UserObject
+  mode: string 
+  data: User
   teams: Team[]
 }>()
 
 const submitForm = async (body: any) => {
   if (props.mode === "create") {
-    // POST request for creating a new user
     try{
       const response = await fetchData("POST", "/users", body)
       if (response.status === 201) {
@@ -67,7 +66,6 @@ const submitForm = async (body: any) => {
       console.log(error)
     }
   } else {
-    // PUT request for updating an existing user
     try{
       const response = await fetchData("PUT", `/users/${props.data.id}`, body)
       if (response.status === 200) {
@@ -91,22 +89,18 @@ const submitForm = async (body: any) => {
   }
 }
 
-// Define the form using vee-validate for single form fields
 const { handleSubmit, errors } = useForm({
   validationSchema: toTypedSchema(signupFormSchema)
 })
 
-// Initialize selectedTeams as a reactive array (best for multiple checkboxes)
 const selectedTeams = ref<string[]>([])
 const selectedRole = ref<number>()
 
-// Hooks for field validation (regular form fields)
 const { value: username } = useField<string>("username")
 const { value: email } = useField<string>("email")
 const { value: password } = useField<string>("password")
 const { value: confirmPassword } = useField<string>("confirmPassword")
 
-// Form submission logic
 const onSubmit = handleSubmit((values) => {
   const body = {
     username: values.username,
@@ -247,7 +241,7 @@ const isSaveDisabled = computed(() => {
 
         <!-- Submit Button -->
         <DialogClose as-child>
-          <Button :disabled="isSaveDisabled" class="w-auto ml-auto" type="submit"> Save </Button>
+          <Button :disabled="isSaveDisabled" class="w-auto ml-auto" type="submit"> {{ props.mode === "create" ? "Create": "Update" }} </Button>
         </DialogClose>
       </form>
     </DialogContent>

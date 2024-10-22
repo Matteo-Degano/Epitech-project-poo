@@ -137,7 +137,7 @@ const columns: ColumnDef<User>[] = [
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      return h("div", { class: "flex gap-4" }, [
+      return h("div", { class: "flex gap-4 float-right" }, [
         h(UserModal, { mode: "update", data: row.original, teams: teamsData.value , onRefresh: fetchUsers }),
         h(
           DeleteUserModal,
@@ -148,7 +148,7 @@ const columns: ColumnDef<User>[] = [
   }
 ]
 
-const filterColumns = [{column: 'username', fieldName: 'name'}, {column: 'email', fieldName: 'email'}, {column: 'role', fieldName: 'role'}, {column: 'teams', fieldName: 'teams'}]
+const filterColumns = [{column: 'username', fieldName: 'name'}, {column: 'email', fieldName: 'email'}, {column: 'role_id', fieldName: 'role'}, {column: 'teams', fieldName: 'teams'}]
 
 
 </script>
