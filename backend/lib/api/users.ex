@@ -54,7 +54,7 @@ defmodule Api.Users do
     case Repo.insert(changeset) do
       {:ok, user} ->
         case associate_teams(user, team_ids) do
-          {:ok, _} ->
+          :ok ->
             user_with_teams = Repo.preload(user, :teams)
             {:ok, user_with_teams}
 
