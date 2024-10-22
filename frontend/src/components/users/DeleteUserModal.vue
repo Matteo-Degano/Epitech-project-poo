@@ -8,7 +8,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
+  DialogDescription
 } from "@/components/ui/dialog"
 
 // Props
@@ -32,12 +33,12 @@ const isModalOpen = ref(false)
     <DialogContent>
       <DialogHeader>
         <DialogTitle>Delete User</DialogTitle>
-        <DialogClose />
+        <DialogDescription></DialogDescription>
       </DialogHeader>
       <p>Are you sure you want to delete this user?</p>
       <DialogFooter>
         <DialogClose as-child>
-            <Button variant="destructive" @click="props.function(props.id); isModalOpen = false">Delete</Button>
+            <Button variant="destructive" @click="props.function && props.function(props.id); isModalOpen = false">Delete</Button>
         </DialogClose>
         <DialogClose as-child>
             <Button variant="secondary" @click="isModalOpen = false">Cancel</Button>
