@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { reactive, ref } from "vue"
+import { ref } from "vue"
 import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -14,7 +13,7 @@ import { signupFormSchema, teams } from "@/lib/formSchemas/signin.form"
 import { useForm, useField } from "vee-validate"
 import { toTypedSchema } from "@vee-validate/zod"
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import {fetchData} from "@/services/api"
+import { fetchData } from "@/services/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useAuthStore } from "@/stores/auth.store"
@@ -31,7 +30,7 @@ const props = defineProps({
 const signinHandler = async (body: any) => {
   if (props.mode === "create") {
     // POST request for creating a new user
-    try{
+    try {
       const response = await fetchData("POST", "/users", body)
       if (response.status === 201) {
         toast({
@@ -52,7 +51,7 @@ const signinHandler = async (body: any) => {
     }
   } else {
     // PUT request for updating an existing user
-    try{
+    try {
       const response = await fetchData("PUT", `/users/${props.data.id}`, body)
       if (response.status === 200) {
         toast({
@@ -103,7 +102,6 @@ const onSubmit = handleSubmit((values) => {
   }
   signinHandler(body)
 })
-
 </script>
 
 <template>
@@ -119,7 +117,11 @@ const onSubmit = handleSubmit((values) => {
           {{ props.mode === "create" ? "Create user" : "Update user" }}
         </DialogTitle>
         <DialogDescription>
-          {{ props.mode === "create" ? "Create an user here. Click save when you're done." : "Make changes to an user here. Click save when you're done." }}
+          {{
+            props.mode === "create"
+              ? "Create an user here. Click save when you're done."
+              : "Make changes to an user here. Click save when you're done."
+          }}
         </DialogDescription>
       </DialogHeader>
       <form class="flex flex-col w-full gap-6 p-2" @submit.prevent="onSubmit">
@@ -128,12 +130,12 @@ const onSubmit = handleSubmit((values) => {
           <FormItem>
             <FormLabel>Username</FormLabel>
             <FormControl>
-              <Input 
-                type="text" 
-                placeholder="Username" 
-                v-bind="componentField" 
-                v-model="username" 
-                />
+              <Input
+                type="text"
+                placeholder="Username"
+                v-bind="componentField"
+                v-model="username"
+              />
             </FormControl>
             <FormMessage v-if="errors">{{ errors }}</FormMessage>
           </FormItem>
@@ -205,11 +207,14 @@ const onSubmit = handleSubmit((values) => {
         </FormField>
 
         <!-- Role Selection -->
-        <FormField v-slot="{errors}" name="role">
+        <FormField v-slot="{ errors }" name="role">
           <FormItem>
             <FormLabel>Role</FormLabel>
             <FormControl>
-              <select v-model="selectedRole" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+              <select
+                v-model="selectedRole"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
                 <option value="1">Employee</option>
                 <option value="2">Manager</option>
                 <option value="3" v-if="authStore.user.role_id === 4">General manager</option>

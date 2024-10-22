@@ -15,41 +15,40 @@ import { DateFormatter, getLocalTimeZone, CalendarDate } from "@internationalize
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 import { useAuthStore } from "@/stores/auth.store"
+import DialogDescription from "../ui/dialog/DialogDescription.vue"
+import { useToast } from "../ui/toast/use-toast"
+import { CirclePlus } from "lucide-vue-next"
+import type { APIResponse } from "@/types/api.type"
 
-// Props for mode and data
 const props = defineProps({
-  mode: String, // 'create' or 'update'
-  data: Object, // Working time data when updating
-  workingTimeData: Array // Array of working time data
+  mode: String,
+  data: Object,
+  workingTimeData: Array
 })
 
-const emit = defineEmits(["close"])
+const { toast } = useToast()
 const authStore = useAuthStore()
-
-// Modal visibility state
 const isModalOpen = ref(false)
+const selectedDate = ref(getInitialDate() || null)
+const emit = defineEmits(["close", "refresh"])
 
-// Reactive state for date and time range
 function getInitialDate() {
   const date = props.data?.start.split("T")[0]
   if (date) {
-    let [year, month, day] = date.split("-")
-    return new CalendarDate("AD", year, month, day)
+    let [year, month, day] = date.split("-").map(Number)
+    return new CalendarDate(year, month, day)
   }
 }
 
-const selectedDate = ref(getInitialDate() || null) // Date picker state
 const timeRange = ref({
   start: props.data?.start.split("T")[1].split(".")[0] || "",
   end: props.data?.end.split("T")[1].split(".")[0] || ""
 })
 
-// DateFormatter to format the selected date
 const df = new DateFormatter("en-US", {
   dateStyle: "long"
 })
 
-// Watch for changes in props to update date and timeRange values
 watch(
   () => props.data,
   (newValue) => {
@@ -70,43 +69,46 @@ function clearInputs() {
   timeRange.value.end = ""
 }
 
-// Function to handle the submission (create or update)
 async function submitWorkingTime() {
+  const formattedDate = `${selectedDate?.value?.year}-${String(selectedDate?.value?.month).padStart(2, "0")}-${String(selectedDate?.value?.day).padStart(2, "0")}`
+
   const requestData = {
-    start: `${selectedDate.value ? selectedDate.value.toDate().toISOString().split("T")[0] : null}T${timeRange.value.start}:00Z`,
-    end: `${selectedDate.value ? selectedDate.value.toDate().toISOString().split("T")[0] : null}T${timeRange.value.end}:00Z`
+    start: `${formattedDate} ${timeRange.value.start}`,
+    end: `${formattedDate} ${timeRange.value.end}`
   }
 
-  if (props.mode === "create") {
-    // POST request for creating a new working time
-    try{
-      const response = await fetchData("POST", `/workingtime/${authStore.user.id}`, requestData)
-      if (response.status === 201) {
-        console.log("Working time created successfully")
-        props.workingTimeData.push(response.data.data)
-      } else {
-        console.error("Failed to create working time")
-      }
-    } catch (error) {
-      console.log("Error creating working time", error)
+  try {
+    let response: APIResponse
+    let description: string
+    if (props.mode === "create") {
+      response = await fetchData("POST", `/workingtime/${authStore.user.id}`, requestData)
+      description = "Working time created successfully"
+    } else {
+      response = await fetchData("PUT", `/workingtime/${props?.data?.id}`, requestData)
+      description = "Working time updated successfully"
     }
-  } else {
-    // PUT request for updating an existing working time
-    try{
-      console.log("Updating working time", requestData)
-      const response = await fetchData("PUT", `/workingtime/${props.data.id}`, requestData)
-      if(response.status === 200) {
-        console.log("Working time updated successfully")
-      } else {
-        console.error("Failed to update working time")
-      }
-    } catch (error) {
-      console.log("Error updating working time", error)
-    }
-  }
 
+    if (response.status === 201 || response.status === 200) {
+      clearInputs()
+      emit("close")
+      emit("refresh")
+      isModalOpen.value = false
+      toast({
+        description: description
+      })
+    } else {
+      toast({
+        variant: "destructive",
+        description: "Failed to save working time"
+      })
+    }
+  } catch (error) {
+    toast({
+      variant: "destructive",
+      description: "Error in working time operation: " + error
+    })
+  }
   clearInputs()
-  // Emit close event and close modal
   emit("close")
   isModalOpen.value = false
 }
@@ -115,22 +117,22 @@ async function submitWorkingTime() {
 <template>
   <Dialog>
     <DialogTrigger as-child>
-      <!-- Trigger button text changes based on mode -->
-      <Button variant="default">
-        {{ props.mode === "create" ? "Create Working Time" : "Update" }}
+      <Button v-if="props.mode === 'create'" class="flex gap-2 bg-green-600 hover:bg-green-500"
+        ><CirclePlus />Add a new Working Time
       </Button>
+      <Button v-if="props.mode === 'update'">Update</Button>
     </DialogTrigger>
-    <DialogContent class="sm:max-w-md">
+    <DialogContent class="max-w-96">
       <DialogHeader>
         <DialogTitle>{{
           props.mode === "create" ? "Create Working Time" : "Update Working Time"
         }}</DialogTitle>
       </DialogHeader>
-      <div class="flex flex-col gap-4">
-        <!-- Date Picker -->
+      <DialogDescription>Select a date, a start time and a end time</DialogDescription>
+      <div class="flex flex-col gap-4 my-8">
         <Popover>
           <PopoverTrigger as-child>
-            <Button variant="outline" class="w-[280px] justify-start text-left font-normal">
+            <Button variant="outline" class="justify-start w-full text-left font-normal">
               {{
                 selectedDate ? df.format(selectedDate.toDate(getLocalTimeZone())) : "Pick a date"
               }}
@@ -141,15 +143,14 @@ async function submitWorkingTime() {
           </PopoverContent>
         </Popover>
 
-        <!-- Time Inputs -->
-        <div class="flex items-center gap-2">
-          <p>Start:</p>
+        <div class="flex flex-col gap-2">
+          <p>Start time:</p>
           <input
             type="time"
             v-model="timeRange.start"
             class="p-1 border border-gray-300 rounded-md h-full cursor-pointer"
           />
-          <p>End:</p>
+          <p>End time:</p>
           <input
             type="time"
             v-model="timeRange.end"
@@ -157,17 +158,18 @@ async function submitWorkingTime() {
           />
         </div>
       </div>
-
-      <!-- Dialog footer with save and close buttons -->
-      <DialogFooter class="sm:justify-start">
+      <DialogFooter>
+        <DialogClose as-child>
+          <Button type="button" variant="destructive">Cancel</Button>
+        </DialogClose>
         <DialogClose as-child>
           <Button
             type="button"
-            variant="outline"
+            class="bg-green-600 hover:bg-green-500"
             @click="submitWorkingTime"
             :disabled="isSaveDisabled"
           >
-            Save
+            {{ props.mode === "create" ? "Create" : "Update" }}
           </Button>
         </DialogClose>
       </DialogFooter>
