@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref } from "vue"
+import { computed, reactive, ref } from "vue"
 import {
   Dialog,
   DialogClose,
@@ -25,8 +25,8 @@ const authStore = useAuthStore()
 const emit = defineEmits(["close", "refresh"])
 
 type Team = {
-  id: number;
-  name: string;
+  id: number
+  name: string
 }
 
 type User = {
@@ -37,9 +37,9 @@ type User = {
 }
 
 const props = defineProps<{
-  mode: string; // 'create' or 'update'
-  data: User; // UserObject
-  teams: Team[];
+  mode: string // 'create' or 'update'
+  data: User // UserObject
+  teams: Team[]
 }>()
 
 const submitForm = async (body: any) => {
@@ -122,6 +122,10 @@ if(props.mode === "update") {
   username.value = props.data.username
   email.value = props.data.email
 }
+
+const isSaveDisabled = computed(() => {
+  return !username.value || !email.value || !selectedRole.value || !password.value || !confirmPassword.value || !selectedTeams.value.length
+})
 
 </script>
 
@@ -241,7 +245,7 @@ if(props.mode === "update") {
 
         <!-- Submit Button -->
         <DialogClose as-child>
-          <Button class="w-auto ml-auto" type="submit"> Save </Button>
+          <Button :disabled="isSaveDisabled" class="w-auto ml-auto" type="submit"> Save </Button>
         </DialogClose>
       </form>
     </DialogContent>
