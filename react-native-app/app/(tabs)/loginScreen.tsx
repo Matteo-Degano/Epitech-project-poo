@@ -1,14 +1,61 @@
 // LoginScreen.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const LoginScreen = () => {
+
+  const navigation = useNavigation(); 
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    // Handle login logic here (e.g., API call)
-    Alert.alert('Login Pressed', `Username: ${username}, Password: ${password}`);
+  const handleLogin = async () => {
+
+    if (username && password) {
+      try {
+        //http://10.15.192.16:4000/api/login
+        // const response = await fetch('http://127.0.0.1:4000/api/login'
+        const response = await fetch('http://10.15.192.16:4000/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: username, password }),
+        });
+  
+        const data = await response.json();
+  
+        console.log(data);
+
+        if (response.ok) {
+
+          await AsyncStorage.setItem('username',data.username);
+          await AsyncStorage.setItem('email',data.email);
+          await AsyncStorage.setItem('userId',data.id.toString());
+          await AsyncStorage.setItem('roleId',data.role_id.toString());
+          await AsyncStorage.setItem('teams', JSON.stringify(data.teams));
+
+          // await AsyncStorage.setItem('user', JSON.stringify(data.user));
+          // await AsyncStorage.setItem('userId', id.toString());
+          // await AsyncStorage.setItem('role', role_id.toString());
+          // await AsyncStorage.setItem('teams', JSON.stringify(teams));
+          // await AsyncStorage.setItem('email', email);
+          // await AsyncStorage.setItem('username', username);
+
+
+          navigation.navigate('Home'); //  Home screen
+        } else {
+          Alert.alert('Login Failed', data.message || 'Invalid credentials');
+        }
+      } catch (error) {
+        Alert.alert('Error', 'An error occurred while logging in');
+      }
+    } else {
+      Alert.alert('Error', 'Please enter username and password');
+    }
   };
 
   return (
@@ -39,29 +86,28 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'space-between', // Space out input fields and button
+    justifyContent: 'space-between',
     padding: 16,
   },
   inputContainer: {
     flex: 1,
-    justifyContent: 'center', // Center inputs vertically
-    alignItems: 'center', // Center inputs horizontally
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
     fontSize: 24,
-    marginBottom: 16, // Reduced margin for title
+    marginBottom: 16,
   },
   input: {
     height: 40,
     borderColor: '#ccc',
     borderWidth: 1,
-    marginBottom: 0, // No space between inputs
+    marginBottom: 20, 
     paddingHorizontal: 8,
-    width: '80%', // Centering input width
-    marginTop:20
+    width: '80%',
   },
   button: {
-    backgroundColor: '#8e44ad', // Purple color
+    backgroundColor: '#8e44ad',
     padding: 12,
     borderRadius: 5,
     alignItems: 'center',
