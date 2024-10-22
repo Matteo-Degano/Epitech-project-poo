@@ -11,10 +11,10 @@ import { toast } from "../ui/toast/use-toast";
 
 const isLoading = ref(true)
 
-const usersData = ref<UserType[]>([])
+const usersData = ref<User[]>([])
 const teamsData = ref<Team[]>([])
 
-type UserType = {
+type User = {
     id: number
     username: string
     email: string
@@ -48,17 +48,7 @@ async function deleteUser(id: number) {
   }
 }
 
-onMounted(async () => {
-  try {
-    // Fetch data when the component is mounted
-    const response = await fetchData("GET", "/teams")
-    // console.log("Working times fetched successfully", response.data.data)
-    teamsData.value = response.data.data
-    console.log("Teams fetched successfully", teamsData.value)
-  } catch (error) {
-    console.log(error)
-  }
-
+async function fetchUsers(){
   try {
     // Fetch data when the component is mounted
     const response = await fetchData("GET", "/users")
@@ -70,6 +60,20 @@ onMounted(async () => {
   } finally {
     isLoading.value = false
   }
+}
+
+onMounted(async () => {
+  try {
+    // Fetch data when the component is mounted
+    const response = await fetchData("GET", "/teams")
+    // console.log("Working times fetched successfully", response.data.data)
+    teamsData.value = response.data.data
+    console.log("Teams fetched successfully", teamsData.value)
+  } catch (error) {
+    console.log(error)
+  }
+  
+  await fetchUsers()
 })
 
 function idToStringRole(id: number) {
@@ -87,7 +91,7 @@ function idToStringRole(id: number) {
   }
 }
 
-const columns: ColumnDef<UserType>[] = [
+const columns: ColumnDef<User>[] = [
   {
     accessorKey: 'username',
     header: ({ column }) => {
@@ -133,7 +137,7 @@ const columns: ColumnDef<UserType>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       return h("div", { class: "flex gap-4" }, [
-        h(UserModal, { mode: "update", data: row.original, teams: teamsData.value }),
+        h(UserModal, { mode: "update", data: row.original, teams: teamsData.value , onRefresh: fetchUsers }),
         h(
           DeleteUserModal,
           { id: row.original.id, function: deleteUser }
@@ -155,9 +159,13 @@ const filterColumns = [{column: 'username', fieldName: 'name'}, {column: 'email'
   
   <div v-else>
     <div class="flex justify-end mb-4">
-      <UserModal mode="create" :data="{}" :teams="teamsData"/>
+      <UserModal mode="create" :data="{}" :teams="teamsData" @refresh="fetchUsers"/>
     </div>
-    <DataTable :columns="columns" :data="usersData" :filters="filterColumns"/>
+    <DataTable 
+      :columns="columns" 
+      :data="usersData" 
+      :filters="filterColumns"
+    />
   </div>
   
 </template>

@@ -22,6 +22,7 @@ import { useToast } from "@/components/ui/toast/use-toast"
 
 const { toast } = useToast()
 const authStore = useAuthStore()
+const emit = defineEmits(["close", "refresh"])
 
 type Team = {
   id: number;
@@ -50,6 +51,7 @@ const submitForm = async (body: any) => {
         toast({
           description: `User successfully created !`
         })
+        emit("refresh")
       } else {
         toast({
           description: `An error occured.`,
@@ -71,6 +73,7 @@ const submitForm = async (body: any) => {
         toast({
           description: `User successfully updated !`
         })
+        emit("refresh")
       } else {
         toast({
           description: `An error occured.`,
