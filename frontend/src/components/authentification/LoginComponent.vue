@@ -37,7 +37,7 @@ const { value: password } = useField<string>("password")
 </script>
 
 <template>
-  <form class="flex flex-col w-full gap-6 p-2" @submit.prevent="onSubmit">
+  <form class="flex flex-col max-w-lg w-full gap-6 p-2" @submit.prevent="onSubmit">
     <FormField v-slot="{ componentField, errors }" name="email">
       <FormItem>
         <FormLabel>Email</FormLabel>

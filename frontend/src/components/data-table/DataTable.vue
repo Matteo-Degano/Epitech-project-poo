@@ -1,5 +1,8 @@
 <script setup lang="ts" generic="TData, TValue">
-import type { ColumnDef } from '@tanstack/vue-table'
+import type { ColumnDef, ColumnFiltersState, Updater, SortingState } from '@tanstack/vue-table'
+import { ref, type Ref } from 'vue';
+import { Input } from '@/components/ui/input'
+import DataTablePagination from "@/components/data-table/DataTablePagination.vue";
 import {
   Table,
   TableBody,
@@ -13,21 +16,50 @@ import {
   FlexRender,
   getCoreRowModel,
   useVueTable,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
 } from '@tanstack/vue-table'
+
+function valueUpdater<T extends Updater<any>>(updaterOrValue: T, ref: Ref) {
+  ref.value = typeof updaterOrValue === 'function'
+    ? updaterOrValue(ref.value)
+    : updaterOrValue
+}
 
 const props = defineProps<{
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  filters: {column: string, fieldName: string}[]
 }>()
+
+const columnFilters = ref<ColumnFiltersState>([])
+const sorting = ref<SortingState>([])
 
 const table = useVueTable({
   get data() { return props.data },
   get columns() { return props.columns },
   getCoreRowModel: getCoreRowModel(),
+  getPaginationRowModel: getPaginationRowModel(),
+  onColumnFiltersChange: updaterOrValue => valueUpdater(updaterOrValue, columnFilters),
+  getFilteredRowModel: getFilteredRowModel(),
+  getSortedRowModel: getSortedRowModel(),
+  onSortingChange: updaterOrValue => valueUpdater(updaterOrValue, sorting),
+  state: {
+    get columnFilters() { return columnFilters.value },
+    get sorting() { return sorting.value },
+  },
 })
+
 </script>
 
 <template>
+  <div class="flex items-center py-4 space-x-4">
+    <Input v-for="filter in filters" class="max-w-sm" :placeholder="`Filter by ${filter.fieldName}...`"
+    :model-value="table.getColumn(filter.column)?.getFilterValue() as string"
+    @update:model-value=" table.getColumn(filter.column)?.setFilterValue($event)" />
+  </div>
+
   <div class="border rounded-md">
     <Table>
       <TableHeader>
@@ -61,4 +93,5 @@ const table = useVueTable({
       </TableBody>
     </Table>
   </div>
+  <DataTablePagination :table="table" />
 </template>
