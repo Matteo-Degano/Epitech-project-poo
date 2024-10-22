@@ -7,11 +7,12 @@ import { Button } from "../ui/button";
 import { ArrowUpDown } from "lucide-vue-next";
 import DeleteUserModal from "./DeleteUserModal.vue";
 import { fetchData } from "@/services/api";
+import { toast } from "../ui/toast/use-toast";
 
 const isLoading = ref(true)
 
 const usersData = ref<UserType[]>([])
-const teamsData = ref<TeamType[]>([])
+const teamsData = ref<Team[]>([])
 
 type UserType = {
     id: number
@@ -20,12 +21,31 @@ type UserType = {
     role: string
 }
 
-type TeamType = {
+type Team = {
     id: number
     name: string
 }
 
-function deleteUser(id: number) {
+async function deleteUser(id: number) {
+  try {
+    const response = await fetchData("DELETE", `/users/${id}`)
+    if (response.status === 200) {
+      toast({
+          description: `User successfully deleted !`
+        })
+    } else {
+      toast({
+          description: `Failed to delete user.`,
+          variant: "destructive"
+        })
+    }
+  } catch (error) {
+    toast({
+        description: `Error deleting user.`,
+        variant: "destructive"
+      })
+    console.log(error)
+  }
 }
 
 onMounted(async () => {
