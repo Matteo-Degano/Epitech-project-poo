@@ -1,4 +1,4 @@
-defmodule Api.Role do
+defmodule Api.Roles.Role do
   use Ecto.Schema
   import Ecto.Changeset
 

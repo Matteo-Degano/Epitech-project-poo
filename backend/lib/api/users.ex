@@ -1,7 +1,7 @@
 defmodule Api.Users do
   import Ecto.Query, warn: false
   alias Api.Repo
-  alias Api.Users.User
+  alias Api.Users.{User, Guardian}
   alias Api.UsersTeams
   alias Argon2
 
@@ -18,6 +18,8 @@ defmodule Api.Users do
 
   def get_user!(id) do
     Repo.get!(User, id)
+    |> Repo.preload(:role)
+    |> Repo.preload(:teams)
   end
 
   def get_user_with_teams(id) do
@@ -118,6 +120,17 @@ defmodule Api.Users do
         else
           {:error, :invalid_credentials}
         end
+    end
+  end
+
+  def get_current_user(conn) do
+    case Guardian.decode_and_verify(Map.get(conn.cookies, "access_token")) do
+      {:ok, data} ->
+        user = get_user!(data["sub"])
+        {:ok, user}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 end
