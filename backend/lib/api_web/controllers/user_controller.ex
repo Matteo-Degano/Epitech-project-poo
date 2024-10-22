@@ -5,30 +5,12 @@ defmodule ApiWeb.UserController do
 
   action_fallback(ApiWeb.FallbackController)
 
-  def index(conn, %{"username" => username, "email" => email}) do
-    users = Users.list_users_by_username_and_email_with_teams(username, email)
-
-    response =
-      Enum.map(users, fn user ->
-        teams = Enum.map(user.teams, fn team -> %{id: team.id, name: team.name} end)
-
-        %{
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          role_id: user.role_id,
-          teams: teams
-        }
-      end)
+  def index(conn, attrs \\ %{}) do
+    users = Users.list_users_by_username_or_email_with_teams(attrs)
 
     conn
     |> put_status(:ok)
-    |> json(response)
-  end
-
-  def index(conn, _params) do
-    users = Users.list_users()
-    render(conn, :index, users: users)
+    |> json(format_user_response(users))
   end
 
   def create(conn, %{
@@ -120,5 +102,19 @@ defmodule ApiWeb.UserController do
     with {:ok, %User{}} <- Users.delete_user(user) do
       send_resp(conn, :no_content, "")
     end
+  end
+
+  defp format_user_response(users) do
+    Enum.map(users, fn user ->
+      teams = Enum.map(user.teams, fn team -> %{id: team.id, name: team.name} end)
+
+      %{
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role_id: user.role_id,
+        teams: teams
+      }
+    end)
   end
 end
