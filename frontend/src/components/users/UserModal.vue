@@ -23,13 +23,25 @@ import { useToast } from "@/components/ui/toast/use-toast"
 const { toast } = useToast()
 const authStore = useAuthStore()
 
-const props = defineProps({
-  mode: String, // 'create' or 'update'
-  data: Object, // UserObject
-  teams: Array
-})
+type Team = {
+  id: number;
+  name: string;
+}
 
-const signinHandler = async (body: any) => {
+type User = {
+    id: number
+    username: string
+    email: string
+    role: string
+}
+
+const props = defineProps<{
+  mode: string; // 'create' or 'update'
+  data: User; // UserObject
+  teams: Team[];
+}>()
+
+const submitForm = async (body: any) => {
   if (props.mode === "create") {
     // POST request for creating a new user
     try{
@@ -82,7 +94,6 @@ const { handleSubmit, errors } = useForm({
 
 // Initialize selectedTeams as a reactive array (best for multiple checkboxes)
 const selectedTeams = ref<string[]>([])
-
 const selectedRole = ref<number>()
 
 // Hooks for field validation (regular form fields)
@@ -100,7 +111,7 @@ const onSubmit = handleSubmit((values) => {
     team_ids: selectedTeams.value,
     role_id: selectedRole.value
   }
-  signinHandler(body)
+  submitForm(body)
 })
 
 </script>
@@ -192,7 +203,7 @@ const onSubmit = handleSubmit((values) => {
             <FormLabel>Select Teams</FormLabel>
             <FormControl>
               <div class="grid grid-cols-2 gap-4">
-                <div v-for="team in props.teams" :key="team" class="flex items-center">
+                <div v-for="team in props.teams" :key="team.id" class="flex items-center">
                   <!-- Bind to selectedTeams array using v-model -->
                   <input type="checkbox" :value="team.id" v-model="selectedTeams" class="mr-2" />
                   <label>{{ team.name }}</label>
