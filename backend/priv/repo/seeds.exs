@@ -12,7 +12,7 @@
 
 alias Api.Repo
 # alias Api.Users.Users
-alias Api.Role
+alias Api.Roles.Role
 # alias Api.Team
 
 role_data = [

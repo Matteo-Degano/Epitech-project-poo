@@ -1,8 +1,8 @@
 defmodule ApiWeb.WorkingtimeController do
   use ApiWeb, :controller
 
-  alias Api.Workingtimes
-  alias Api.Workingtimes.Workingtime
+  alias Api.{Workingtimes, Workingtimes.Workingtime}
+  alias Api.Users
 
   action_fallback(ApiWeb.FallbackController)
 
@@ -15,12 +15,17 @@ defmodule ApiWeb.WorkingtimeController do
 
     workingtimes = Workingtimes.list_workingtimes_by_start_and_end(workingtime_params)
 
-    render(conn, :index, workingtimes: workingtimes)
+    conn
+    |> put_status(200)
+    |> json(workingtimes)
   end
 
   def index(conn, %{"user" => user_id}) do
     workingtimes = Workingtimes.list_workingtimes_by_user(user_id)
-    render(conn, :index, workingtimes: workingtimes)
+
+    conn
+    |> put_status(200)
+    |> json(workingtimes)
   end
 
   def create(conn, %{"user" => user_id_params, "start" => start_params, "end" => end_params}) do
@@ -39,7 +44,31 @@ defmodule ApiWeb.WorkingtimeController do
     end
   end
 
-  def show(conn, %{"id" => id, "user" => user_id}) do
+  def show(conn, _) do
+    {:ok, user} = Users.get_current_user(conn)
+    teams = Enum.map(user.teams, fn t -> t.id end)
+
+    workingtimes =
+      case user.role.name do
+        "user" ->
+          Workingtimes.list_workingtimes_by_user(user.id)
+
+        "manager" ->
+          Workingtimes.list_workingtimes_by_teams(%{teams: teams})
+
+        "general_manager" ->
+          Workingtimes.list_workingtimes_by_teams(nil)
+
+        "admin" ->
+          Workingtimes.list_workingtimes_by_teams(nil)
+      end
+
+    conn
+    |> put_status(200)
+    |> json(workingtimes)
+  end
+
+  def show_user_workingtime(conn, %{"id" => id, "user" => user_id}) do
     workingtime_params = %{
       "id" => id,
       "user_id" => user_id
