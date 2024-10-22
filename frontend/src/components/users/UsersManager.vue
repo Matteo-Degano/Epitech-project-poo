@@ -113,7 +113,7 @@ const columns: ColumnDef<UserType>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       return h("div", { class: "flex gap-4" }, [
-        h(UserModal, { mode: "update", data: row.original }),
+        h(UserModal, { mode: "update", data: row.original, teams: teamsData.value }),
         h(
           DeleteUserModal,
           { id: row.original.id, function: deleteUser }
