@@ -6,7 +6,7 @@ defmodule Api.Users.User do
     field(:username, :string)
     field(:email, :string)
     field(:password, :string)
-    belongs_to :role, Api.Role
+    belongs_to :role, Api.Roles.Role
     many_to_many :teams, Api.Teams.Team, join_through: "users_teams"
 
     timestamps(type: :utc_datetime)
