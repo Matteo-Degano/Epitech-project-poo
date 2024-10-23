@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue"
+import { computed, onMounted, ref, watch } from "vue"
 import { fetchData } from "@/services/api"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Check, ChevronsUpDown } from "lucide-vue-next"
+import { cn } from "@/utils"
 import {
   Dialog,
   DialogClose,
@@ -11,6 +15,14 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList
+} from "@/components/ui/command"
 import { DateFormatter, getLocalTimeZone, CalendarDate } from "@internationalized/date"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
@@ -18,7 +30,7 @@ import { useAuthStore } from "@/stores/auth.store"
 import DialogDescription from "../ui/dialog/DialogDescription.vue"
 import { useToast } from "../ui/toast/use-toast"
 import { CirclePlus } from "lucide-vue-next"
-import type { APIResponse } from "@/types/api.type"
+import type { APIResponse, User } from "@/types/api.type"
 
 const props = defineProps({
   mode: String,
@@ -29,11 +41,15 @@ const props = defineProps({
 const { toast } = useToast()
 const authStore = useAuthStore()
 const isModalOpen = ref(false)
-const selectedDate = ref(getInitialDate() || null)
+const selectedStartDate = ref(getInitialDate(props.data?.start) || null)
+const selectedEndDate = ref(getInitialDate(props.data?.end) || null)
+const selectedUser = ref(props.data?.user_id || "")
+const usersList = ref<User[]>([])
+const open = ref(false)
 const emit = defineEmits(["close", "refresh"])
 
-function getInitialDate() {
-  const date = props.data?.start.split("T")[0]
+function getInitialDate(datetime: any) {
+  const date = datetime?.split("T")[0]
   if (date) {
     let [year, month, day] = date.split("-").map(Number)
     return new CalendarDate(year, month, day)
@@ -53,28 +69,58 @@ watch(
   () => props.data,
   (newValue) => {
     if (newValue) {
+      selectedUser.value = newValue.user_id
       timeRange.value.start = newValue.start
       timeRange.value.end = newValue.end
     }
-  }
+  },
+  { immediate: true }
 )
 
+// Fetch users list
+const fetchUsersLists = async () => {
+  try {
+    const response = await fetchData("GET", "/users")
+    usersList.value = response.data
+    console.log(usersList)
+  } catch (err: any) {
+    toast({
+      variant: "destructive",
+      description: "Error fetching data"
+    })
+  }
+}
+
+onMounted(() => {
+  fetchUsersLists()
+})
+
 const isSaveDisabled = computed(() => {
-  return !selectedDate.value || !timeRange.value.start || !timeRange.value.end
+  return (
+    !selectedStartDate.value ||
+    !timeRange.value.start ||
+    !selectedEndDate.value ||
+    !timeRange.value.end ||
+    (props.mode === "create" && !selectedUser.value) // Ensure user is selected in create mode
+  )
 })
 
 function clearInputs() {
-  selectedDate.value = null
+  selectedStartDate.value = null
+  selectedEndDate.value = null
   timeRange.value.start = ""
   timeRange.value.end = ""
+  selectedUser.value = null
 }
 
 async function submitWorkingTime() {
-  const formattedDate = `${selectedDate?.value?.year}-${String(selectedDate?.value?.month).padStart(2, "0")}-${String(selectedDate?.value?.day).padStart(2, "0")}`
+  const formattedStartDate = `${selectedStartDate?.value?.year}-${String(selectedStartDate?.value?.month).padStart(2, "0")}-${String(selectedStartDate?.value?.day).padStart(2, "0")}`
+  const formattedEndDate = `${selectedEndDate?.value?.year}-${String(selectedEndDate?.value?.month).padStart(2, "0")}-${String(selectedEndDate?.value?.day).padStart(2, "0")}`
 
   const requestData = {
-    start: `${formattedDate} ${timeRange.value.start}`,
-    end: `${formattedDate} ${timeRange.value.end}`
+    start: `${formattedStartDate} ${timeRange.value.start}`,
+    end: `${formattedEndDate} ${timeRange.value.end}`,
+    user_id: selectedUser.value // Include the user_id in the request
   }
 
   try {
@@ -122,42 +168,108 @@ async function submitWorkingTime() {
       </Button>
       <Button v-if="props.mode === 'update'">Update</Button>
     </DialogTrigger>
-    <DialogContent class="max-w-96">
+    <DialogContent class="max-w-md">
       <DialogHeader>
         <DialogTitle>{{
           props.mode === "create" ? "Create Working Time" : "Update Working Time"
         }}</DialogTitle>
       </DialogHeader>
-      <DialogDescription>Select a date, a start time and a end time</DialogDescription>
-      <div class="flex flex-col gap-4 my-8">
+      <DialogDescription>Select a start datetime and end datetime</DialogDescription>
+
+      <div v-if="props.mode === 'create'" class="mb-4">
+        <Popover v-model:open="open">
+          <PopoverTrigger as-child>
+            <Button
+              variant="outline"
+              role="combobox"
+              :aria-expanded="open"
+              class="w-[200px] justify-between"
+            >
+              {{
+                selectedUser?.value
+                  ? usersList.find((user) => user.id === selectedUser.value)?.username
+                  : "Select a user..."
+              }}
+              <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent class="w-[200px] p-0">
+            <Command v-model="selectedUser">
+              <CommandInput placeholder="Search user..." />
+              <CommandEmpty>No users found.</CommandEmpty>
+              <CommandList>
+                <CommandGroup>
+                  <CommandItem
+                    v-for="user in usersList"
+                    :key="user.id"
+                    :value="user.id"
+                    @select="open = false"
+                  >
+                    {{ user.username }}
+                    <Check
+                      :class="
+                        cn(
+                          'ml-auto h-4 w-4',
+                          selectedUser.value === user.id ? 'opacity-100' : 'opacity-0'
+                        )
+                      "
+                    />
+                  </CommandItem>
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      </div>
+      <div class="flex justify-between items-center mb-4">
+        <Label>Start Date:</Label>
         <Popover>
           <PopoverTrigger as-child>
-            <Button variant="outline" class="justify-start w-full text-left font-normal">
+            <Button variant="outline" class="justify-start w-auto text-left font-normal">
               {{
-                selectedDate ? df.format(selectedDate.toDate(getLocalTimeZone())) : "Pick a date"
+                selectedStartDate
+                  ? df.format(selectedStartDate.toDate(getLocalTimeZone()))
+                  : "Pick a start date"
               }}
             </Button>
           </PopoverTrigger>
           <PopoverContent class="w-auto p-0">
-            <Calendar v-model="selectedDate" initial-focus />
+            <Calendar v-model="selectedStartDate" initial-focus />
           </PopoverContent>
         </Popover>
-
-        <div class="flex flex-col gap-2">
-          <p>Start time:</p>
-          <input
-            type="time"
-            v-model="timeRange.start"
-            class="p-1 border border-gray-300 rounded-md h-full cursor-pointer"
-          />
-          <p>End time:</p>
-          <input
-            type="time"
-            v-model="timeRange.end"
-            class="p-1 border border-gray-300 rounded-md h-full cursor-pointer"
-          />
-        </div>
+        <Input
+          type="time"
+          step="60"
+          v-model="timeRange.start"
+          class="w-auto cursor-pointer hover:bg-gray-100"
+        />
       </div>
+
+      <!-- End Date and Time -->
+      <div class="flex justify-between items-center">
+        <Label>End Date:</Label>
+        <Popover>
+          <PopoverTrigger as-child>
+            <Button variant="outline" class="justify-start w-auto text-left font-normal">
+              {{
+                selectedEndDate
+                  ? df.format(selectedEndDate.toDate(getLocalTimeZone()))
+                  : "Pick an end date"
+              }}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent class="w-auto p-0">
+            <Calendar v-model="selectedEndDate" initial-focus />
+          </PopoverContent>
+        </Popover>
+        <Input
+          type="time"
+          step="60"
+          v-model="timeRange.end"
+          class="w-auto cursor-pointer hover:bg-gray-100"
+        />
+      </div>
+
       <DialogFooter>
         <DialogClose as-child>
           <Button type="button" variant="destructive">Cancel</Button>
