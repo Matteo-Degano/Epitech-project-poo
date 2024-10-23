@@ -2,10 +2,12 @@ defmodule ApiWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :api
 
   # Update Corsica settings to allow specific origins and credentials
+
   plug Corsica,
-    origins: ["http://localhost:8081"],  # Specify the allowed origin(s)
-    allow_headers: ["content-type", "authorization", "api_key"],
-    allow_credentials: true  # Allow credentials (cookies, etc.)
+    origins: ["http://localhost:8081"],  # Allow specific origin
+    allow_headers: ["content-type", "authorization", "api_key"],  # Allowed headers
+    allow_credentials: true  # Allow cookies, Authorization headers, etc.
+
 
   # The rest of your endpoint code remains the same
 
