@@ -55,12 +55,12 @@ async function fetchUsers(){
   try {
     const response = await fetchData("GET", "/users")
     usersData.value = response.data.map(user => {
-          return {
-            ...user,
-            role_string: idToStringRole(user.role_id),
-            teams_string: user.teams.map(team => team.name).join(', ')
-          };
-        });
+      return {
+        ...user,
+        role_string: idToStringRole(user.role_id),
+        teams_string: user.teams.map(team => team.name).join(', ')
+      }
+    })
     console.log("Users fetched successfully", usersData.value)
   } catch (error) {
     console.log(error)
@@ -153,7 +153,6 @@ const columns: ColumnDef<User>[] = [
 ]
 
 const filterColumns = [{column: 'username', fieldName: 'name'}, {column: 'email', fieldName: 'email'}, {column: 'role_string', fieldName: 'role'}, {column: 'teams_string', fieldName: 'team'}]
-
 
 </script>
 

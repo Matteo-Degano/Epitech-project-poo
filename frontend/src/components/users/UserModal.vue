@@ -11,7 +11,7 @@ import {
   DialogDescription
 } from "@/components/ui/dialog"
 import { signupFormSchema } from "@/lib/formSchemas/signin.form"
-import { useForm, useField } from "vee-validate"
+import { useForm, useField, Form } from "vee-validate"
 import { toTypedSchema } from "@vee-validate/zod"
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import {fetchData} from "@/services/api"
@@ -96,16 +96,16 @@ const { handleSubmit, errors } = useForm({
 const selectedTeams = ref<string[]>([])
 const selectedRole = ref<number>()
 
-const { value: username } =useField<string>("username")
-const { value: email } =useField<string>("email")
+const { value: username } = useField<string>("username")
+const { value: email } = useField<string>("email")
 const { value: password } = useField<string>("password")
 const { value: confirmPassword } = useField<string>("confirmPassword")
 
 if(props.mode === "update") {
   selectedTeams.value = props.data.teams.map(team => team.id.toString())
   selectedRole.value = props.data.role_id
-  username.value = props.data.username
   email.value = props.data.email
+  username.value = props.data.username
 }
 
 const onSubmit = handleSubmit((values) => {
@@ -122,8 +122,6 @@ const onSubmit = handleSubmit((values) => {
 const isSaveDisabled = computed(() => {
   return !username.value || !email.value || !selectedRole.value || !password.value || !confirmPassword.value || !selectedTeams.value.length
 })
-
-
 </script>
 
 <template>
@@ -142,7 +140,7 @@ const isSaveDisabled = computed(() => {
           {{ props.mode === "create" ? "Create an user here. Click save when you're done." : "Make changes to an user here. Click save when you're done." }}
         </DialogDescription>
       </DialogHeader>
-      <form class="flex flex-col w-full gap-6 p-2" @submit.prevent="onSubmit">
+      <Form class="flex flex-col w-full gap-6 p-2" @submit.prevent="onSubmit">
         <!-- Username Field -->
         <FormField v-slot="{ componentField, errors }" name="username">
           <FormItem>
@@ -244,7 +242,7 @@ const isSaveDisabled = computed(() => {
         <DialogClose as-child>
           <Button :disabled="isSaveDisabled" class="w-auto ml-auto" type="submit"> {{ props.mode === "create" ? "Create": "Update" }} </Button>
         </DialogClose>
-      </form>
+      </Form>
     </DialogContent>
   </Dialog>
 </template>
