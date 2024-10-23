@@ -43,6 +43,15 @@ const props = defineProps<{
   teams: Team[]
 }>()
 
+function clearInputs(){
+  selectedTeams.value = []
+  selectedRole.value = null
+  email.value = ""
+  username.value = ""
+  password.value = ""
+  confirmPassword.value = ""
+}
+
 const submitForm = async (body: any) => {
   if (props.mode === "create") {
     try{
@@ -51,6 +60,7 @@ const submitForm = async (body: any) => {
         toast({
           description: `User successfully created !`
         })
+        clearInputs()
         emit("refresh")
       } else {
         toast({
@@ -140,8 +150,8 @@ const isSaveDisabled = computed(() => {
           {{ props.mode === "create" ? "Create an user here. Click save when you're done." : "Make changes to an user here. Click save when you're done." }}
         </DialogDescription>
       </DialogHeader>
-      <Form class="flex flex-col w-full gap-6 p-2">
-        <form @submit.prevent="onSubmit">
+      <Form>
+        <form class="flex flex-col w-full gap-6 p-2" @submit.prevent="onSubmit">
           <!-- Username Field -->
           <FormField v-slot="{ componentField, errors }" name="username">
             <FormItem>
@@ -240,7 +250,7 @@ const isSaveDisabled = computed(() => {
           </FormField>
           <!-- Submit Button -->
           <DialogClose as-child>
-            <Button :disabled="isSaveDisabled" class="w-auto mt-2 float-right" type="submit"> {{ props.mode === "create" ? "Create": "Update" }} </Button>
+            <Button :disabled="isSaveDisabled" class="w-auto ml-auto" type="submit"> {{ props.mode === "create" ? "Create": "Update" }} </Button>
           </DialogClose>
         </form>
       </Form>
