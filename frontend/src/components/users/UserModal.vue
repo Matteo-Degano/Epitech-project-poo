@@ -140,108 +140,109 @@ const isSaveDisabled = computed(() => {
           {{ props.mode === "create" ? "Create an user here. Click save when you're done." : "Make changes to an user here. Click save when you're done." }}
         </DialogDescription>
       </DialogHeader>
-      <Form class="flex flex-col w-full gap-6 p-2" @submit.prevent="onSubmit">
-        <!-- Username Field -->
-        <FormField v-slot="{ componentField, errors }" name="username">
-          <FormItem>
-            <FormLabel>Username</FormLabel>
-            <FormControl>
-              <Input 
-                type="text" 
-                placeholder="Username" 
-                v-bind="componentField" 
-                v-model="username" 
+      <Form class="flex flex-col w-full gap-6 p-2">
+        <form @submit.prevent="onSubmit">
+          <!-- Username Field -->
+          <FormField v-slot="{ componentField, errors }" name="username">
+            <FormItem>
+              <FormLabel>Username</FormLabel>
+              <FormControl>
+                <Input 
+                  type="text" 
+                  placeholder="Username" 
+                  v-bind="componentField" 
+                  v-model="username" 
+                  />
+              </FormControl>
+              <FormMessage v-if="errors">{{ errors }}</FormMessage>
+            </FormItem>
+          </FormField>
+
+          <!-- Email Field -->
+          <FormField v-slot="{ componentField, errors }" name="email">
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input
+                  type="email"
+                  placeholder="email@example.com"
+                  v-bind="componentField"
+                  v-model="email"
                 />
-            </FormControl>
-            <FormMessage v-if="errors">{{ errors }}</FormMessage>
-          </FormItem>
-        </FormField>
+              </FormControl>
+              <FormMessage v-if="errors">{{ errors }}</FormMessage>
+            </FormItem>
+          </FormField>
 
-        <!-- Email Field -->
-        <FormField v-slot="{ componentField, errors }" name="email">
-          <FormItem>
-            <FormLabel>Email</FormLabel>
-            <FormControl>
-              <Input
-                type="email"
-                placeholder="email@example.com"
-                v-bind="componentField"
-                v-model="email"
-              />
-            </FormControl>
-            <FormMessage v-if="errors">{{ errors }}</FormMessage>
-          </FormItem>
-        </FormField>
+          <!-- Password Field -->
+          <FormField v-slot="{ componentField, errors }" name="password">
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  placeholder="Password"
+                  v-bind="componentField"
+                  v-model="password"
+                />
+              </FormControl>
+              <FormMessage v-if="errors">{{ errors }}</FormMessage>
+            </FormItem>
+          </FormField>
 
-        <!-- Password Field -->
-        <FormField v-slot="{ componentField, errors }" name="password">
-          <FormItem>
-            <FormLabel>Password</FormLabel>
-            <FormControl>
-              <Input
-                type="password"
-                placeholder="Password"
-                v-bind="componentField"
-                v-model="password"
-              />
-            </FormControl>
-            <FormMessage v-if="errors">{{ errors }}</FormMessage>
-          </FormItem>
-        </FormField>
+          <!-- Confirm Password Field -->
+          <FormField v-slot="{ componentField, errors }" name="confirmPassword">
+            <FormItem>
+              <FormLabel>Confirm Password</FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  placeholder="Confirm Password"
+                  v-bind="componentField"
+                  v-model="confirmPassword"
+                />
+              </FormControl>
+              <FormMessage v-if="errors">{{ errors }}</FormMessage>
+            </FormItem>
+          </FormField>
 
-        <!-- Confirm Password Field -->
-        <FormField v-slot="{ componentField, errors }" name="confirmPassword">
-          <FormItem>
-            <FormLabel>Confirm Password</FormLabel>
-            <FormControl>
-              <Input
-                type="password"
-                placeholder="Confirm Password"
-                v-bind="componentField"
-                v-model="confirmPassword"
-              />
-            </FormControl>
-            <FormMessage v-if="errors">{{ errors }}</FormMessage>
-          </FormItem>
-        </FormField>
-
-        <!-- Teams Selection with Checkboxes -->
-        <FormField v-slot="{ errors }" name="teams">
-          <FormItem>
-            <FormLabel>Select Teams</FormLabel>
-            <FormControl>
-              <div class="grid grid-cols-2 gap-4">
-                <div v-for="team in props.teams" :key="team.id" class="flex items-center">
-                  <!-- Bind to selectedTeams array using v-model -->
-                  <input type="checkbox" :value="team.id" v-model="selectedTeams" class="mr-2" />
-                  <label>{{ team.name }}</label>
+          <!-- Teams Selection with Checkboxes -->
+          <FormField v-slot="{ errors }" name="teams">
+            <FormItem>
+              <FormLabel>Select Teams</FormLabel>
+              <FormControl>
+                <div class="grid grid-cols-2 gap-4">
+                  <div v-for="team in props.teams" :key="team.id" class="flex items-center">
+                    <!-- Bind to selectedTeams array using v-model -->
+                    <input type="checkbox" :value="team.id" v-model="selectedTeams" class="mr-2" />
+                    <label>{{ team.name }}</label>
+                  </div>
                 </div>
-              </div>
-            </FormControl>
-            <FormMessage v-if="errors">{{ errors }}</FormMessage>
-          </FormItem>
-        </FormField>
+              </FormControl>
+              <FormMessage v-if="errors">{{ errors }}</FormMessage>
+            </FormItem>
+          </FormField>
 
-        <!-- Role Selection -->
-        <FormField v-slot="{errors}" name="role">
-          <FormItem>
-            <FormLabel>Role</FormLabel>
-            <FormControl>
-              <select v-model="selectedRole" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                <option value="1">Employee</option>
-                <option value="2">Manager</option>
-                <option value="3" v-if="authStore.user.role_id === 4">General manager</option>
-                <option value="4" v-if="authStore.user.role_id === 4">Admin</option>
-              </select>
-            </FormControl>
-            <FormMessage v-if="errors">{{ errors }}</FormMessage>
-          </FormItem>
-        </FormField>
-
-        <!-- Submit Button -->
-        <DialogClose as-child>
-          <Button :disabled="isSaveDisabled" class="w-auto ml-auto" type="submit"> {{ props.mode === "create" ? "Create": "Update" }} </Button>
-        </DialogClose>
+          <!-- Role Selection -->
+          <FormField v-slot="{errors}" name="role">
+            <FormItem>
+              <FormLabel>Role</FormLabel>
+              <FormControl>
+                <select v-model="selectedRole" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                  <option value="1">Employee</option>
+                  <option value="2">Manager</option>
+                  <option value="3" v-if="authStore.user.role_id === 4">General manager</option>
+                  <option value="4" v-if="authStore.user.role_id === 4">Admin</option>
+                </select>
+              </FormControl>
+              <FormMessage v-if="errors">{{ errors }}</FormMessage>
+            </FormItem>
+          </FormField>
+          <!-- Submit Button -->
+          <DialogClose as-child>
+            <Button :disabled="isSaveDisabled" class="w-auto mt-2 float-right" type="submit"> {{ props.mode === "create" ? "Create": "Update" }} </Button>
+          </DialogClose>
+        </form>
       </Form>
     </DialogContent>
   </Dialog>
