@@ -13,6 +13,7 @@ const isLoading = ref(true)
 
 const usersData = ref<User[]>([])
 const teamsData = ref<Team[]>([])
+const emit = defineEmits(["close", "refresh"])
 
 type User = {
     id: number
@@ -34,6 +35,7 @@ async function deleteUser(id: number) {
       toast({
           description: `User successfully deleted !`
         })
+    emit("refresh")
     } else {
       toast({
           description: `Failed to delete user.`,
@@ -51,10 +53,14 @@ async function deleteUser(id: number) {
 
 async function fetchUsers(){
   try {
-    // Fetch data when the component is mounted
     const response = await fetchData("GET", "/users")
-    // console.log("Working times fetched successfully", response.data.data)
-    usersData.value = response.data
+    usersData.value = response.data.map(user => {
+          return {
+            ...user,
+            role_string: idToStringRole(user.role_id),
+            teams_string: user.teams.map(team => team.name).join(', ')
+          };
+        });
     console.log("Users fetched successfully", usersData.value)
   } catch (error) {
     console.log(error)
@@ -65,9 +71,7 @@ async function fetchUsers(){
 
 onMounted(async () => {
   try {
-    // Fetch data when the component is mounted
     const response = await fetchData("GET", "/teams")
-    // console.log("Working times fetched successfully", response.data.data)
     teamsData.value = response.data.data
     console.log("Teams fetched successfully", teamsData.value)
   } catch (error) {
@@ -114,24 +118,24 @@ const columns: ColumnDef<User>[] = [
     cell: ({ row }) => h('div', { class: 'text-left font-medium' }, row.getValue('email')),
   },
   {
-    accessorKey: 'role_id',
+    accessorKey: 'role_string',
     header: ({ column }) => {
       return h(Button, {
         variant: 'ghost',
         onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
       }, () => ['Role', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
     },
-    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, idToStringRole(row.getValue('role_id'))),
+    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, row.getValue('role_string')),
   },
   {
-    accessorKey: 'teams',
+    accessorKey: 'teams_string',
     header: ({ column }) => {
       return h(Button, {
         variant: 'ghost',
         onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
       }, () => ['Teams', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
     },
-    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, (row.getValue('teams') as Team[]).map(team => team.name).join(', ')),
+    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, row.getValue('teams_string')),
   },
   {
     id: 'actions',
@@ -141,14 +145,14 @@ const columns: ColumnDef<User>[] = [
         h(UserModal, { mode: "update", data: row.original, teams: teamsData.value , onRefresh: fetchUsers }),
         h(
           DeleteUserModal,
-          { id: row.original.id, function: deleteUser }
+          { id: row.original.id, function: deleteUser, onRefresh: fetchUsers }
         )
       ])
     }
   }
 ]
 
-const filterColumns = [{column: 'username', fieldName: 'name'}, {column: 'email', fieldName: 'email'}, {column: 'role_id', fieldName: 'role'}, {column: 'teams', fieldName: 'teams'}]
+const filterColumns = [{column: 'username', fieldName: 'name'}, {column: 'email', fieldName: 'email'}, {column: 'role_string', fieldName: 'role'}, {column: 'teams_string', fieldName: 'team'}]
 
 
 </script>
@@ -163,10 +167,9 @@ const filterColumns = [{column: 'username', fieldName: 'name'}, {column: 'email'
       <UserModal mode="create" :data="{}" :teams="teamsData" @refresh="fetchUsers"/>
     </div>
     <DataTable 
-      :columns="columns" 
-      :data="usersData" 
+      :columns="columns"
+      :data="usersData"
       :filters="filterColumns"
     />
   </div>
-  
 </template>

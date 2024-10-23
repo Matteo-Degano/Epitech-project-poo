@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue"
+import { computed, ref } from "vue"
 import {
   Dialog,
   DialogClose,
@@ -96,10 +96,17 @@ const { handleSubmit, errors } = useForm({
 const selectedTeams = ref<string[]>([])
 const selectedRole = ref<number>()
 
-const { value: username } = useField<string>("username")
-const { value: email } = useField<string>("email")
+const { value: username } =useField<string>("username")
+const { value: email } =useField<string>("email")
 const { value: password } = useField<string>("password")
 const { value: confirmPassword } = useField<string>("confirmPassword")
+
+if(props.mode === "update") {
+  selectedTeams.value = props.data.teams.map(team => team.id.toString())
+  selectedRole.value = props.data.role_id
+  username.value = props.data.username
+  email.value = props.data.email
+}
 
 const onSubmit = handleSubmit((values) => {
   const body = {
@@ -112,16 +119,10 @@ const onSubmit = handleSubmit((values) => {
   submitForm(body)
 })
 
-if(props.mode === "update") {
-  selectedTeams.value = props.data.teams.map(team => team.id.toString())
-  selectedRole.value = props.data.role_id
-  username.value = props.data.username
-  email.value = props.data.email
-}
-
 const isSaveDisabled = computed(() => {
   return !username.value || !email.value || !selectedRole.value || !password.value || !confirmPassword.value || !selectedTeams.value.length
 })
+
 
 </script>
 
