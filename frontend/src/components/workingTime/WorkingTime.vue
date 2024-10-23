@@ -69,17 +69,15 @@ watch(
   (newValue) => {
     if (newValue) {
       selectedStartDate.value = getInitialDate(newValue.start) || null
-      selectedStartDate.value = getInitialDate(newValue.start)
-      timeRange.value.start = newValue.start.split("T")[1]?.split(".")[0] || ""
+      timeRange.value.start = newValue.start.split("T")[1]?.split(":").slice(0, 2).join(":") || "" // Only hours and minutes
 
       // Extract date and time for the end datetime
       selectedEndDate.value = getInitialDate(newValue.end)
-      timeRange.value.end = newValue.end.split("T")[1]?.split(".")[0] || ""
+      timeRange.value.end = newValue.end.split("T")[1]?.split(":").slice(0, 2).join(":") || "" // Only hours and minutes
     }
   },
   { immediate: true }
 )
-
 const isSaveDisabled = computed(() => {
   return (
     !selectedStartDate.value ||
