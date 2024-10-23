@@ -2,6 +2,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Image, StyleSheet } from 'react-native'; // Correct import for Image
+// import ClockManager from './clockManager';
+
 
 const AppScreen = () => {
 
@@ -74,10 +76,10 @@ const AppScreen = () => {
         </View>
       </View>
 
-      <View>
+      {/* <View>
+        <ClockManager/>
+      </View> */}
 
-      </View>
-      
     </View>
   );
 };

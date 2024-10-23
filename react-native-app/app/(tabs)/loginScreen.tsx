@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { fetchData } from '../service/api';
 
 
 const LoginScreen = () => {
@@ -18,25 +19,28 @@ const LoginScreen = () => {
       try {
         //http://10.15.192.16:4000/api/login
         // const response = await fetch('http://127.0.0.1:4000/api/login'
-        const response = await fetch('http://10.15.192.16:4000/api/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email: username, password }),
-        });
-  
-        const data = await response.json();
-  
-        console.log(data);
 
-        if (response.ok) {
+        console.log("login");
+
+        const response = await fetchData("POST",'/login', { email: username, password });
+
+        console.log(response);
+  
+        
+
+
+        if (response.status == "200") {
+          
+          const data = await response.data;
+          console.log("response ok");
 
           await AsyncStorage.setItem('username',data.username);
           await AsyncStorage.setItem('email',data.email);
           await AsyncStorage.setItem('userId',data.id.toString());
           await AsyncStorage.setItem('roleId',data.role_id.toString());
           await AsyncStorage.setItem('teams', JSON.stringify(data.teams));
+          // await AsyncStorage.setItem('access_token', data.access_token);
+          // await AsyncStorage.setItem('refresh_token', data.refresh_token);
 
           // await AsyncStorage.setItem('user', JSON.stringify(data.user));
           // await AsyncStorage.setItem('userId', id.toString());
@@ -45,8 +49,9 @@ const LoginScreen = () => {
           // await AsyncStorage.setItem('email', email);
           // await AsyncStorage.setItem('username', username);
 
-
+          console.log("redirect to home");
           navigation.navigate('Home'); //  Home screen
+
         } else {
           Alert.alert('Login Failed', data.message || 'Invalid credentials');
         }

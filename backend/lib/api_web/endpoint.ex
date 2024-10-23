@@ -1,11 +1,14 @@
 defmodule ApiWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :api
 
-  plug Corsica, origins: "*", allow_headers: ["content-type", "authorization", "api_key"]
+  # Update Corsica settings to allow specific origins and credentials
+  plug Corsica,
+    origins: ["http://localhost:8081"],  # Specify the allowed origin(s)
+    allow_headers: ["content-type", "authorization", "api_key"],
+    allow_credentials: true  # Allow credentials (cookies, etc.)
 
-  # The session will be stored in the cookie and signed,
-  # this means its contents can be read but not tampered with.
-  # Set :encryption_salt if you would also like to encrypt it.
+  # The rest of your endpoint code remains the same
+
   @session_options [
     store: :cookie,
     key: "_api_key",
@@ -17,18 +20,12 @@ defmodule ApiWeb.Endpoint do
     websocket: [connect_info: [session: @session_options]],
     longpoll: [connect_info: [session: @session_options]]
 
-  # Serve at "/" the static files from "priv/static" directory.
-  #
-  # You should set gzip to true if you are running phx.digest
-  # when deploying your static files in production.
   plug Plug.Static,
     at: "/",
     from: :api,
     gzip: false,
     only: ApiWeb.static_paths()
 
-  # Code reloading can be explicitly enabled under the
-  # :code_reloader configuration of your endpoint.
   if code_reloading? do
     plug Phoenix.CodeReloader
     plug Phoenix.Ecto.CheckRepoStatus, otp_app: :api
