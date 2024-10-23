@@ -35,9 +35,9 @@ defmodule ApiWeb.ChartManagerController do
             start_date: DateTime.to_iso8601(start_date),
             end_date: DateTime.to_iso8601(end_date),
             total_days: Date.diff(end_date, start_date),
-            # chart_3: chart_3_data,
-            # chart_1: chart_1_data,
-            # chart_2: chart_2_data
+            chart_1: chart_1_data,
+            chart_2: chart_2_data,
+            chart_3: chart_3_data
           }
 
           conn
@@ -61,6 +61,7 @@ defmodule ApiWeb.ChartManagerController do
   end
 
 
+  # Calculer le temps travaillé de nuit en secondes (horaires comptées de 21h à 6h)
   def calc_chart_3(workingtimes) do
     data = Enum.map(workingtimes, fn workingtime ->
 
@@ -68,13 +69,20 @@ defmodule ApiWeb.ChartManagerController do
       end_time = ensure_naive_datetime(workingtime.end)
 
       night_start_time = NaiveDateTime.new(start_time.year, start_time.month, start_time.day, 21, 0, 0) |> elem(1)
-      night_end_time = NaiveDateTime.new(start_time.year, start_time.month, start_time.day + 1, 6, 0, 0) |> elem(1) # 6h du jour suivant
+      night_end_time =
+        case NaiveDateTime.new(start_time.year, start_time.month, start_time.day + 1, 6, 0, 0) do
+          {:ok, dt} -> dt
+          {:error, _} ->
+            next_day = Date.add(Date.new!(start_time.year, start_time.month, start_time.day), 1)
+            NaiveDateTime.new!(next_day.year, next_day.month, next_day.day, 6, 0, 0)
+      end
 
-      IO.inspect(start_time)
-      IO.inspect(end_time)
+      # IO.puts("--------------------")
+      # IO.inspect("start_time #{start_time}")
+      # IO.inspect("end_time #{end_time}")
 
-      IO.inspect(night_start_time)
-      IO.inspect(night_end_time)
+      # IO.inspect("night_start_time #{night_start_time}")
+      # IO.inspect("night_end_time #{night_end_time}")
 
       adjusted_start_time =
         if NaiveDateTime.compare(start_time, night_start_time) == :lt do
@@ -83,7 +91,7 @@ defmodule ApiWeb.ChartManagerController do
           start_time
         end
 
-      IO.inspect("adjusted_start_time #{adjusted_start_time}")
+      # IO.inspect("adjusted_start_time #{adjusted_start_time}")
 
       adjusted_end_time =
         if NaiveDateTime.compare(end_time, night_end_time) == :gt do
@@ -92,7 +100,7 @@ defmodule ApiWeb.ChartManagerController do
           end_time
         end
 
-      IO.inspect("adjusted_end_time #{adjusted_end_time}")
+      # IO.inspect("adjusted_end_time #{adjusted_end_time}")
 
       total_night_seconds =
         if NaiveDateTime.compare(adjusted_start_time, adjusted_end_time) == :lt do
@@ -101,9 +109,16 @@ defmodule ApiWeb.ChartManagerController do
           0
         end
 
-      IO.inspect(("total_night_seconds #{total_night_seconds}"))
+      # IO.inspect(("total_night_seconds #{total_night_seconds}"))
+      %{start_date: start_time, end_date: end_time, total_night_seconds: total_night_seconds}
 
     end)
+
+    %{
+      description: "Temps travaillé de nuit en secondes (horaires comptées de 21h à 6h)",
+      data: data
+    }
+
   end
 
   defp ensure_naive_datetime(datetime) do
@@ -172,7 +187,8 @@ defmodule ApiWeb.ChartManagerController do
     ]
 
     %{
-      data: data
+      data: data,
+      description: "Ratio de présence de l'employé"
     }
 
   end
