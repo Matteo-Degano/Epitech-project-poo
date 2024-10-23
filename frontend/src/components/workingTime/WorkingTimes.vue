@@ -9,11 +9,10 @@ import DeleteWorkingTimeModal from "./DeleteWorkingTimeModal.vue"
 import DataTable from "@/components/data-table/DataTable.vue"
 import { useToast } from "../ui/toast/use-toast"
 import { formatDateTime } from "@/utils/dateFormat"
-import type { WorkingTimeType, User } from "@/types/api.type"
+import type { WorkingTimeType } from "@/types/api.type"
 
 const { toast } = useToast()
 const workingTimeData = ref<WorkingTimeType[]>([])
-const userList = ref<User[]>([])
 const isLoading = ref(true)
 
 // Function to handle working time deletion
@@ -77,13 +76,31 @@ const columns: ColumnDef<WorkingTimeType>[] = [
   },
   {
     accessorKey: "start",
-    header: () => h("div", { class: "text-left" }, "Start Date & Time"),
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc")
+        },
+        () => ["Start Date & Time", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+      )
+    },
     cell: ({ row }) =>
       h("div", { class: "text-left font-medium" }, formatDateTime(row.getValue("start")))
   },
   {
     accessorKey: "end",
-    header: () => h("div", { class: "text-left" }, "End Date & Time"),
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc")
+        },
+        () => ["End Date & Time", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+      )
+    },
     cell: ({ row }) =>
       h("div", { class: "text-left font-medium" }, formatDateTime(row.getValue("end")))
   },

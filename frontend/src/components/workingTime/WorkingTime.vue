@@ -26,7 +26,6 @@ import {
 import { DateFormatter, getLocalTimeZone, CalendarDate } from "@internationalized/date"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
-import { useAuthStore } from "@/stores/auth.store"
 import DialogDescription from "../ui/dialog/DialogDescription.vue"
 import { useToast } from "../ui/toast/use-toast"
 import { CirclePlus } from "lucide-vue-next"
@@ -39,7 +38,6 @@ const props = defineProps({
 })
 
 const { toast } = useToast()
-const authStore = useAuthStore()
 const isModalOpen = ref(false)
 const selectedStartDate = ref(getInitialDate(props.data?.start) || null)
 const selectedEndDate = ref(getInitialDate(props.data?.end) || null)
@@ -48,12 +46,13 @@ const usersList = ref<User[]>([])
 const open = ref(false)
 const emit = defineEmits(["close", "refresh"])
 
-function getInitialDate(datetime: any) {
+function getInitialDate(datetime: any): CalendarDate | null {
   const date = datetime?.split("T")[0]
   if (date) {
     let [year, month, day] = date.split("-").map(Number)
     return new CalendarDate(year, month, day)
   }
+  return null
 }
 
 const timeRange = ref({
@@ -69,31 +68,17 @@ watch(
   () => props.data,
   (newValue) => {
     if (newValue) {
-      selectedUser.value = newValue.user_id
-      timeRange.value.start = newValue.start
-      timeRange.value.end = newValue.end
+      selectedStartDate.value = getInitialDate(newValue.start) || null
+      selectedStartDate.value = getInitialDate(newValue.start)
+      timeRange.value.start = newValue.start.split("T")[1]?.split(".")[0] || ""
+
+      // Extract date and time for the end datetime
+      selectedEndDate.value = getInitialDate(newValue.end)
+      timeRange.value.end = newValue.end.split("T")[1]?.split(".")[0] || ""
     }
   },
   { immediate: true }
 )
-
-// Fetch users list
-const fetchUsersLists = async () => {
-  try {
-    const response = await fetchData("GET", "/users")
-    usersList.value = response.data
-    console.log(usersList)
-  } catch (err: any) {
-    toast({
-      variant: "destructive",
-      description: "Error fetching data"
-    })
-  }
-}
-
-onMounted(() => {
-  fetchUsersLists()
-})
 
 const isSaveDisabled = computed(() => {
   return (
@@ -101,7 +86,7 @@ const isSaveDisabled = computed(() => {
     !timeRange.value.start ||
     !selectedEndDate.value ||
     !timeRange.value.end ||
-    (props.mode === "create" && !selectedUser.value) // Ensure user is selected in create mode
+    (props.mode === "create" && !selectedUser.value)
   )
 })
 
@@ -110,24 +95,32 @@ function clearInputs() {
   selectedEndDate.value = null
   timeRange.value.start = ""
   timeRange.value.end = ""
-  selectedUser.value = null
+  selectedUser.value = ""
 }
 
 async function submitWorkingTime() {
   const formattedStartDate = `${selectedStartDate?.value?.year}-${String(selectedStartDate?.value?.month).padStart(2, "0")}-${String(selectedStartDate?.value?.day).padStart(2, "0")}`
   const formattedEndDate = `${selectedEndDate?.value?.year}-${String(selectedEndDate?.value?.month).padStart(2, "0")}-${String(selectedEndDate?.value?.day).padStart(2, "0")}`
 
+  let userId = selectedUser.value
+
+  if (props.mode === "create") {
+    const matchedUser = usersList.value.find((user) => user.username === selectedUser.value)
+    if (matchedUser) {
+      userId = matchedUser.id
+    }
+  }
+
   const requestData = {
     start: `${formattedStartDate} ${timeRange.value.start}`,
-    end: `${formattedEndDate} ${timeRange.value.end}`,
-    user_id: selectedUser.value // Include the user_id in the request
+    end: `${formattedEndDate} ${timeRange.value.end}`
   }
 
   try {
     let response: APIResponse
     let description: string
     if (props.mode === "create") {
-      response = await fetchData("POST", `/workingtime/${authStore.user.id}`, requestData)
+      response = await fetchData("POST", `/workingtime/${userId}`, requestData)
       description = "Working time created successfully"
     } else {
       response = await fetchData("PUT", `/workingtime/${props?.data?.id}`, requestData)
@@ -158,6 +151,26 @@ async function submitWorkingTime() {
   emit("close")
   isModalOpen.value = false
 }
+
+const fetchUsersLists = async () => {
+  try {
+    const response = await fetchData("GET", "/users")
+    usersList.value = response.data
+    console.log(usersList)
+  } catch (err: any) {
+    toast({
+      variant: "destructive",
+      description: "Error fetching data"
+    })
+  }
+}
+
+onMounted(() => {
+  fetchUsersLists()
+  if (props.mode === "update") {
+    selectedUser.value = props.data?.user_id
+  }
+})
 </script>
 
 <template>
@@ -176,7 +189,8 @@ async function submitWorkingTime() {
       </DialogHeader>
       <DialogDescription>Select a start datetime and end datetime</DialogDescription>
 
-      <div v-if="props.mode === 'create'" class="mb-4">
+      <div v-if="props.mode === 'create'" class="flex justify-between items-center">
+        <Label> User: </Label>
         <Popover v-model:open="open">
           <PopoverTrigger as-child>
             <Button
@@ -186,8 +200,8 @@ async function submitWorkingTime() {
               class="w-[200px] justify-between"
             >
               {{
-                selectedUser?.value
-                  ? usersList.find((user) => user.id === selectedUser.value)?.username
+                selectedUser
+                  ? usersList.find((user) => user.username === selectedUser)?.username
                   : "Select a user..."
               }}
               <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -202,7 +216,7 @@ async function submitWorkingTime() {
                   <CommandItem
                     v-for="user in usersList"
                     :key="user.id"
-                    :value="user.id"
+                    :value="user.username"
                     @select="open = false"
                   >
                     {{ user.username }}
@@ -210,7 +224,7 @@ async function submitWorkingTime() {
                       :class="
                         cn(
                           'ml-auto h-4 w-4',
-                          selectedUser.value === user.id ? 'opacity-100' : 'opacity-0'
+                          selectedUser.value === user.username ? 'opacity-100' : 'opacity-0'
                         )
                       "
                     />
@@ -223,51 +237,53 @@ async function submitWorkingTime() {
       </div>
       <div class="flex justify-between items-center mb-4">
         <Label>Start Date:</Label>
-        <Popover>
-          <PopoverTrigger as-child>
-            <Button variant="outline" class="justify-start w-auto text-left font-normal">
-              {{
-                selectedStartDate
-                  ? df.format(selectedStartDate.toDate(getLocalTimeZone()))
-                  : "Pick a start date"
-              }}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent class="w-auto p-0">
-            <Calendar v-model="selectedStartDate" initial-focus />
-          </PopoverContent>
-        </Popover>
-        <Input
-          type="time"
-          step="60"
-          v-model="timeRange.start"
-          class="w-auto cursor-pointer hover:bg-gray-100"
-        />
+        <div class="flex gap-2">
+          <Popover>
+            <PopoverTrigger as-child>
+              <Button variant="outline" class="justify-start w-auto text-left font-normal">
+                {{
+                  selectedStartDate
+                    ? df.format(selectedStartDate.toDate(getLocalTimeZone()))
+                    : "Pick a start date"
+                }}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent class="w-auto p-0">
+              <Calendar v-model="selectedStartDate" initial-focus />
+            </PopoverContent>
+          </Popover>
+          <Input
+            type="time"
+            step="60"
+            v-model="timeRange.start"
+            class="w-auto cursor-pointer hover:bg-gray-100"
+          />
+        </div>
       </div>
-
-      <!-- End Date and Time -->
       <div class="flex justify-between items-center">
         <Label>End Date:</Label>
-        <Popover>
-          <PopoverTrigger as-child>
-            <Button variant="outline" class="justify-start w-auto text-left font-normal">
-              {{
-                selectedEndDate
-                  ? df.format(selectedEndDate.toDate(getLocalTimeZone()))
-                  : "Pick an end date"
-              }}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent class="w-auto p-0">
-            <Calendar v-model="selectedEndDate" initial-focus />
-          </PopoverContent>
-        </Popover>
-        <Input
-          type="time"
-          step="60"
-          v-model="timeRange.end"
-          class="w-auto cursor-pointer hover:bg-gray-100"
-        />
+        <div class="flex gap-2">
+          <Popover>
+            <PopoverTrigger as-child>
+              <Button variant="outline" class="justify-start w-auto text-left font-normal">
+                {{
+                  selectedEndDate
+                    ? df.format(selectedEndDate.toDate(getLocalTimeZone()))
+                    : "Pick an end date"
+                }}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent class="w-auto p-0">
+              <Calendar v-model="selectedEndDate" initial-focus />
+            </PopoverContent>
+          </Popover>
+          <Input
+            type="time"
+            step="60"
+            v-model="timeRange.end"
+            class="w-auto cursor-pointer hover:bg-gray-100"
+          />
+        </div>
       </div>
 
       <DialogFooter>
