@@ -39,15 +39,6 @@ const LoginScreen = () => {
           await AsyncStorage.setItem('userId',data.id.toString());
           await AsyncStorage.setItem('roleId',data.role_id.toString());
           await AsyncStorage.setItem('teams', JSON.stringify(data.teams));
-          // await AsyncStorage.setItem('access_token', data.access_token);
-          // await AsyncStorage.setItem('refresh_token', data.refresh_token);
-
-          // await AsyncStorage.setItem('user', JSON.stringify(data.user));
-          // await AsyncStorage.setItem('userId', id.toString());
-          // await AsyncStorage.setItem('role', role_id.toString());
-          // await AsyncStorage.setItem('teams', JSON.stringify(teams));
-          // await AsyncStorage.setItem('email', email);
-          // await AsyncStorage.setItem('username', username);
 
           console.log("redirect to home");
           navigation.navigate('Home'); //  Home screen
