@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import ChartDonut from "@/components/charts/ChartDonut.vue"
-import LineChart from "@/components/charts/LineChart.vue"
+import DayWorkedChart from "@/components/charts/DayWorkedChart.vue"
+import HoursWorkedChart from "@/components/charts/HoursWorkedChart.vue"
+// import NightChart from "@/components/charts/NightChart.vue"
 import { fetchData } from "@/services/api"
 import { useAuthStore } from "@/stores/auth.store"
 import { onMounted, ref } from "vue"
 
 const authStore = useAuthStore()
 
-const donutData = ref(null)
-const lineData = ref(null)
+const workedDay = ref(null)
+const dayTime = ref(null)
+const nightTime = ref(null)
 const isLoading = ref(true)
 const error = ref(null)
 
@@ -17,8 +19,9 @@ onMounted(async () => {
     const response = await fetchData("GET", `/chartmanager/${authStore.userId}`)
     if (response.status === 200) {
       console.log(response.data)
-      donutData.value = response.data.donut_chart
-      lineData.value = response.data.line_chart.data
+      workedDay.value = response.data.chart_1.data
+      dayTime.value = response.data.chart_2.data
+      nightTime.value = response.data.chart_3.data
     }
   } catch (err: any) {
     error.value = err.message || "Error fetching data"
@@ -34,10 +37,9 @@ onMounted(async () => {
     <p v-if="isLoading">Loading...</p>
     <p v-if="error">{{ error }}</p>
     <div v-if="!isLoading" class="grid grid-cols-2 grid-rows-2 gap-4">
-      <div class="col-span-1 row-span-1"><ChartDonut v-if="donutData" :data="donutData" /></div>
-      <div class="col-span-1 row-span-1"><LineChart v-if="lineData" :data="lineData" /></div>
-      <div class="col-span-1 row-span-2"></div>
-      <div class="col-span-1 row-span-2"></div>
+      <div class="col-span-1 row-span-1"><DayWorkedChart v-if="workedDay" :data="workedDay" /></div>
+      <div class="col-span-1 row-span-1"><HoursWorkedChart v-if="dayTime" :data="dayTime" /></div>
+      <!-- <div class="col-span-1 row-span-2"><NightChart v-if="nightTime" :data="nightTime" /></div> -->
     </div>
   </div>
 </template>
