@@ -11,7 +11,9 @@ import { useToast } from "../ui/toast/use-toast"
 import { formatDateTime } from "@/utils/dateFormat"
 import type { WorkingTimeType } from "@/types/api.type"
 import { useAuthStore } from "@/stores/auth.store"
+import { useRoute } from "vue-router"
 
+const route = useRoute()
 const { toast } = useToast()
 const useAuth = useAuthStore()
 const workingTimeData = ref<WorkingTimeType[]>([])
@@ -152,7 +154,7 @@ const filterColumns = [
       v-else
       @refresh="fetchWorkingTimes"
       :columns="columns"
-      :data="workingTimeData"
+      :data="route.path === '/working-times' ? workingTimeData : workingTimeData.slice(0, 5)"
       :filters="filterColumns"
     />
   </div>
