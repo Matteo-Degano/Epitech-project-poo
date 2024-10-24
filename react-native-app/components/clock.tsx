@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet, Alert } from 'react-native';
 import { fetchData } from '../app/service/api';
 
-
 // Helper function to format time (HH:MM:SS)
 function formatTime(elapsedTime) {
   const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
@@ -12,6 +11,12 @@ function formatTime(elapsedTime) {
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
+function frenchDate() {
+  const currentDate = new Date()
+  const offset = currentDate.getTimezoneOffset() * 60000
+  const parisTime = new Date(currentDate.getTime() - offset)
+  return parisTime.toISOString()
+}
 
 const Clock = () => {  
   const [userId, setUserId] = useState<number | null>(null);
@@ -26,7 +31,7 @@ const Clock = () => {
     const startDateTime = new Date().getTime() - pausedTime;
 
     // API call with dynamic userId
-    await fetchData('POST', `/clocks/${userId}`, { time: new Date().toISOString(), status: true });
+    await fetchData('POST', `/clocks/${userId}`, { time: frenchDate(), status: true });
 
     const id = setInterval(() => {
       const elapsedTime = new Date().getTime() - startDateTime;
@@ -45,8 +50,7 @@ const Clock = () => {
     setTime("00:00:00");
     setPausedTime(0);
 
-    // API call with dynamic userId
-    await fetchData('POST', `/clocks/${userId}`, { time: new Date().toISOString(), status: false });
+    await fetchData('POST', `/clocks/${userId}`, { time: frenchDate(), status: false });
   };
 
   // Function to handle the clock-out confirmation
@@ -66,6 +70,7 @@ const Clock = () => {
 
   // Function to get the clock's current state
   const getClock = async () => {
+    if (userId === null) return; // Prevent API call if userId is null
     try {
       const response = await fetchData('GET', `/clocks/${userId}`);
       if (response.data && Array.isArray(response.data.data) && response.data.data.length > 0) {
@@ -97,7 +102,7 @@ const Clock = () => {
   useEffect(() => {
     loadUserData().then(() => {
       if (userId) {
-        getClock();
+        getClock(); // Call getClock only if userId is valid
       }
     });
 
@@ -106,7 +111,7 @@ const Clock = () => {
         clearInterval(intervalId); // Clean up on unmount
       }
     };
-  }, [userId, intervalId]);
+  }, [userId]); // Only depend on userId
 
   return (
     <View style={styles.container}>
