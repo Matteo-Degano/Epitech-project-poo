@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue"
+import { ref } from "vue"
 import {
   Dialog,
   DialogClose,
@@ -11,12 +11,10 @@ import {
   DialogDescription
 } from "@/components/ui/dialog"
 import { signupFormSchema } from "@/lib/formSchemas/signin.form"
-import { useForm, useField, Form } from "vee-validate"
+import { Form, Field, ErrorMessage } from "vee-validate"
 import { toTypedSchema } from "@vee-validate/zod"
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import {fetchData} from "@/services/api"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { useAuthStore } from "@/stores/auth.store"
 import { useToast } from "@/components/ui/toast/use-toast"
 
@@ -43,15 +41,6 @@ const props = defineProps<{
   teams: Team[]
 }>()
 
-function clearInputs(){
-  selectedTeams.value = []
-  selectedRole.value = null
-  email.value = ""
-  username.value = ""
-  password.value = ""
-  confirmPassword.value = ""
-}
-
 const submitForm = async (body: any) => {
   if (props.mode === "create") {
     try{
@@ -60,7 +49,6 @@ const submitForm = async (body: any) => {
         toast({
           description: `User successfully created !`
         })
-        clearInputs()
         emit("refresh")
       } else {
         toast({
@@ -99,26 +87,22 @@ const submitForm = async (body: any) => {
   }
 }
 
-const { handleSubmit, errors } = useForm({
-  validationSchema: toTypedSchema(signupFormSchema)
-})
-
 const selectedTeams = ref<string[]>([])
 const selectedRole = ref<number>()
-
-const { value: username } = useField<string>("username")
-const { value: email } = useField<string>("email")
-const { value: password } = useField<string>("password")
-const { value: confirmPassword } = useField<string>("confirmPassword")
 
 if(props.mode === "update") {
   selectedTeams.value = props.data.teams.map(team => team.id.toString())
   selectedRole.value = props.data.role_id
-  email.value = props.data.email
-  username.value = props.data.username
 }
 
-const onSubmit = handleSubmit((values) => {
+const initialValues = {
+  username: props.mode === "update" ? props.data.username : "",
+  email: props.mode === "update" ? props.data.email : "",
+  password: "",
+  confirmPassword: "",
+}
+
+const onSubmit = (values) => {
   const body = {
     username: values.username,
     email: values.email,
@@ -127,11 +111,10 @@ const onSubmit = handleSubmit((values) => {
     role_id: selectedRole.value
   }
   submitForm(body)
-})
+}
 
-const isSaveDisabled = computed(() => {
-  return !username.value || !email.value || !selectedRole.value || !password.value || !confirmPassword.value || !selectedTeams.value.length
-})
+const inputStyle="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+
 </script>
 
 <template>
@@ -150,109 +133,43 @@ const isSaveDisabled = computed(() => {
           {{ props.mode === "create" ? "Create an user here. Click save when you're done." : "Make changes to an user here. Click save when you're done." }}
         </DialogDescription>
       </DialogHeader>
-      <Form>
-        <form class="flex flex-col w-full gap-6 p-2" @submit.prevent="onSubmit">
-          <!-- Username Field -->
-          <FormField v-slot="{ componentField, errors }" name="username">
-            <FormItem>
-              <FormLabel>Username</FormLabel>
-              <FormControl>
-                <Input 
-                  type="text" 
-                  placeholder="Username" 
-                  v-bind="componentField" 
-                  v-model="username" 
-                  />
-              </FormControl>
-              <FormMessage v-if="errors">{{ errors }}</FormMessage>
-            </FormItem>
-          </FormField>
 
-          <!-- Email Field -->
-          <FormField v-slot="{ componentField, errors }" name="email">
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input
-                  type="email"
-                  placeholder="email@example.com"
-                  v-bind="componentField"
-                  v-model="email"
-                />
-              </FormControl>
-              <FormMessage v-if="errors">{{ errors }}</FormMessage>
-            </FormItem>
-          </FormField>
+      <Form :validation-schema="toTypedSchema(signupFormSchema)" @submit="onSubmit" class="flex flex-col w-full gap-6 p-2" :initialValues="initialValues">
+        <label for="username" class="font-medium">Username</label>
+        <Field type="text" name="username" :class="inputStyle"/>
+        <ErrorMessage name="username" class="text-[#FF0000]"/>
+        
+        <label for="email" class="font-medium">Email</label>
+        <Field type="email" name="email" :class="inputStyle"/>
+        <ErrorMessage name="email" class="text-[#FF0000]"/>
 
-          <!-- Password Field -->
-          <FormField v-slot="{ componentField, errors }" name="password">
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  placeholder="Password"
-                  v-bind="componentField"
-                  v-model="password"
-                />
-              </FormControl>
-              <FormMessage v-if="errors">{{ errors }}</FormMessage>
-            </FormItem>
-          </FormField>
+        <label for="password" class="font-medium">Password</label>
+        <Field type="password" name="password" :class="inputStyle"/>
+        <ErrorMessage name="password" class="text-[#FF0000]"/>
 
-          <!-- Confirm Password Field -->
-          <FormField v-slot="{ componentField, errors }" name="confirmPassword">
-            <FormItem>
-              <FormLabel>Confirm Password</FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  placeholder="Confirm Password"
-                  v-bind="componentField"
-                  v-model="confirmPassword"
-                />
-              </FormControl>
-              <FormMessage v-if="errors">{{ errors }}</FormMessage>
-            </FormItem>
-          </FormField>
+        <label for="confirmPassword" class="font-medium">Confirm password</label>
+        <Field type="password" name="confirmPassword" :class="inputStyle"/>
+        <ErrorMessage name="confirmPassword" class="text-[#FF0000]"/>
 
-          <!-- Teams Selection with Checkboxes -->
-          <FormField v-slot="{ errors }" name="teams">
-            <FormItem>
-              <FormLabel>Select Teams</FormLabel>
-              <FormControl>
-                <div class="grid grid-cols-2 gap-4">
-                  <div v-for="team in props.teams" :key="team.id" class="flex items-center">
-                    <!-- Bind to selectedTeams array using v-model -->
-                    <input type="checkbox" :value="team.id" v-model="selectedTeams" class="mr-2" />
-                    <label>{{ team.name }}</label>
-                  </div>
-                </div>
-              </FormControl>
-              <FormMessage v-if="errors">{{ errors }}</FormMessage>
-            </FormItem>
-          </FormField>
+        <label for="teams" class="font-medium">Select Teams</label>
+        <div class="grid grid-cols-2 gap-4">
+          <div v-for="team in props.teams" :key="team.id" class="flex items-center">
+            <input type="checkbox" :value="team.id" v-model="selectedTeams" class="mr-2" />
+            <label>{{ team.name }}</label>
+          </div>
+        </div>
 
-          <!-- Role Selection -->
-          <FormField v-slot="{errors}" name="role">
-            <FormItem>
-              <FormLabel>Role</FormLabel>
-              <FormControl>
-                <select v-model="selectedRole" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                  <option value="1">Employee</option>
-                  <option value="2">Manager</option>
-                  <option value="3" v-if="authStore.user.role_id === 4">General manager</option>
-                  <option value="4" v-if="authStore.user.role_id === 4">Admin</option>
-                </select>
-              </FormControl>
-              <FormMessage v-if="errors">{{ errors }}</FormMessage>
-            </FormItem>
-          </FormField>
-          <!-- Submit Button -->
-          <DialogClose as-child>
-            <Button :disabled="isSaveDisabled" class="w-auto ml-auto" type="submit"> {{ props.mode === "create" ? "Create": "Update" }} </Button>
-          </DialogClose>
-        </form>
+        <label for="role" class="font-medium">Role</label>
+        <select v-model="selectedRole" :class="inputStyle">
+          <option value="1">Employee</option>
+          <option value="2">Manager</option>
+          <option value="3" v-if="authStore.user.role_id === 4">General manager</option>
+          <option value="4" v-if="authStore.user.role_id === 4">Admin</option>
+        </select>
+        
+        <DialogClose as-child>
+          <Button class="w-auto ml-auto" type="submit"> {{ props.mode === "create" ? "Create": "Update" }} </Button>
+        </DialogClose>
       </Form>
     </DialogContent>
   </Dialog>
