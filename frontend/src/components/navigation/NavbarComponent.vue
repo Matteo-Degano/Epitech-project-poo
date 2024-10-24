@@ -69,7 +69,7 @@ const admin = 4
         </NavigationMenuItem>
 
         <NavigationMenuItem>
-          <NavigationMenuLink :class="['nav-link', 'text-red-600']">
+          <NavigationMenuLink :class="['nav-link2', 'text-red-600']">
             <button @click="logoutHandler">
               <div class="flex gap-1 items-center"><LogOut :size="18" /> Logout</div>
             </button>

@@ -29,5 +29,5 @@ test: ## Run tests
 	docker exec -it backend mix test;
 
 seeder:
-	docker exec -it backend mix ecto.reset
+	make force-migrate
 	docker exec -it backend mix run priv/repo/seeds.exs

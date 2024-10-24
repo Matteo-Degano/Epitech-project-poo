@@ -129,7 +129,11 @@ const inputStyle="flex h-10 w-full rounded-md border border-input bg-background 
           {{ props.mode === "create" ? "Create user" : "Update user" }}
         </DialogTitle>
         <DialogDescription>
-          {{ props.mode === "create" ? "Create an user here. Click save when you're done." : "Make changes to an user here. Click save when you're done." }}
+          {{
+            props.mode === "create"
+              ? "Create an user here. Click save when you're done."
+              : "Make changes to an user here. Click save when you're done."
+          }}
         </DialogDescription>
       </DialogHeader>
 

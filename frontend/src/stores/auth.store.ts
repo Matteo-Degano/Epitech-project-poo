@@ -84,6 +84,7 @@ export const useAuthStore = defineStore("auth", {
     // Additional computed getters
     isLoggedIn: (state) => !!state.user,
     hasRole: (state) => (roleId: number) => state.role === roleId,
-    isInTeam: (state) => (teamId: number) => state.teams.includes(teamId)
+    isInTeam: (state) => (teamId: number) => state.teams.includes(teamId),
+    isEmployee: (state) => state.role === 1
   }
 })
