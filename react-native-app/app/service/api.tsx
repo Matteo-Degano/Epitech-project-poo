@@ -1,35 +1,80 @@
-export async function fetchData(
-    method: "GET" | "POST" | "PUT" | "DELETE",
-    endpoint: string,
-    body?: any
-  ): Promise<any> {
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+async function extractTokens(response) {
+
+   console.log(response);   
+   // console.log(JSON.stringify(response,null,4)); //headers.map.set-cookie
+    let setCookie  = response.headers.map['set-cookie']
+    // console.log(setCookie);
+    //access_token = chaine.split("ACCESS-TOKEN=")[1].split(";")[0]
+    let refresh_token = setCookie.split("refresh_token=")[1].split(";")[0]
+    // console.log(refresh_token);
+    let access_token = setCookie.split("access_token=")[1].split(";")[0]
+    // console.log(access_token);
+
+
+    await AsyncStorage.setItem('refresh_token',refresh_token);
+    await AsyncStorage.setItem('access_token',access_token);
+  };
+
+
+export async function fetchData(method: "GET" | "POST" | "PUT" | "DELETE",endpoint: string,body?: any): Promise<any> {
+    
     try {
-      // Default headers with optional custom headers merged in
-      const headers: HeadersInit = {
-        "Content-Type": "application/json"
-      }
-  
+
+        console.log("---------- 0 ---------");
+        let access_token:string | null = null;
+        let headers: HeadersInit | null = null;
+
+        if(endpoint != '/login'){
+           const refresh_token = await AsyncStorage.getItem('refresh_token');
+           access_token = await AsyncStorage.getItem('access_token');
+
+           console.log(access_token);
+
+           headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${access_token}`,
+          }
+
+        }else{
+            await AsyncStorage.removeItem('refresh_token');
+            await AsyncStorage.removeItem('access_token');
+
+            headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+              }
+        }
+
+      console.log("---------- 1 ---------");
+      console.log(headers);
+
       const response = await fetch(`http://10.15.192.16:4000/api${endpoint}`, {
         method,
         headers,
         body: method !== "GET" ? JSON.stringify(body) : null,
-        credentials: "include" // Important: send cookies with the request
+        credentials: "include" 
       })
   
-      // Check if the response is successful
+      if(endpoint == '/login'){
+        console.log("---------- 2 ---------");
+         extractTokens(response)
+      }
+
+
       if (!response.ok) {
+        console.log("erreur");
         const errorData = await response.json()
         throw new Error(errorData.error || "An error occurred")
       }
-  
-      // Parse and return the response JSON
+
       const json = await response.json()
 
-      console.log(json);
+     //console.log(JSON.stringify(json));
 
-    //   await AsyncStorage.setItem('access_token', data.access_token);
-    //   await AsyncStorage.setItem('refresh_token', data.refresh_token);
-  
       return {
         data: json,
         status: response.status
