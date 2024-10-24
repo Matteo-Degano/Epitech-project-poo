@@ -100,6 +100,18 @@ async function submitWorkingTime() {
   const formattedStartDate = `${selectedStartDate?.value?.year}-${String(selectedStartDate?.value?.month).padStart(2, "0")}-${String(selectedStartDate?.value?.day).padStart(2, "0")}`
   const formattedEndDate = `${selectedEndDate?.value?.year}-${String(selectedEndDate?.value?.month).padStart(2, "0")}-${String(selectedEndDate?.value?.day).padStart(2, "0")}`
 
+  // Check if start time is greater than end time
+  if (
+    new Date(`${formattedStartDate}T${timeRange.value.start}`) >
+    new Date(`${formattedEndDate}T${timeRange.value.end}`)
+  ) {
+    toast({
+      variant: "destructive",
+      description: "Start time cannot be greater than end time"
+    })
+    return
+  }
+
   let userId = selectedUser.value
 
   if (props.mode === "create") {

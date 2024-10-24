@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { h, ref, onMounted } from "vue"
+import { h, ref, onMounted, computed } from "vue"
 import { type ColumnDef } from "@tanstack/vue-table"
 import { ArrowUpDown } from "lucide-vue-next"
 import { Button } from "@/components/ui/button"
@@ -10,10 +10,13 @@ import DataTable from "@/components/data-table/DataTable.vue"
 import { useToast } from "../ui/toast/use-toast"
 import { formatDateTime } from "@/utils/dateFormat"
 import type { WorkingTimeType } from "@/types/api.type"
+import { useAuthStore } from "@/stores/auth.store"
 
 const { toast } = useToast()
+const useAuth = useAuthStore()
 const workingTimeData = ref<WorkingTimeType[]>([])
 const isLoading = ref(true)
+const isEmployee: boolean = useAuth.isEmployee
 
 // Function to handle working time deletion
 async function deleteWorkingTime(id: number) {
@@ -43,6 +46,16 @@ const fetchWorkingTimes = async () => {
   try {
     const response = await fetchData("GET", `/workingtime`)
     workingTimeData.value = response.data
+    console.log(workingTimeData)
+    if (isEmployee) {
+      workingTimeData.value = workingTimeData.value.map((entry) => ({
+        ...entry,
+        user: {
+          ...entry.user,
+          username: "me"
+        }
+      }))
+    }
   } catch (err: any) {
     toast({
       variant: "destructive",
@@ -56,84 +69,91 @@ onMounted(async () => {
   isLoading.value = false
 })
 
-// Define the columns
-const columns: ColumnDef<WorkingTimeType>[] = [
-  {
-    accessorFn: (row) => row.user.username,
-    id: "user.username",
-    header: ({ column }) => {
-      return h(
-        Button,
-        {
-          variant: "ghost",
-          onClick: () => column.toggleSorting(column.getIsSorted() === "asc")
-        },
-        () => ["User", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
-      )
+// Define the columns using a computed property
+const columns = computed<ColumnDef<WorkingTimeType>[]>(() => {
+  const baseColumns: ColumnDef<WorkingTimeType>[] = [
+    {
+      accessorKey: "start",
+      header: ({ column }) => {
+        return h(
+          Button,
+          {
+            variant: "ghost",
+            onClick: () => column.toggleSorting(column.getIsSorted() === "asc")
+          },
+          () => ["Start Date & Time", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        )
+      },
+      cell: ({ row }) =>
+        h("div", { class: "text-left font-medium" }, formatDateTime(row.getValue("start")))
     },
-    cell: ({ row }) =>
-      h("div", { class: "text-left font-medium capitalize" }, row.getValue("user.username"))
-  },
-  {
-    accessorKey: "start",
-    header: ({ column }) => {
-      return h(
-        Button,
-        {
-          variant: "ghost",
-          onClick: () => column.toggleSorting(column.getIsSorted() === "asc")
-        },
-        () => ["Start Date & Time", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
-      )
-    },
-    cell: ({ row }) =>
-      h("div", { class: "text-left font-medium" }, formatDateTime(row.getValue("start")))
-  },
-  {
-    accessorKey: "end",
-    header: ({ column }) => {
-      return h(
-        Button,
-        {
-          variant: "ghost",
-          onClick: () => column.toggleSorting(column.getIsSorted() === "asc")
-        },
-        () => ["End Date & Time", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
-      )
-    },
-    cell: ({ row }) =>
-      h("div", { class: "text-left font-medium" }, formatDateTime(row.getValue("end")))
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      return h("div", { class: "flex gap-4 float-right" }, [
-        h(WorkingTime, { mode: "update", data: row.original, id: row.original.id }),
-        h(DeleteWorkingTimeModal, { id: row.original.id, function: deleteWorkingTime })
-      ])
+    {
+      accessorKey: "end",
+      header: ({ column }) => {
+        return h(
+          Button,
+          {
+            variant: "ghost",
+            onClick: () => column.toggleSorting(column.getIsSorted() === "asc")
+          },
+          () => ["End Date & Time", h(ArrowUpDown, { class: `ml-2 h-4 w-4 ` })]
+        )
+      },
+      cell: ({ row }) =>
+        h("div", { class: "text-left font-medium" }, formatDateTime(row.getValue("end")))
     }
+  ]
+
+  if (!isEmployee) {
+    baseColumns.unshift({
+      accessorFn: (row) => row.user.username,
+      id: "user.username",
+      header: ({ column }) => {
+        return h(
+          Button,
+          {
+            variant: "ghost",
+            onClick: () => column.toggleSorting(column.getIsSorted() === "asc")
+          },
+          () => ["User", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        )
+      },
+      cell: ({ row }) =>
+        h("div", { class: "text-left font-medium capitalize" }, row.getValue("user.username"))
+    })
+
+    baseColumns.push({
+      id: "actions",
+      cell: ({ row }) => {
+        return h("div", { class: "flex gap-4 float-right" }, [
+          h(WorkingTime, { mode: "update", data: row.original, id: row.original.id }),
+          h(DeleteWorkingTimeModal, { id: row.original.id, function: deleteWorkingTime })
+        ])
+      }
+    })
   }
-]
+
+  return baseColumns
+})
+
 const filterColumns = [
-  { column: "user.username", fieldName: "User" },
-  { column: "start", fieldName: "Start Date & Time" },
-  { column: "end", fieldName: "End Date & Time" }
+  { column: "start", fieldName: "Start" },
+  { column: "end", fieldName: "End" },
+  ...(!isEmployee ? [{ column: "user.username", fieldName: "User" }] : [])
 ]
 </script>
 
 <template>
   <div class="flex flex-col gap-2 w-full">
-    <div class="flex justify-end">
-      <WorkingTime
-        :mode="'create'"
-        :workingTimeData="workingTimeData"
-        @refresh="fetchWorkingTimes"
-      />
-    </div>
     <div v-if="isLoading" class="flex justify-center items-center h-full">
       <p>Loading...</p>
     </div>
-    <DataTable v-else :columns="columns" :data="workingTimeData" :filters="filterColumns" />
+    <DataTable
+      v-else
+      @refresh="fetchWorkingTimes"
+      :columns="columns"
+      :data="workingTimeData"
+      :filters="filterColumns"
+    />
   </div>
 </template>

@@ -11,7 +11,6 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
-
 import {
   FlexRender,
   getCoreRowModel,
@@ -20,6 +19,9 @@ import {
   getPaginationRowModel,
   getSortedRowModel
 } from "@tanstack/vue-table"
+import WorkingTime from "../workingTime/WorkingTime.vue"
+import { useRoute } from "vue-router"
+import type { WorkingTimeType } from "@/types/api.type"
 
 function valueUpdater<T extends Updater<any>>(updaterOrValue: T, ref: Ref) {
   ref.value = typeof updaterOrValue === "function" ? updaterOrValue(ref.value) : updaterOrValue
@@ -29,10 +31,19 @@ const props = defineProps<{
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   filters: { column: string; fieldName: string }[]
+  workingTimeData?: WorkingTimeType[]
 }>()
 
+const route = useRoute()
 const columnFilters = ref<ColumnFiltersState>([])
 const sorting = ref<SortingState>([])
+const emit = defineEmits(["refresh"])
+const isWorkingTimesTable = route.path === "/working-times"
+const isUsersTable = route.path === "/users"
+
+function onRefresh() {
+  emit("refresh")
+}
 
 const table = useVueTable({
   get data() {
@@ -59,14 +70,17 @@ const table = useVueTable({
 </script>
 
 <template>
-  <div class="flex items-center space-x-4">
-    <Input
-      v-for="filter in filters"
-      class="max-w-sm"
-      :placeholder="`Filter by ${filter.fieldName}...`"
-      :model-value="table.getColumn(filter.column)?.getFilterValue() as string"
-      @update:model-value="table.getColumn(filter.column)?.setFilterValue($event)"
-    />
+  <div class="flex w-full space-x-4 justify-between">
+    <div class="flex items-center space-x-4">
+      <Input
+        v-for="filter in filters"
+        class="max-w-sm"
+        :placeholder="`Filter by ${filter.fieldName}...`"
+        :model-value="table.getColumn(filter.column)?.getFilterValue() as string"
+        @update:model-value="table.getColumn(filter.column)?.setFilterValue($event)"
+      />
+    </div>
+    <WorkingTime v-if="isWorkingTimesTable" :mode="'create'" @refresh="onRefresh" />
   </div>
 
   <div class="border rounded-md">
