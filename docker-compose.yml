@@ -9,7 +9,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     networks:
-      - network
+      - app-network
 
   backend:
     build:
@@ -25,19 +25,8 @@ services:
     volumes:
       - ./backend:/app
     networks:
-      - network
-
-  adminer:
-    container_name: adminer
-    image: adminer
-    environment:
-      - ADMINER_DESIGN=pepa-linha
-    ports:
-      - "8080:8080"
-    depends_on:
-      - database
-    networks:
-      - network
+      - app-network
+      # - prometheus-network
 
   frontend:
     build:
@@ -52,7 +41,19 @@ services:
       - ./frontend:/app
       - /app/node_modules
     networks:
-     - network
+      - app-network
+
+  adminer:
+    container_name: adminer
+    image: adminer
+    environment:
+      - ADMINER_DESIGN=pepa-linha
+    ports:
+      - "8081:8080"
+    depends_on:
+      - database
+    networks:
+      - app-network
 
   swagger-ui:
     image: swaggerapi/swagger-ui
@@ -71,4 +72,5 @@ volumes:
   node_modules:
 
 networks:
-  network:
+  app-network:
+  # prometheus-network:
