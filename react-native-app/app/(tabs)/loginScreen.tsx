@@ -10,8 +10,8 @@ const LoginScreen = () => {
 
   const navigation = useNavigation(); 
 
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('admin&epitech.eu');
+  const [password, setPassword] = useState('password');
 
   const handleLogin = async () => {
 
