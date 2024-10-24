@@ -9,6 +9,7 @@ import {
   DialogTrigger,
   DialogDescription
 } from "@/components/ui/dialog"
+import { CirclePlus } from "lucide-vue-next"
 import { signupFormSchema } from "@/lib/formSchemas/signin.form"
 import { Form, Field, ErrorMessage } from "vee-validate"
 import { toTypedSchema } from "@vee-validate/zod"
@@ -119,9 +120,10 @@ const inputStyle="flex h-10 w-full rounded-md border border-input bg-background 
 <template>
   <Dialog>
     <DialogTrigger class="space-x-4">
-      <Button>
-        {{ props.mode === "create" ? "Create user" : "Update" }}
+      <Button v-if="props.mode === 'create'" class="flex gap-2 bg-green-600 hover:bg-green-500">
+        <CirclePlus />Add a new user
       </Button>
+      <Button v-if="props.mode === 'update'">Update</Button>
     </DialogTrigger>
     <DialogContent class="max-h-[90dvh] overflow-y-auto">
       <DialogHeader>

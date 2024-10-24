@@ -22,6 +22,7 @@ import {
 import WorkingTime from "../workingTime/WorkingTime.vue"
 import { useRoute } from "vue-router"
 import type { WorkingTimeType } from "@/types/api.type"
+import UserModal from "../users/UserModal.vue"
 
 function valueUpdater<T extends Updater<any>>(updaterOrValue: T, ref: Ref) {
   ref.value = typeof updaterOrValue === "function" ? updaterOrValue(ref.value) : updaterOrValue
@@ -32,6 +33,7 @@ const props = defineProps<{
   data: TData[]
   filters: { column: string; fieldName: string }[]
   workingTimeData?: WorkingTimeType[]
+  teams?: Team[]
 }>()
 
 const route = useRoute()
@@ -81,6 +83,7 @@ const table = useVueTable({
       />
     </div>
     <WorkingTime v-if="isWorkingTimesTable" :mode="'create'" @refresh="onRefresh" />
+    <UserModal v-if="isUsersTable" :mode="'create'" @refresh="onRefresh" :data="{}" :teams="props.teams"/>
   </div>
 
   <div class="border rounded-md">
