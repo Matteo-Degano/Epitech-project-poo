@@ -139,6 +139,7 @@ const filterColumns = [{column: 'username', fieldName: 'name'}, {column: 'email'
     </div>
     
     <DataTable 
+      v-else
       :columns="columns"
       :data="usersData"
       :filters="filterColumns"
