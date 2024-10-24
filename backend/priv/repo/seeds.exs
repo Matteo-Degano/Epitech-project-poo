@@ -85,7 +85,7 @@ users =
     end)
 
     Enum.each(0..90, fn (i) ->
-      date = Date.add(Date.utc_today(), i)
+      date = Date.add(Date.utc_today(), -i)
 
       {:ok, start_time} = Time.new(9, Enum.random(15..45), Enum.random(0..59))
       {:ok, end_time} = Time.new(17, Enum.random(15..45), Enum.random(0..59))
