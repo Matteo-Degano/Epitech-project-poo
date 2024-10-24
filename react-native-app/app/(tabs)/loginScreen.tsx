@@ -44,7 +44,8 @@ const LoginScreen = () => {
           navigation.navigate('Home'); //  Home screen
 
         } else {
-          Alert.alert('Login Failed', data.message || 'Invalid credentials');
+          const errorData = await response.json();
+          Alert.alert('Login Failed', errorData.message || 'Invalid credentials');
         }
       } catch (error) {
         Alert.alert('Error', 'An error occurred while logging in');
