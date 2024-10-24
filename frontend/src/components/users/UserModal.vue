@@ -4,7 +4,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -134,7 +133,7 @@ const inputStyle="flex h-10 w-full rounded-md border border-input bg-background 
         </DialogDescription>
       </DialogHeader>
 
-      <Form :validation-schema="toTypedSchema(signupFormSchema)" @submit="onSubmit" class="flex flex-col w-full gap-6 p-2" :initialValues="initialValues">
+      <Form v-slot="{errors}" :validation-schema="toTypedSchema(signupFormSchema)" @submit="onSubmit" class="flex flex-col w-full gap-6 p-2" :initialValues="initialValues" :validateOnMount="true">
         <label for="username" class="font-medium">Username</label>
         <Field type="text" name="username" :class="inputStyle"/>
         <ErrorMessage name="username" class="text-[#FF0000]"/>
@@ -168,7 +167,7 @@ const inputStyle="flex h-10 w-full rounded-md border border-input bg-background 
         </select>
         
         <DialogClose as-child>
-          <Button class="w-auto ml-auto" type="submit"> {{ props.mode === "create" ? "Create": "Update" }} </Button>
+          <Button class="w-auto ml-auto" type="submit" :disabled="Object.keys(errors).length > 0"> {{ props.mode === "create" ? "Create": "Update" }} </Button>
         </DialogClose>
       </Form>
     </DialogContent>
