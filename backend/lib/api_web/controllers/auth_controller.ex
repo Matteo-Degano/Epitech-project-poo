@@ -3,6 +3,8 @@ defmodule ApiWeb.AuthController do
 
   alias Api.{Users, Users.Guardian}
 
+  action_fallback(ApiWeb.FallbackController)
+
   def refresh(conn, _params) do
     refresh_token = Map.get(conn.cookies, "refresh_token")
 
@@ -74,14 +76,14 @@ defmodule ApiWeb.AuthController do
     conn
     |> put_status(200)
     |> put_resp_cookie("access_token", access_token,
-      secure: true,
-      max_age: 8 * 60 * 60,
-      same_site: "None"
+      # secure: true,
+      max_age: 8 * 60 * 60
+      # same_site: "None"
     )
     |> put_resp_cookie("refresh_token", refresh_token,
-      secure: true,
-      max_age: 7 * 24 * 60 * 60,
-      same_site: "None"
+      # secure: true,
+      max_age: 7 * 24 * 60 * 60
+      # same_site: "None"
     )
     |> json(response)
   end

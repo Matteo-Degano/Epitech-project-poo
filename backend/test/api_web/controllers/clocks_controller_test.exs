@@ -1,9 +1,9 @@
 defmodule ApiWeb.ClocksControllerTest do
   use ApiWeb.ConnCase
 
-  import Api.ClockingFixtures
+  import Api.ClockFixtures
 
-  alias Api.Clocking.Clocks
+  alias Api.Clock.Clocks
 
   @create_attrs %{
     status: true,
@@ -49,7 +49,7 @@ defmodule ApiWeb.ClocksControllerTest do
   describe "update clocks" do
     setup [:create_clocks]
 
-    test "renders clocks when data is valid", %{conn: conn, clocks: %Clocks{id: id} = clocks} do
+    test "renders clocks when data is valid", %{conn: conn, clocks: %Clock{id: id} = clocks} do
       conn = put(conn, ~p"/api/clocks/#{clocks}", clocks: @update_attrs)
       assert %{"id" => ^id} = json_response(conn, 200)["data"]
 

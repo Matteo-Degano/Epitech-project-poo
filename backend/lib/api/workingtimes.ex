@@ -61,7 +61,7 @@ defmodule Api.Workingtimes do
         end: w.end,
         inserted_at: w.inserted_at,
         updated_at: w.updated_at,
-        user: find__and_format_user(users, w.user_id)
+        user: find_and_format_user(users, w.user_id)
       }
     end)
   end
@@ -94,7 +94,7 @@ defmodule Api.Workingtimes do
     Workingtime.changeset(workingtime, attrs)
   end
 
-  defp find__and_format_user(users, id) do
+  defp find_and_format_user(users, id) do
     user = Enum.find(users, fn u -> id == u.id end)
 
     %{
