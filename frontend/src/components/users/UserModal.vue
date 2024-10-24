@@ -139,22 +139,22 @@ const inputStyle="flex h-10 w-full rounded-md border border-input bg-background 
         </DialogDescription>
       </DialogHeader>
 
-      <Form v-slot="{errors}" :validation-schema="toTypedSchema(signupFormSchema)" @submit="onSubmit" class="flex flex-col w-full gap-6 p-2" :initialValues="initialValues" :validateOnMount="true">
+      <Form v-slot="{errors}" :validation-schema="toTypedSchema(signupFormSchema)" @submit="onSubmit" class="flex flex-col w-full gap-6 p-2" :initialValues="initialValues">
         <label for="username" class="font-medium">Username</label>
         <Field type="text" name="username" :class="inputStyle"/>
-        <ErrorMessage name="username" class="text-[#FF0000]"/>
+        <ErrorMessage name="username" class="text-[#ef4444] font-medium"/>
         
         <label for="email" class="font-medium">Email</label>
         <Field type="email" name="email" :class="inputStyle"/>
-        <ErrorMessage name="email" class="text-[#FF0000]"/>
+        <ErrorMessage name="email" class="text-[#ef4444] font-medium"/>
 
         <label for="password" class="font-medium">Password</label>
         <Field type="password" name="password" :class="inputStyle"/>
-        <ErrorMessage name="password" class="text-[#FF0000]"/>
+        <ErrorMessage name="password" class="text-[#ef4444] font-medium"/>
 
         <label for="confirmPassword" class="font-medium">Confirm password</label>
         <Field type="password" name="confirmPassword" :class="inputStyle"/>
-        <ErrorMessage name="confirmPassword" class="text-[#FF0000]"/>
+        <ErrorMessage name="confirmPassword" class="text-[#ef4444] font-medium"/>
 
         <label for="teams" class="font-medium">Select Teams</label>
         <div class="grid grid-cols-2 gap-4">
