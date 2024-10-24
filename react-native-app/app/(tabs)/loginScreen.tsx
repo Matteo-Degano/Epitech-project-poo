@@ -17,17 +17,11 @@ const LoginScreen = () => {
 
     if (username && password) {
       try {
-        //http://10.15.192.16:4000/api/login
-        // const response = await fetch('http://127.0.0.1:4000/api/login'
-
         console.log("login");
 
         const response = await fetchData("POST",'/login', { email: username, password });
 
         console.log(response);
-  
-        
-
 
         if (response.status == "200") {
           

@@ -1,55 +1,40 @@
-import { Image, StyleSheet, Platform, View } from 'react-native';
-
+import { StyleSheet, View } from 'react-native';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-
-
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import LoginScreen from './loginScreen';
-import AppScreen from './AppScreen';
-
+import HomeTabScreen from './HomeTabScreen';
+import Workingtimes from './Workingtimes';
 
 const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
 
-export default function HomeScreen() {
+function TabNavigator() {
   return (
-
-    <NavigationContainer independent={true}>
-    <Stack.Navigator initialRouteName="Login">
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Home" component={AppScreen} />
-    </Stack.Navigator>
-  </NavigationContainer>
-  //   <View style={styles.container}>
-  //   <LoginScreen />
-  // </View>
-
+    <Tab.Navigator>
+      <Tab.Screen name="Home" component={HomeTabScreen} />
+      <Tab.Screen name="Working Time" component={Workingtimes} />
+      <Tab.Screen name="Logout" component={LoginScreen} />
+    </Tab.Navigator>
   );
 }
 
+export default function HomeScreen() {
+  return (
+    <NavigationContainer independent={true}>
+      <Stack.Navigator initialRouteName="Login">
+        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        
+        {/* Use TabNavigator for Home screen to show the tab menu */}
+        <Stack.Screen name="Home" component={TabNavigator} options={{ headerShown: false }} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
 });
-
-
-// const styles = StyleSheet.create({
-//   titleContainer: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     gap: 8,
-//   },
-//   stepContainer: {
-//     gap: 8,
-//     marginBottom: 8,
-//   },
-//   reactLogo: {
-//     height: 178,
-//     width: 290,
-//     bottom: 0,
-//     left: 0,
-//     position: 'absolute',
-//   },
-// });
