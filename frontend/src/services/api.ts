@@ -22,7 +22,15 @@ export async function fetchData(
       throw new Error(errorData.error || "An error occurred")
     }
 
-    // Parse and return the response JSON
+    // If its a delete request with no content, return null
+    if (response.status === 204) {
+      return {
+        data: null,
+        status: response.status
+      }
+    }
+
+    // Parse and return the response JSON for other status codes
     const json = await response.json()
 
     return {

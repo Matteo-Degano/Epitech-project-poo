@@ -13,6 +13,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
+import { AlarmClockOff, AlarmClockCheck } from "lucide-vue-next"
 
 const authStore = useAuthStore()
 const isLoading = ref(true)
@@ -70,7 +71,6 @@ async function stopClock() {
 async function getClock() {
   try {
     const response = await fetchData("GET", `/clocks/${authStore.userId}`)
-
     if (response.data && Array.isArray(response.data.data) && response.data.data.length > 0) {
       const sortedClocks = response.data.data.sort(
         (a: { time: string }, b: { time: string }) =>
@@ -95,6 +95,7 @@ async function getClock() {
     }
   } catch (error) {
     console.error("Error fetching clocks:", error)
+    isLoading.value = false
   }
 }
 
@@ -123,18 +124,19 @@ onBeforeUnmount(() => {
       v-if="!isClockRunning && !isLoading"
       @click="startClock"
       variant="ghost"
-      class="ring-1 ring-red-500 hover:bg-green-500 hover:text-background hover:ring-0 min-w-36"
+      class="ring-1 ring-red-500 hover:bg-green-500 hover:text-background hover:ring-0 w-32 flex justify-between group"
     >
-      {{ time }}
+      {{ time }} <AlarmClockOff :size="18" class="text-red-500 group-hover:text-background" />
     </Button>
     <Dialog>
       <DialogTrigger as-child>
         <Button
           v-if="isClockRunning && !isLoading"
           variant="ghost"
-          class="bg-green-500 hover:bg-red-500 text-background hover:text-background min-w-36"
+          class="ring-1 ring-green-500 hover:bg-red-500 hover:text-background hover:ring-0 w-32 flex justify-between group"
         >
           {{ time }}
+          <AlarmClockCheck :size="18" class="text-green-500 group-hover:text-background" />
         </Button>
       </DialogTrigger>
       <DialogContent class="sm:max-w-md">
