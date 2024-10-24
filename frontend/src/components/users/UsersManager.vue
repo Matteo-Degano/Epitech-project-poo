@@ -138,13 +138,11 @@ const filterColumns = [{column: 'username', fieldName: 'name'}, {column: 'email'
         <p>Loading...</p>
     </div>
     
-    <div v-else>
-      <DataTable 
-        :columns="columns"
-        :data="usersData"
-        :filters="filterColumns"
-        :teams="teamsData"
-      />
-    </div>
+    <DataTable 
+      :columns="columns"
+      :data="usersData"
+      :filters="filterColumns"
+      :teams="teamsData"
+    />
   </div>
 </template>
