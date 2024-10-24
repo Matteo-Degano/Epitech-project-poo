@@ -28,29 +28,6 @@ type Team = {
     name: string
 }
 
-async function deleteUser(id: number) {
-  try {
-    const response = await fetchData("DELETE", `/users/${id}`)
-    if (response.status === 200) {
-      toast({
-          description: `User successfully deleted !`
-        })
-    emit("refresh")
-    } else {
-      toast({
-          description: `Failed to delete user.`,
-          variant: "destructive"
-        })
-    }
-  } catch (error) {
-    toast({
-        description: `Error deleting user.`,
-        variant: "destructive"
-      })
-    console.log(error)
-  }
-}
-
 async function fetchUsers(){
   try {
     const response = await fetchData("GET", "/users")
@@ -145,7 +122,7 @@ const columns: ColumnDef<User>[] = [
         h(UserModal, { mode: "update", data: row.original, teams: teamsData.value , onRefresh: fetchUsers }),
         h(
           DeleteUserModal,
-          { id: row.original.id, function: deleteUser, onRefresh: fetchUsers }
+          { id: row.original.id, onRefresh: fetchUsers }
         )
       ])
     }
