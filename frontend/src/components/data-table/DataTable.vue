@@ -119,5 +119,5 @@ const table = useVueTable({
       </TableBody>
     </Table>
   </div>
-  <DataTablePagination :table="table" />
+  <DataTablePagination v-if="props.data.length > 10" :table="table" />
 </template>
