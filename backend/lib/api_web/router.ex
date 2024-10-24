@@ -47,7 +47,7 @@ defmodule ApiWeb.Router do
     pipe_through([:api, :auth, :role_user])
 
     #  Charts
-    get("/chartmanager/:userID", ChartManagerController, :show_user_workingtime)
+    get("/chartmanager/:userID", ChartManagerController, :show)
 
     #  Teams
     get("teams/:id", TeamController, :show)
