@@ -23,15 +23,12 @@ export async function fetchData(method: "GET" | "POST" | "PUT" | "DELETE",endpoi
     
     try {
 
-        console.log("---------- 0 ---------");
         let access_token:string | null = null;
         let headers: HeadersInit | null = null;
 
         if(endpoint != '/login'){
            const refresh_token = await AsyncStorage.getItem('refresh_token');
            access_token = await AsyncStorage.getItem('access_token');
-
-           console.log(access_token);
 
            headers = {
             'Accept': 'application/json',
@@ -49,9 +46,6 @@ export async function fetchData(method: "GET" | "POST" | "PUT" | "DELETE",endpoi
               }
         }
 
-      console.log("---------- 1 ---------");
-      console.log(headers);
-
       const response = await fetch(`http://10.15.192.16:4000/api${endpoint}`, {
         method,
         headers,
@@ -60,7 +54,6 @@ export async function fetchData(method: "GET" | "POST" | "PUT" | "DELETE",endpoi
       })
   
       if(endpoint == '/login'){
-        console.log("---------- 2 ---------");
          extractTokens(response)
       }
 
@@ -73,7 +66,6 @@ export async function fetchData(method: "GET" | "POST" | "PUT" | "DELETE",endpoi
 
       const json = await response.json()
 
-     //console.log(JSON.stringify(json));
 
       return {
         data: json,
