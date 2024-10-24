@@ -9,7 +9,7 @@ export async function fetchData(
         "Content-Type": "application/json"
       }
   
-      const response = await fetch(`http://0.0.0.0:4000/api${endpoint}`, {
+      const response = await fetch(`http://10.15.192.16:4000/api${endpoint}`, {
         method,
         headers,
         body: method !== "GET" ? JSON.stringify(body) : null,
