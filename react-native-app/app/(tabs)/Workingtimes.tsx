@@ -44,7 +44,7 @@ const Workingtimes = ()=>{
 
         if(response){
             //console.log(response.data.data);
-            setWorkingTimeData(response.data)
+            setWorkingTimeData(response.data.data)
         }
     }
 
