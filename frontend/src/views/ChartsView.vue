@@ -15,14 +15,11 @@ import { Button } from "@/components/ui/button"
 import { fetchData } from "@/services/api"
 import { useAuthStore } from "@/stores/auth.store"
 import { onMounted, ref, computed, watch } from "vue"
-import { format, subMonths, endOfMonth, startOfMonth } from "date-fns"
-import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select"
-import Separator from "@/components/ui/separator/Separator.vue"
-import Label from "@/components/ui/label/Label.vue"
 import { useRoute, useRouter } from "vue-router"
 import { useToast } from "@/components/ui/toast/use-toast"
 import type { User } from "@/types/api.type"
 import { cn } from "@/utils"
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select"
 
 const authStore = useAuthStore()
 const { toast } = useToast()
@@ -40,33 +37,59 @@ const isLoading = ref(true)
 const error = ref(null)
 const open = ref(false)
 
-// Generate the last 12 months with start and end dates
+// Define month array with start and end days
+const monthDefinitions = [
+  { name: "January", startDay: "01", endDay: "31" },
+  { name: "February", startDay: "01", endDay: "28" }, // Adjust for leap years
+  { name: "March", startDay: "01", endDay: "31" },
+  { name: "April", startDay: "01", endDay: "30" },
+  { name: "May", startDay: "01", endDay: "31" },
+  { name: "June", startDay: "01", endDay: "30" },
+  { name: "July", startDay: "01", endDay: "31" },
+  { name: "August", startDay: "01", endDay: "31" },
+  { name: "September", startDay: "01", endDay: "30" },
+  { name: "October", startDay: "01", endDay: "31" },
+  { name: "November", startDay: "01", endDay: "30" },
+  { name: "December", startDay: "01", endDay: "31" }
+]
+
+// Helper to determine if a year is a leap year
+function isLeapYear(year) {
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0
+}
+
+// Generate the last 12 months with fixed start and end dates
 const months = ref(
   Array.from({ length: 12 }, (_, i) => {
-    const date = subMonths(new Date(), i)
-    const start = startOfMonth(date).toISOString().split("T")[0] + "T00:00:01Z"
-    const end = endOfMonth(date).toISOString().split("T")[0] + "T23:59:59Z"
+    const currentDate = new Date()
+    const monthIndex = (currentDate.getMonth() - i + 12) % 12
+    const yearOffset = Math.floor((currentDate.getMonth() - i) / 12)
+    const year = currentDate.getFullYear() + yearOffset
+
+    const { startDay, endDay, name } = monthDefinitions[monthIndex]
+    const adjustedEndDay = monthIndex === 1 && isLeapYear(year) ? "29" : endDay // Adjust February for leap years
+
     return {
-      label: format(date, "MMMM yyyy"),
-      start,
-      end
+      label: `${name} ${year}`,
+      start: `${year}-${String(monthIndex + 1).padStart(2, "0")}-${startDay}T00:00:00.000Z`,
+      end: `${year}-${String(monthIndex + 1).padStart(2, "0")}-${adjustedEndDay}T23:59:59.999Z`
     }
   })
 )
 
 const selectedMonth = ref(months.value[0])
 
-// Computed properties to calculate totals
+// Computed totals
 const totalHoursWorked = computed(() => {
   if (!dayTime.value) return 0
   const totalSeconds = dayTime.value.data.reduce((sum, entry) => sum + entry.time_worked, 0)
-  return (totalSeconds / 3600).toFixed(2) // Convert to hours
+  return (totalSeconds / 3600).toFixed(2)
 })
 
 const totalExtraHours = computed(() => {
   if (!extraTime.value) return 0
   const totalSeconds = extraTime.value.data.reduce((sum, entry) => sum + entry.value, 0)
-  return (totalSeconds / 3600).toFixed(2) // Convert to hours
+  return (totalSeconds / 3600).toFixed(2)
 })
 
 const daysWorked = computed(() => {
@@ -75,54 +98,56 @@ const daysWorked = computed(() => {
   return workedDaysEntry ? workedDaysEntry.value : 0
 })
 
-watch(selectedMonth, async (newVal) => {
-  await fetchChart(newVal.start, newVal.end)
-})
-
+// Fetch functions
 const fetchUsersLists = async () => {
   try {
     const response = await fetchData("GET", "/users")
     usersList.value = response.data
-  } catch (err: any) {
-    toast({
-      variant: "destructive",
-      description: "Error fetching data"
-    })
+  } catch (err) {
+    toast({ variant: "destructive", description: "Error fetching data" })
   }
 }
 
-const fetchChart = async (id = chartId || authStore.userId) => {
+const fetchChart = async (
+  start = selectedMonth.value.start,
+  end = selectedMonth.value.end,
+  id = chartId || authStore.userId
+) => {
   try {
     isLoading.value = true
-    const response = await fetchData("GET", `/chartmanager/${id}`)
+    const response = await fetchData("GET", `/chartmanager/${id}?start=${start}&end=${end}`)
     if (response.status === 200) {
       workedDay.value = response.data.chart_1
       dayTime.value = response.data.chart_2
       nightTime.value = response.data.chart_3
       extraTime.value = response.data.chart_4
     }
-  } catch (err: any) {
+  } catch (err) {
     error.value = err.message || "Error fetching data"
+    toast({ variant: "destructive", description: error.value })
   } finally {
     isLoading.value = false
   }
 }
 
-// Watch selectedUser for changes and update route
+// Watchers
+watch(selectedMonth, (newVal) => {
+  fetchChart(newVal.start, newVal.end)
+})
+
 watch(
   () => selectedUser.value,
   (newValue) => {
     const userId = usersList.value.find((user) => user.username === newValue)?.id
     if (userId !== undefined) {
       router.push(`/charts/${userId}`)
+      fetchChart(selectedMonth.value.start, selectedMonth.value.end, userId)
     }
-    fetchChart(userId)
-  },
-  { immediate: true }
+  }
 )
 
 onMounted(async () => {
-  await fetchChart()
+  await fetchChart(selectedMonth.value.start, selectedMonth.value.end)
   if (!isEmployee) await fetchUsersLists()
 })
 </script>
