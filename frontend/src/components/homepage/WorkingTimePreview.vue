@@ -9,6 +9,7 @@ import { formatDateTime } from "@/utils/dateFormat"
 import type { WorkingTimeType } from "@/types/api.type"
 import { useAuthStore } from "@/stores/auth.store"
 import { useRoute } from "vue-router"
+import router from "@/router"
 
 const useAuth = useAuthStore()
 const workingTimeData = ref<WorkingTimeType[]>([])
@@ -22,7 +23,6 @@ const fetchWorkingTimes = async () => {
         const response = await fetchData("GET", `/workingtime`)
         workingTimeData.value = response.data
         workingTimeData.value = workingTimeData.value.filter(entry => entry.user.id === useAuth.user.id).sort()
-        console.log(workingTimeData.value)
     } catch (err: any) {
         console.log(err)
     }
@@ -73,7 +73,7 @@ const columns: ColumnDef<WorkingTimeType>[] = [
         <div v-if="isLoading" class="flex justify-center items-center h-full">
             <p>Loading...</p>
         </div>
-        <div v-else>
+        <div v-else class="flex flex-col gap-2 w-full">
             <h2>Latest working times</h2>
             <DataTable
             @refresh="fetchWorkingTimes"
@@ -81,8 +81,8 @@ const columns: ColumnDef<WorkingTimeType>[] = [
             :data="workingTimeData.slice(-5)"
             :filters="[]"
             />
-            <router-link to="/working-times" :class="[{ 'text-primary': isActive('/working-times') }]">
-                <p class="text-right text-primary">View more...</p>
+            <router-link to="/working-times" :class="[{ 'text-primary': isActive('/working-times')}, , 'self-end']">
+                <Button >View all</Button>
             </router-link>
         </div>
     </div>
