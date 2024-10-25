@@ -54,7 +54,7 @@ const monthDefinitions = [
 ]
 
 // Helper to determine if a year is a leap year
-function isLeapYear(year) {
+function isLeapYear(year: number): boolean {
   return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0
 }
 
@@ -80,22 +80,26 @@ const months = ref(
 const selectedMonth = ref(months.value[0])
 
 // Computed totals
-const totalHoursWorked = computed(() => {
-  if (!dayTime.value) return 0
-  const totalSeconds = dayTime.value.data.reduce((sum, entry) => sum + entry.time_worked, 0)
-  return (totalSeconds / 3600).toFixed(2)
-})
-
-const totalExtraHours = computed(() => {
-  if (!extraTime.value) return 0
-  const totalSeconds = extraTime.value.data.reduce((sum, entry) => sum + entry.value, 0)
-  return (totalSeconds / 3600).toFixed(2)
-})
-
 const daysWorked = computed(() => {
   if (!workedDay.value) return 0
   const workedDaysEntry = workedDay.value.data.find((entry) => entry.name === "Jours travaillés")
   return workedDaysEntry ? workedDaysEntry.value : 0
+})
+
+const totalHoursWorked = computed(() => {
+  if (!dayTime.value) return "0h 0m"
+  const totalSeconds = dayTime.value.data.reduce((sum, entry) => sum + entry.time_worked, 0)
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  return `${hours}h ${minutes}m`
+})
+
+const totalExtraHours = computed(() => {
+  if (!extraTime.value) return "0h 0m"
+  const totalSeconds = extraTime.value.data.reduce((sum, entry) => sum + entry.value, 0)
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  return `${hours}h ${minutes}m`
 })
 
 // Fetch functions
@@ -225,11 +229,11 @@ onMounted(async () => {
           </div>
           <div class="flex flex-col gap-2">
             <Label class="text-2xl">Total Hours</Label>
-            <p class="text-xl pl-4">{{ totalHoursWorked }} hours</p>
+            <p class="text-xl pl-4">{{ totalHoursWorked }}</p>
           </div>
           <div class="flex flex-col gap-2">
             <Label class="text-2xl">Total Extra Hours</Label>
-            <p class="text-xl pl-4">{{ totalExtraHours }} hours</p>
+            <p class="text-xl pl-4">{{ totalExtraHours }}</p>
           </div>
         </div>
         <ExtraTimeChart v-if="extraTime" :data="extraTime" class="w-full" />
