@@ -22,19 +22,27 @@ const chartOptions = ref({
   chart: {
     type: "pie"
   },
+  plotOptions: {
+    pie: {
+      donut: {
+        labels: {
+          show: true
+        }
+      }
+    }
+  },
   labels: labels.value,
   legend: {
-    position: "bottom"
+    position: "top"
   },
   title: {
     text: props.data.description,
     align: "center"
-  }
+  },
+  colors: ["#9c4ff5", "#808080"]
 })
 </script>
 
 <template>
-  <div class="flex justify-center items-center">
-    <ApexChart type="pie" :options="chartOptions" :series="series" />
-  </div>
+  <ApexChart height="100%" type="donut" :options="chartOptions" :series="series" />
 </template>

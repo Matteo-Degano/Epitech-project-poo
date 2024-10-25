@@ -23,6 +23,7 @@
     "apexcharts": "^3.54.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "lucide-vue-next": "^0.451.0",
     "pinia": "^2.2.4",
     "radix-vue": "^1.9.7",

@@ -43,6 +43,11 @@ const routes = [
         path: "charts",
         component: ChartsView,
         meta: { requiresAuth: true, roles: [employee, manager, generalManager, admin] }
+      },
+      {
+        path: "charts/:id",
+        component: ChartsView,
+        meta: { requiresAuth: true, roles: [manager, generalManager, admin] }
       }
     ]
   }

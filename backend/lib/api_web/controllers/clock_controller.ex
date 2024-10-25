@@ -61,13 +61,16 @@ defmodule ApiWeb.ClocksController do
   end
 
   # Get clocks by user
-  def show(conn, %{"user" => user}) do
-    case clocks = Clocks.get_clocks_by_user(user) do
-      [] -> send_resp(conn, :not_found, "No clockings found for user")
-      clocks -> render(conn, :index, clocks: clocks)
-    end
+def show(conn, %{"user" => user}) do
+    case Clocks.get_clocks_by_user(user) do
+      [] ->
+        send_resp(conn, :not_found, "No clockings found for user")
 
-    render(conn, :index, clocks: clocks)
+      clocks ->
+        conn
+        |> put_status(200)
+        |> json(%{clocks: Enum.map(clocks, fn c -> format_clock_json(c) end)})
+    end
   end
 
   defp format_clock_json(%Clock{} = clock) do
