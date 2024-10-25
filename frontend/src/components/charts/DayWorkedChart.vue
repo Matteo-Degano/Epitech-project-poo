@@ -1,20 +1,40 @@
 <script setup lang="ts">
-import { DonutChart } from "@/components/ui/chart-donut"
-import { defineProps } from "vue"
+import { defineProps, ref } from "vue"
 
 const props = defineProps<{
   data: {
-    name: string
-    value: number
-  }[]
+    data: [
+      {
+        name: string
+        value: number
+      }
+    ]
+    description: string
+  }
 }>()
 
-const filteredData = props.data.filter((item) => item.name !== "Ratio")
-console.log(filteredData)
+const series = ref(
+  props.data.data.filter((item) => item.name !== "Ratio").map((item) => item.value)
+)
+const labels = ref(props.data.data.filter((item) => item.name !== "Ratio").map((item) => item.name))
+
+const chartOptions = ref({
+  chart: {
+    type: "pie"
+  },
+  labels: labels.value,
+  legend: {
+    position: "bottom"
+  },
+  title: {
+    text: props.data.description,
+    align: "center"
+  }
+})
 </script>
 
 <template>
   <div class="flex justify-center items-center">
-    <DonutChart index="name" :category="'value'" :data="filteredData" />
+    <ApexChart type="pie" :options="chartOptions" :series="series" />
   </div>
 </template>

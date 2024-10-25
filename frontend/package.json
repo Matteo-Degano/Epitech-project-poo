@@ -20,6 +20,7 @@
     "@unovis/vue": "^1.4.4",
     "@vee-validate/zod": "^4.13.2",
     "@vueuse/core": "^11.1.0",
+    "apexcharts": "^3.54.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-vue-next": "^0.451.0",
@@ -30,6 +31,7 @@
     "vee-validate": "^4.13.2",
     "vue": "^3.4.29",
     "vue-router": "^4.3.3",
+    "vue3-apexcharts": "^1.7.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

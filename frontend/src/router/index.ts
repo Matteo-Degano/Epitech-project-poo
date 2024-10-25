@@ -53,8 +53,6 @@ const router = createRouter({
   routes
 })
 
-// Ensure Pinia is ready before initializing the router
-
 // Global navigation guard
 router.beforeEach(
   (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
