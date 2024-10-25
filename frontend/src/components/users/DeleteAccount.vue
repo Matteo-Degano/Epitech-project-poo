@@ -47,8 +47,8 @@ const isModalOpen = ref(false)
 
 <template>
   <Dialog>
-    <DialogTrigger as-child>
-        <div class="flex gap-1 items-center text-red-600 cursor-pointer"><UserX/> Delete account</div>
+    <DialogTrigger as-child class="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent focus:bg-accent focus:text-accent-foreground text-red-600">
+        <div class="flex gap-1 items-center cursor-pointer"><UserX :size="18"/> Delete account</div>
     </DialogTrigger>
     <DialogContent>
       <DialogHeader>

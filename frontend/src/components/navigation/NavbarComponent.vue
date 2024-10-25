@@ -76,9 +76,9 @@ const admin = 4
           <div class="flex gap-1 items-center"><Settings :size="18" /> Account</div>
         </NavigationMenuTrigger>
         <NavigationMenuContent>
-          <ul class="w-52 p-4 grid gap-3">
+          <ul class="w-60 p-4 grid gap-3">
             <li>
-              <NavigationMenuLink class="text-red-600">
+              <NavigationMenuLink class="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent focus:bg-accent focus:text-accent-foreground text-red-600">
                 <button @click="logoutHandler">
                   <div class="flex gap-1 items-center"><LogOut :size="18" /> Logout</div>
                 </button>
