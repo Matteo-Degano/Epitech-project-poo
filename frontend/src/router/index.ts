@@ -43,6 +43,11 @@ const routes = [
         path: "charts",
         component: ChartsView,
         meta: { requiresAuth: true, roles: [employee, manager, generalManager, admin] }
+      },
+      {
+        path: "charts/:id",
+        component: ChartsView,
+        meta: { requiresAuth: true, roles: [manager, generalManager, admin] }
       }
     ]
   }
@@ -52,8 +57,6 @@ const router = createRouter({
   history: createWebHistory(),
   routes
 })
-
-// Ensure Pinia is ready before initializing the router
 
 // Global navigation guard
 router.beforeEach(
@@ -70,6 +73,11 @@ router.beforeEach(
     // If the user is logged in and tries to access the login page, redirect to home
     if (isLoggedIn && to.path === "/login") {
       return next("/")
+    }
+
+    // Check if employee is trying to access charts/:id and redirect to /charts
+    if (userRole === employee && to.path.startsWith("/charts/") && to.params.id) {
+      return next("/charts")
     }
 
     // If the route has roles defined, check if the user's role is authorized

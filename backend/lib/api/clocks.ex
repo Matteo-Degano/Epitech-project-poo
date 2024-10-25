@@ -13,7 +13,7 @@ defmodule Api.Clocks do
   def get_clocks_by_user(id) do
     Repo.all(
       from(clock in Clock,
-        where: clock.user == ^id
+        where: clock.user_id == ^id
       )
     )
   end

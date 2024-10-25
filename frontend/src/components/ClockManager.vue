@@ -71,12 +71,11 @@ async function stopClock() {
 async function getClock() {
   try {
     const response = await fetchData("GET", `/clocks/${authStore.userId}`)
-    if (response.data && Array.isArray(response.data.data) && response.data.data.length > 0) {
-      const sortedClocks = response.data.data.sort(
+    if (response.status === 200) {
+      const sortedClocks = response.data.clocks.sort(
         (a: { time: string }, b: { time: string }) =>
           new Date(b.time).getTime() - new Date(a.time).getTime()
       )
-
       const lastClock = sortedClocks[0]
       if (lastClock.status === true) {
         clockIn.value = true
@@ -94,7 +93,6 @@ async function getClock() {
       isLoading.value = false
     }
   } catch (error) {
-    console.error("Error fetching clocks:", error)
     isLoading.value = false
   }
 }
