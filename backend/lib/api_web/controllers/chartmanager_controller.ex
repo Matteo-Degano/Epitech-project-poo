@@ -35,9 +35,9 @@ defmodule ApiWeb.ChartManagerController do
             start_date: DateTime.to_iso8601(start_date),
             end_date: DateTime.to_iso8601(end_date),
             total_days: Date.diff(end_date, start_date),
-            # chart_1: chart_1_data,
-            # chart_2: chart_2_data,
-            # chart_3: chart_3_data,
+            chart_1: chart_1_data,
+            chart_2: chart_2_data,
+            chart_3: chart_3_data,
             chart_4: chart_4_data
           }
 
@@ -61,36 +61,29 @@ defmodule ApiWeb.ChartManagerController do
 
   end
 
-  #Calculer le temps moyen d'arrivée au travail et le temps moyen de fin de travail
+  # Permet de retourner que le temps supplémentaire de travail (au delà de 8h) en secondes
   def calc_chart_4(workingtimes) do
 
-    start_times = Enum.map(workingtimes, fn workingtime ->
-      ensure_naive_datetime(workingtime.start).hour * 3600 +
-      ensure_naive_datetime(workingtime.start).minute * 60 +
-      ensure_naive_datetime(workingtime.start).second
-    end)
+    all_times_worked = Enum.map(workingtimes, fn(workingtime) ->
 
-    end_times = Enum.map(workingtimes, fn workingtime ->
-      ensure_naive_datetime(workingtime.'end').hour * 3600
-      ensure_naive_datetime(workingtime.'end').minute * 60
-      ensure_naive_datetime(workingtime.'end').second
-    end)
+      start_time = ensure_naive_datetime(workingtime.start)
+      end_time = ensure_naive_datetime(workingtime.end)
 
-    average_start_time_seconds = Enum.sum(start_times) / Enum.count(start_times)
-    average_end_time_seconds = Enum.sum(end_times) / Enum.count(end_times)
+      total_seconds = NaiveDateTime.diff(end_time, start_time)
+
+      major_total_seconds = if total_seconds > 8 * 3600 do
+        total_seconds - (8 * 3600)
+      else
+        0
+      end
+
+      %{date: start_time, value: major_total_seconds}
+
+    end)
 
     %{
-      description: "Temps moyen d'arrivée au travail et temps moyen de fin de travail",
-      data: [
-        %{
-          name: "Temps moyen d'arrivée au travail",
-          value: average_start_time_seconds
-        },
-        %{
-          name: "Temps moyen de fin de travail",
-          value: average_end_time_seconds
-        }
-      ]
+      description: "Temps travaillé par jour majoré de 25% en secondes",
+      data: all_times_worked
     }
 
   end
