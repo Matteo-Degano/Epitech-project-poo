@@ -20,9 +20,9 @@ import { useRouter } from "vue-router";
 const authStore = useAuthStore()
 const router = useRouter()
 
-async function deleteUser(id: number) {
+async function deleteUser() {
   try {
-    const response = await fetchData("DELETE", `/users/${id}`)
+    const response = await fetchData("DELETE", `/users/${authStore.user.id}`)
     if (response.status === 204) {
         await authStore.logout()
         router.push("/login")
@@ -48,7 +48,7 @@ const isModalOpen = ref(false)
 <template>
   <Dialog>
     <DialogTrigger as-child>
-        <div class="flex gap-1 items-center text-red-600"><UserX/> Delete account</div>
+        <div class="flex gap-1 items-center text-red-600 cursor-pointer"><UserX/> Delete account</div>
     </DialogTrigger>
     <DialogContent>
       <DialogHeader>
@@ -60,7 +60,7 @@ const isModalOpen = ref(false)
       </DialogHeader>
       <DialogFooter>
         <DialogClose as-child>
-            <Button variant="destructive" @click="deleteUser; isModalOpen = false">Delete</Button>
+            <Button variant="destructive" @click="deleteUser">Delete</Button>
         </DialogClose>
         <DialogClose as-child>
             <Button variant="secondary" @click="isModalOpen = false">Cancel</Button>
