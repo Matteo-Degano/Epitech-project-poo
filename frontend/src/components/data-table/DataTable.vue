@@ -44,6 +44,7 @@ const emit = defineEmits(["refresh"])
 const isWorkingTimesTable = route.path === "/working-times"
 const isUsersTable = route.path === "/users"
 const authStore = useAuthStore()
+const isEmployee: boolean = authStore.isEmployee
 
 function onRefresh() {
   emit("refresh")
@@ -84,7 +85,7 @@ const table = useVueTable({
         @update:model-value="table.getColumn(filter.column)?.setFilterValue($event)"
       />
     </div>
-    <WorkingTime v-if="isWorkingTimesTable && authStore.role !== 1" :mode="'create'" @refresh="onRefresh" />
+    <WorkingTime v-if="isWorkingTimesTable && !isEmployee" :mode="'create'" @refresh="onRefresh" />
     <UserModal v-if="isUsersTable" :mode="'create'" @refresh="onRefresh" :data="{}" :teams="props.teams"/>
   </div>
 
