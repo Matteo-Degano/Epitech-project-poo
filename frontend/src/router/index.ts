@@ -75,6 +75,11 @@ router.beforeEach(
       return next("/")
     }
 
+    // Check if employee is trying to access charts/:id and redirect to /charts
+    if (userRole === employee && to.path.startsWith("/charts/") && to.params.id) {
+      return next("/charts")
+    }
+
     // If the route has roles defined, check if the user's role is authorized
     if (to.meta.roles && !to.meta.roles.some((role: number) => role === userRole)) {
       return next("/") // Redirect to home if user role is not authorized
