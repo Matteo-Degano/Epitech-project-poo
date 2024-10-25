@@ -22,8 +22,8 @@ const logoutHandler = async () => {
   router.push("/login")
 }
 
-// Function to check if the link is active
-const isActive = (path: string) => route.path === path
+// function to check if the link is active, handling base paths for dynamic routes
+const isActive = (path: string) => route.path === path || route.path.startsWith(path + "/")
 
 const role = authStore.role
 const employee = 1

@@ -5,17 +5,16 @@ const props = defineProps<{
   data: {
     data: [
       {
-        day: string
-        time_worked: number
+        value: number
+        date: string
       }
     ]
     description: string
   }
 }>()
 
-// Sort data by date in ascending order
 const sortedData = props.data.data.sort(
-  (a, b) => new Date(a.day).getTime() - new Date(b.day).getTime()
+  (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
 )
 const description = props.data.description
 
@@ -27,26 +26,28 @@ function convertSecondsToHoursMinutes(seconds: number) {
 
 const series = ref([
   {
-    name: "Time Worked",
-    data: sortedData.map((item) => parseFloat((item.time_worked / 3600).toFixed(2)))
+    name: "Extra Hours",
+    data: sortedData.map((item) => parseFloat((item.value / 3600).toFixed(2)))
   }
 ])
 
 const chartOptions = ref({
   chart: {
-    type: "area",
-    height: "100%"
+    type: "bar"
   },
-  stroke: {
-    curve: "smooth"
-  },
-  fill: {
-    type: "gradient",
-    gradient: {
-      shadeIntensity: 1,
-      opacityFrom: 0.5,
-      opacityTo: 0.1,
-      stops: [0, 100]
+  plotOptions: {
+    bar: {
+      columnWidth: "50%",
+      distributed: false,
+      colors: {
+        ranges: [
+          {
+            from: 0,
+            to: Number.MAX_VALUE,
+            color: "#9c4ff5"
+          }
+        ]
+      }
     }
   },
   dataLabels: {
@@ -54,7 +55,9 @@ const chartOptions = ref({
   },
   xaxis: {
     categories: sortedData.map((item) => {
-      const [year, month, day] = item.day.split("-")
+      const date = new Date(item.date)
+      const day = String(date.getDate()).padStart(2, "0")
+      const month = String(date.getMonth() + 1).padStart(2, "0")
       return `${day}/${month}`
     }),
     labels: {
@@ -63,32 +66,24 @@ const chartOptions = ref({
   },
   yaxis: {
     title: {
-      text: "Time Worked"
+      text: "Extra Time"
     },
     labels: {
       formatter: (val: number) => `${Math.floor(val)}h ${Math.round((val % 1) * 60)}m`
     }
   },
   title: {
-    text: "Total Time Worked",
+    text: "Extra Time",
     align: "center"
   },
   tooltip: {
     y: {
       formatter: (val: number) => convertSecondsToHoursMinutes(val * 3600)
     }
-  },
-  colors: ["#9c4ff5"]
+  }
 })
 </script>
 
 <template>
-  <ApexChart
-    height="100%"
-    width="100%"
-    type="area"
-    :options="chartOptions"
-    :series="series"
-    class="h-full"
-  />
+  <ApexChart height="100%" width="100%" type="bar" :options="chartOptions" :series="series" />
 </template>
