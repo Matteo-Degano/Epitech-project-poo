@@ -23,6 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/u
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Check, ChevronDown } from "lucide-vue-next"
+import Spinner from "@/components/Spinner.vue"
 
 const authStore = useAuthStore()
 const { toast } = useToast()
@@ -162,7 +163,7 @@ onMounted(async () => {
 
 <template>
   <div class="flex flex-col h-[calc(100vh-80px)] p-4">
-    <p v-if="isLoading">Loading...</p>
+    <Spinner v-if="isLoading"/>
     <div v-if="!isLoading" class="flex flex-col h-full gap-4">
       <div class="flex gap-4 bg-primary rounded-md p-4">
         <div class="flex items-center gap-2 flex-grow">

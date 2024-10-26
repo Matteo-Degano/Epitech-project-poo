@@ -9,6 +9,7 @@ import DeleteUserModal from "./DeleteUserModal.vue";
 import { fetchData } from "@/services/api";
 import { toast } from "../ui/toast/use-toast";
 import { teams } from "@/lib/formSchemas/signin.form";
+import Spinner from "../Spinner.vue";
 
 const isLoading = ref(true)
 
@@ -157,7 +158,7 @@ const filterColumns = [
 <template>
   <div class="flex flex-col gap-2 w-full">
     <div v-if="isLoading" class="flex justify-center items-center h-full">
-        <p>Loading...</p>
+        <Spinner/>
     </div>
     
     <DataTable 
