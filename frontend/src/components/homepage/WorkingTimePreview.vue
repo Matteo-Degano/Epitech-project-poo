@@ -62,7 +62,7 @@ const columns: ColumnDef<WorkingTimeType>[] = [
             <DataTable
             @refresh="fetchWorkingTimes"
             :columns="columns"
-            :data="workingTimeData.slice(-5)"
+            :data="workingTimeData"
             :filters="[]"
             />
             <router-link to="/working-times" :class="[{ 'text-primary': isActive('/working-times')}, , 'self-end']">
