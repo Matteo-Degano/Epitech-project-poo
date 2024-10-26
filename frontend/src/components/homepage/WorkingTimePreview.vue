@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { h, ref, onMounted} from "vue"
 import { type ColumnDef } from "@tanstack/vue-table"
-import { ArrowUpDown } from "lucide-vue-next"
 import { Button } from "@/components/ui/button"
 import { fetchData } from "@/services/api"
 import DataTable from "@/components/data-table/DataTable.vue"
@@ -9,7 +8,6 @@ import { formatDateTime } from "@/utils/dateFormat"
 import type { WorkingTimeType } from "@/types/api.type"
 import { useAuthStore } from "@/stores/auth.store"
 import { useRoute } from "vue-router"
-import router from "@/router"
 
 const useAuth = useAuthStore()
 const workingTimeData = ref<WorkingTimeType[]>([])
@@ -17,12 +15,16 @@ const isLoading = ref(true)
 const route = useRoute()
 const isActive = (path: string) => route.path === path
 
+const props = defineProps({
+  startTime: Date,
+  endTime: Date
+})
 
 const fetchWorkingTimes = async () => {
     try {
-        const response = await fetchData("GET", `/workingtime`)
+        const response = await fetchData("GET", `/workingtime/${useAuth.user.id}?start=${props.startTime}&end=${props.endTime}`)
+        console.log(response.data)
         workingTimeData.value = response.data
-        workingTimeData.value = workingTimeData.value.filter(entry => entry.user.id === useAuth.user.id).sort()
     } catch (err: any) {
         console.log(err)
     }
@@ -36,31 +38,13 @@ onMounted(async () => {
 const columns: ColumnDef<WorkingTimeType>[] = [
     {
         accessorKey: "start",
-        header: ({ column }) => {
-            return h(
-            Button,
-            {
-                variant: "ghost",
-                onClick: () => column.toggleSorting(column.getIsSorted() === "asc")
-            },
-            () => ["Start Date & Time", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
-            )
-        },
+        header: () => h('div', { class: 'ml-4' }, 'Start Date & Time'),
         cell: ({ row }) =>
         h("div", { class: "text-left font-medium" }, formatDateTime(row.getValue("start")))
     },
     {
         accessorKey: "end",
-        header: ({ column }) => {
-            return h(
-            Button,
-            {
-                variant: "ghost",
-                onClick: () => column.toggleSorting(column.getIsSorted() === "asc")
-            },
-            () => ["End Date & Time", h(ArrowUpDown, { class: `ml-2 h-4 w-4 ` })]
-            )
-        },
+        header: () => h('div', { class: 'ml-4' }, 'End Date & Time'),
         cell: ({ row }) =>
         h("div", { class: "text-left font-medium" }, formatDateTime(row.getValue("end")))
     }
@@ -73,8 +57,8 @@ const columns: ColumnDef<WorkingTimeType>[] = [
         <div v-if="isLoading" class="flex justify-center items-center h-full">
             <p>Loading...</p>
         </div>
-        <div v-else class="flex flex-col gap-2 w-full">
-            <h2>Latest working times</h2>
+        <div v-else class="flex flex-col gap-1 w-full">
+            <h2 class="font-bold">Latest working times</h2>
             <DataTable
             @refresh="fetchWorkingTimes"
             :columns="columns"
