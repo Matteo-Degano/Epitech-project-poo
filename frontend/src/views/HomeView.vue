@@ -7,6 +7,7 @@ import { useAuthStore } from "@/stores/auth.store";
 import { onMounted, ref } from "vue";
 import { fetchData } from "@/services/api";
 import HoursWorkedChart from "@/components/charts/HoursWorkedChart.vue";
+import Spinner from "@/components/Spinner.vue";
 
 const authStore = useAuthStore()
 const isLoading = ref(true)
@@ -51,7 +52,7 @@ onMounted(async () => {
 
 <template>
   <div v-if="isLoading" class="flex justify-center items-center h-full">
-    <p>Loading...</p>
+    <Spinner/>
   </div>
   <div v-else class="flex flex-col justify-around h-full gap-10">
     <div class="flex gap-8">
