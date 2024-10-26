@@ -3,7 +3,6 @@ import HoursWorkedChart from "@/components/charts/HoursWorkedChart.vue"
 import { fetchData } from "@/services/api"
 import { useAuthStore } from "@/stores/auth.store"
 import { onMounted, ref, computed, watch } from "vue"
-import { useRoute, useRouter } from "vue-router"
 import { useToast } from "@/components/ui/toast/use-toast"
 
 const authStore = useAuthStore()
@@ -41,6 +40,6 @@ onMounted(async () => {
 <template>
     <p v-if="isLoading">Loading...</p>
     <div v-else>
-        <HoursWorkedChart v-if="dayTime" :data="dayTime" class="w-full" />
+        <HoursWorkedChart v-if="dayTime" :data="dayTime" class="w-full h-60" />
     </div>
 </template>
