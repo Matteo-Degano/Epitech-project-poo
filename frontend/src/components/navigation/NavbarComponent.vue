@@ -5,6 +5,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList
 } from "@/components/ui/navigation-menu"
+import CurrentTime from "./CurrentTime.vue"
 import ClockManager from "../ClockManager.vue"
 import { useAuthStore } from "@/stores/auth.store"
 import { House, Clock, Users, ChartSpline, LogOut } from "lucide-vue-next"
@@ -13,29 +14,12 @@ import { useRoute, useRouter } from "vue-router"
 const authStore = useAuthStore()
 const route = useRoute()
 const router = useRouter()
-const dateOptions: Intl.DateTimeFormatOptions = {
-  weekday: "long",
-  day: "numeric",
-  month: "long"
-}
-
-const timeOptions: Intl.DateTimeFormatOptions = {
-  hour: "2-digit",
-  minute: "2-digit",
-  hour12: false
-}
-
-const datePart = new Intl.DateTimeFormat("en-GB", dateOptions).format(new Date())
-const timePart = new Intl.DateTimeFormat("en-GB", timeOptions).format(new Date())
-
-const dateTime = `${datePart} - ${timePart}`
 
 const logoutHandler = async () => {
   await authStore.logout()
   router.push("/login")
 }
 
-// function to check if the link is active, handling base paths for dynamic routes
 const isActive = (path: string) => route.path === path || route.path.startsWith(path + "/")
 
 const role = authStore.role
@@ -94,7 +78,7 @@ const admin = 4
       </NavigationMenuList>
 
       <div class="flex items-center gap-4">
-        {{ dateTime }}
+        <CurrentTime />
         <ClockManager />
       </div>
     </div>
