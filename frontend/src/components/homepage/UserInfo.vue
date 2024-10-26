@@ -22,10 +22,10 @@ console.log(authStore.user)
 </script>
 
 <template>
-    <div class="border-primary border-2 rounded p-4 w-1/3">
-        <p>User : {{authStore.user.username}}</p>
-        <p>Email : {{authStore.user.email}}</p>
-        <p>Role : {{idToStringRole(authStore.user.role_id)}}</p>
-        <p v-if="authStore.user.teams.length">Teams : {{ authStore.user.teams.map(team => team.name).join(', ') }}</p>
+    <div class="border-primary border-4 rounded p-4 w-1/3 flex flex-col justify-between gap-10 bg-[#faf6ff]">
+        <p>Welcome <span class="font-bold">{{ authStore.user.username }}</span> !</p>
+        <p><span class="font-bold">Email :</span> {{authStore.user.email}}</p>
+        <p><span class="font-bold">Role :</span> {{idToStringRole(authStore.user.role_id)}}</p>
+        <p v-if="authStore.user.teams.length"><span class="font-bold">Teams :</span> {{ authStore.user.teams.map(team => team.name).join(', ') }}</p>
     </div>
 </template>
