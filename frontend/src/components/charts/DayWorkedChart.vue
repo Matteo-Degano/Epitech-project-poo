@@ -36,7 +36,7 @@ const chartOptions = ref({
     position: "top"
   },
   title: {
-    text: props.data.description,
+    text: "Days worked",
     align: "center"
   },
   colors: ["#9c4ff5", "#808080"]

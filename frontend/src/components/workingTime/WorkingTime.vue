@@ -259,7 +259,7 @@ onMounted(() => {
                 }}
               </Button>
             </PopoverTrigger>
-            <PopoverContent class="w-auto p-0">
+            <PopoverContent class="p-0">
               <Calendar v-model="selectedStartDate" initial-focus />
             </PopoverContent>
           </Popover>

@@ -13,6 +13,22 @@ import { useRoute, useRouter } from "vue-router"
 const authStore = useAuthStore()
 const route = useRoute()
 const router = useRouter()
+const dateOptions: Intl.DateTimeFormatOptions = {
+  weekday: "long",
+  day: "numeric",
+  month: "long"
+}
+
+const timeOptions: Intl.DateTimeFormatOptions = {
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false
+}
+
+const datePart = new Intl.DateTimeFormat("en-GB", dateOptions).format(new Date())
+const timePart = new Intl.DateTimeFormat("en-GB", timeOptions).format(new Date())
+
+const dateTime = `${datePart} - ${timePart}`
 
 const logoutHandler = async () => {
   await authStore.logout()
@@ -77,7 +93,10 @@ const admin = 4
         </NavigationMenuItem>
       </NavigationMenuList>
 
-      <ClockManager />
+      <div class="flex items-center gap-2">
+        {{ dateTime }}
+        <ClockManager />
+      </div>
     </div>
   </NavigationMenu>
 </template>
