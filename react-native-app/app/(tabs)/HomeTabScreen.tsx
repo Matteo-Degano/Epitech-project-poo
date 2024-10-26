@@ -1,9 +1,13 @@
 
+import Clock from '@/components/clock';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Image, StyleSheet } from 'react-native'; // Correct import for Image
 
-const AppScreen = () => {
+
+
+
+const HomeTabScreen = () => {
 
 
   const [username, setUsername] = useState('');
@@ -74,10 +78,10 @@ const AppScreen = () => {
         </View>
       </View>
 
-      <View>
+    
+         <Clock />
 
-      </View>
-      
+
     </View>
   );
 };
@@ -125,4 +129,4 @@ const styles = StyleSheet.create({
 });
 
   
-export default AppScreen;
+export default HomeTabScreen;

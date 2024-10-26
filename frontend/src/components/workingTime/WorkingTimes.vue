@@ -137,9 +137,9 @@ const columns = computed<ColumnDef<WorkingTimeType>[]>(() => {
 })
 
 const filterColumns = [
+  ...(!isEmployee ? [{ column: "user.username", fieldName: "User" }] : []),
   { column: "start", fieldName: "Start" },
-  { column: "end", fieldName: "End" },
-  ...(!isEmployee ? [{ column: "user.username", fieldName: "User" }] : [])
+  { column: "end", fieldName: "End" }
 ]
 </script>
 

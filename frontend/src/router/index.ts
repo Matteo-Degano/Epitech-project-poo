@@ -43,6 +43,11 @@ const routes = [
         path: "charts",
         component: ChartsView,
         meta: { requiresAuth: true, roles: [employee, manager, generalManager, admin] }
+      },
+      {
+        path: "charts/:id",
+        component: ChartsView,
+        meta: { requiresAuth: true, roles: [manager, generalManager, admin] }
       }
     ]
   }
@@ -53,37 +58,36 @@ const router = createRouter({
   routes
 })
 
-// Ensure Pinia is ready before initializing the router
-router.isReady().then(() => {
-  const authStore = useAuthStore()
+// Global navigation guard
+router.beforeEach(
+  (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    const authStore = useAuthStore()
+    const isLoggedIn = !!authStore.user
+    const userRole = authStore.role
 
-  // Global navigation guard
-  router.beforeEach(
-    (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
-      const isLoggedIn = !!authStore.user
-      const userRole = authStore.role
-
-      // Route requires authentication but user is not logged in
-      if (to.meta.requiresAuth && !isLoggedIn) {
-        next("/login")
-      }
-
-      // User is logged in but tries to access login page, redirect to home
-      else if (isLoggedIn && to.path === "/login") {
-        next("/")
-      }
-
-      // Role-based access control: check if the user's role is allowed for the route
-      else if (to.meta.roles && !to.meta.roles.includes(userRole)) {
-        next("/")
-      }
-
-      // Allow navigation
-      else {
-        next()
-      }
+    // If the route requires authentication and the user is not logged in, redirect to login
+    if (to.meta.requiresAuth && !isLoggedIn) {
+      return next("/login")
     }
-  )
-})
+
+    // If the user is logged in and tries to access the login page, redirect to home
+    if (isLoggedIn && to.path === "/login") {
+      return next("/")
+    }
+
+    // Check if employee is trying to access charts/:id and redirect to /charts
+    if (userRole === employee && to.path.startsWith("/charts/") && to.params.id) {
+      return next("/charts")
+    }
+
+    // If the route has roles defined, check if the user's role is authorized
+    if (to.meta.roles && !to.meta.roles.some((role: number) => role === userRole)) {
+      return next("/") // Redirect to home if user role is not authorized
+    }
+
+    // Otherwise, allow the navigation
+    next()
+  }
+)
 
 export default router

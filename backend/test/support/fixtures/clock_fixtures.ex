@@ -1,4 +1,4 @@
-defmodule Api.ClockingFixtures do
+defmodule Api.ClockFixtures do
   @moduledoc """
   This module defines test helpers for creating
   entities via the `Api.Clocking` context.
@@ -14,7 +14,7 @@ defmodule Api.ClockingFixtures do
         status: true,
         time: ~N[2024-10-07 14:13:00]
       })
-      |> Api.Clocking.create_clocks()
+      |> Api.Clocks.create_clocks()
 
     clocks
   end

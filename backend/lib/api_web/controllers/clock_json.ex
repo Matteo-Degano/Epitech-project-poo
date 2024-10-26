@@ -1,5 +1,5 @@
-defmodule ApiWeb.ClocksJSON do
-  alias Api.Clocking.Clocks
+defmodule ApiWeb.ClockJSON do
+  alias Api.Clocks.Clock
 
   @doc """
   Renders a list of clocks.
@@ -15,12 +15,12 @@ defmodule ApiWeb.ClocksJSON do
     %{data: data(clocks)}
   end
 
-  defp data(%Clocks{} = clocks) do
+  defp data(%Clock{} = clocks) do
     %{
       id: clocks.id,
       time: clocks.time,
       status: clocks.status,
-      user: clocks.user
+      user_d: clocks.user_id
     }
   end
 end

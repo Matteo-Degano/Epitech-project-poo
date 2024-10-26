@@ -3,34 +3,30 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { fetchData } from '../service/api';
 
 
 const LoginScreen = () => {
 
   const navigation = useNavigation(); 
 
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('admin@epitech.eu');
+  const [password, setPassword] = useState('password');
 
   const handleLogin = async () => {
 
     if (username && password) {
       try {
-        //http://10.15.192.16:4000/api/login
-        // const response = await fetch('http://127.0.0.1:4000/api/login'
-        const response = await fetch('http://10.15.192.16:4000/api/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email: username, password }),
-        });
-  
-        const data = await response.json();
-  
-        console.log(data);
+        console.log("login");
 
-        if (response.ok) {
+        const response = await fetchData("POST",'/login', { email: username, password });
+
+        console.log(response);
+
+        if (response.status == "200") {
+          
+          const data = await response.data;
+          console.log("response ok");
 
           await AsyncStorage.setItem('username',data.username);
           await AsyncStorage.setItem('email',data.email);
@@ -38,17 +34,12 @@ const LoginScreen = () => {
           await AsyncStorage.setItem('roleId',data.role_id.toString());
           await AsyncStorage.setItem('teams', JSON.stringify(data.teams));
 
-          // await AsyncStorage.setItem('user', JSON.stringify(data.user));
-          // await AsyncStorage.setItem('userId', id.toString());
-          // await AsyncStorage.setItem('role', role_id.toString());
-          // await AsyncStorage.setItem('teams', JSON.stringify(teams));
-          // await AsyncStorage.setItem('email', email);
-          // await AsyncStorage.setItem('username', username);
-
-
+          console.log("redirect to home");
           navigation.navigate('Home'); //  Home screen
+
         } else {
-          Alert.alert('Login Failed', data.message || 'Invalid credentials');
+          const errorData = await response.json();
+          Alert.alert('Login Failed', errorData.message || 'Invalid credentials');
         }
       } catch (error) {
         Alert.alert('Error', 'An error occurred while logging in');
