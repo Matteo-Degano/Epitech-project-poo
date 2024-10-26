@@ -20,6 +20,9 @@ import { useToast } from "@/components/ui/toast/use-toast"
 import type { User } from "@/types/api.type"
 import { cn } from "@/utils"
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select"
+import { Label } from "@/components/ui/label"
+import { Separator } from "@/components/ui/separator"
+import { Check, ChevronDown } from "lucide-vue-next"
 
 const authStore = useAuthStore()
 const { toast } = useToast()
@@ -82,7 +85,7 @@ const selectedMonth = ref(months.value[0])
 // Computed totals
 const daysWorked = computed(() => {
   if (!workedDay.value) return 0
-  const workedDaysEntry = workedDay.value.data.find((entry) => entry.name === "Jours travaillés")
+  const workedDaysEntry = workedDay.value.data.find((entry) => entry.name === "Worked Days")
   return workedDaysEntry ? workedDaysEntry.value : 0
 })
 
@@ -121,6 +124,7 @@ const fetchChart = async (
     isLoading.value = true
     const response = await fetchData("GET", `/chartmanager/${id}?start=${start}&end=${end}`)
     if (response.status === 200) {
+      console.log(response.data)
       workedDay.value = response.data.chart_1
       dayTime.value = response.data.chart_2
       nightTime.value = response.data.chart_3
@@ -160,9 +164,9 @@ onMounted(async () => {
   <div class="flex flex-col h-[calc(100vh-80px)] p-4">
     <p v-if="isLoading">Loading...</p>
     <div v-if="!isLoading" class="flex flex-col h-full gap-4">
-      <div class="flex gap-2">
-        <div class="flex items-center gap-2">
-          <Label>Choose a month: </Label>
+      <div class="flex gap-4 bg-primary rounded-md p-4">
+        <div class="flex items-center gap-2 flex-grow">
+          <Label class="text-background text-xl">Month: </Label>
           <Select v-model="selectedMonth">
             <SelectTrigger>
               <span>{{ selectedMonth.label }}</span>
@@ -174,25 +178,25 @@ onMounted(async () => {
             </SelectContent>
           </Select>
         </div>
-        <div v-if="!isEmployee" class="flex items-center gap-2">
-          <Label> User: </Label>
+        <div v-if="!isEmployee" class="flex items-center gap-2 w-1/2">
+          <Label class="text-background text-xl"> User: </Label>
           <Popover v-model:open="open">
             <PopoverTrigger as-child>
               <Button
                 variant="outline"
                 role="combobox"
                 :aria-expanded="open"
-                class="w-[200px] justify-between font-normal"
+                class="w-full justify-between font-normal"
               >
                 {{
                   selectedUser
                     ? usersList.find((user) => user.username === selectedUser)?.username
                     : "Select a user..."
                 }}
-                <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                <ChevronDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent class="w-[200px] p-0">
+            <PopoverContent class="p-0">
               <Command v-model="selectedUser">
                 <CommandInput placeholder="Search user..." />
                 <CommandEmpty>No users found.</CommandEmpty>
@@ -222,18 +226,18 @@ onMounted(async () => {
         </div>
       </div>
       <div class="flex flex-grow h-1/2 w-full gap-8 p-8 pl-0">
-        <div class="flex flex-col border rounded-md p-8 text-background bg-[#9c4ff5] w-96 gap-12">
+        <div class="flex flex-col border-4 rounded-md p-6 bg-secondary border-[#9c4ff5] w-96 gap-6">
           <div class="flex flex-col gap-2">
-            <Label class="text-2xl">Days Worked</Label>
-            <p class="text-xl pl-4">{{ daysWorked }} days</p>
+            <Label class="text-xl">Days Worked</Label>
+            <p class="text-xl pl-4 text-primary font-semibold">{{ daysWorked }} days</p>
           </div>
           <div class="flex flex-col gap-2">
-            <Label class="text-2xl">Total Hours</Label>
-            <p class="text-xl pl-4">{{ totalHoursWorked }}</p>
+            <Label class="text-xl">Total Hours</Label>
+            <p class="text-xl pl-4 text-primary font-semibold">{{ totalHoursWorked }}</p>
           </div>
           <div class="flex flex-col gap-2">
-            <Label class="text-2xl">Total Extra Hours</Label>
-            <p class="text-xl pl-4">{{ totalExtraHours }}</p>
+            <Label class="text-xl">Total Extra Hours</Label>
+            <p class="text-xl pl-4 text-primary font-semibold">{{ totalExtraHours }}</p>
           </div>
         </div>
         <ExtraTimeChart v-if="extraTime" :data="extraTime" class="w-full" />
