@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { h, onMounted, ref } from "vue"
 import DataTable from "@/components/data-table/DataTable.vue"
-import type { ColumnDef } from "@tanstack/vue-table"
-import UserModal from "@/components/users/UserModal.vue"
-import { Button } from "../ui/button"
-import { ArrowUpDown } from "lucide-vue-next"
-import DeleteUserModal from "./DeleteUserModal.vue"
-import { fetchData } from "@/services/api"
+import type { ColumnDef } from "@tanstack/vue-table";
+import UserModal from "@/components/users/UserModal.vue";
+import { Button } from "../ui/button";
+import { ArrowUpDown } from "lucide-vue-next";
+import DeleteUserModal from "./DeleteUserModal.vue";
+import { fetchData } from "@/services/api";
+import { toast } from "../ui/toast/use-toast";
+import { teams } from "@/lib/formSchemas/signin.form";
 
 const isLoading = ref(true)
 
@@ -37,7 +39,6 @@ async function fetchUsers() {
         teams_string: user.teams.map((team) => team.name).join(", ")
       }
     })
-    console.log("Users fetched successfully", usersData.value)
   } catch (error) {
     console.log(error)
   } finally {
@@ -49,7 +50,6 @@ onMounted(async () => {
   try {
     const response = await fetchData("GET", "/teams")
     teamsData.value = response.data.data
-    console.log("Teams fetched successfully", teamsData.value)
   } catch (error) {
     console.log(error)
   }
@@ -155,14 +155,17 @@ const filterColumns = [
 </script>
 
 <template>
-  <div v-if="isLoading" class="flex justify-center items-center h-full">
-    <p>Loading...</p>
-  </div>
-
-  <div v-else>
-    <div class="flex justify-end mb-4">
-      <UserModal mode="create" :data="{}" :teams="teamsData" @refresh="fetchUsers" />
+  <div class="flex flex-col gap-2 w-full">
+    <div v-if="isLoading" class="flex justify-center items-center h-full">
+        <p>Loading...</p>
     </div>
-    <DataTable :columns="columns" :data="usersData" :filters="filterColumns" />
+    
+    <DataTable 
+      v-else
+      :columns="columns"
+      :data="usersData"
+      :filters="filterColumns"
+      :teams="teamsData"
+    />
   </div>
 </template>
