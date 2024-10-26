@@ -93,7 +93,7 @@ const admin = 4
         </NavigationMenuItem>
       </NavigationMenuList>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-4">
         {{ dateTime }}
         <ClockManager />
       </div>
