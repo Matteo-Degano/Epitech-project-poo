@@ -23,15 +23,13 @@ const emit = defineEmits(["close", "refresh"])
 
 async function removeFromTeam() {
     const updatedUser = {
-        username: props.user.username,
-        email: props.user.email,
-        role_id: props.user.role_id,
-        teams: props.user.teams
+        team_ids: props.user.teams
         .filter(team => team.id !== props.teamId)
+        .map(team => team.id)
     }
   try {
     const response = await fetchData("PUT", `/users/${props.user.id}`, updatedUser)
-    if (response.status === 204) {
+    if (response.status === 200) {
       toast({
           description: `User successfully removed from team !`
         })
