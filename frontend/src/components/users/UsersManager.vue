@@ -156,6 +156,7 @@ const filterColumns = [
       :data="usersData"
       :filters="filterColumns"
       :teams="teamsData"
+      @refresh="fetchUsers"
     />
   </div>
 </template>
