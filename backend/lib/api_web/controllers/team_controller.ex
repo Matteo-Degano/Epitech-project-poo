@@ -80,7 +80,7 @@ defmodule ApiWeb.TeamController do
 
           working_times_by_team =
             Enum.map(team_ids, fn team_id ->
-              working_times = Workingtimes.list_workingtimes_by_teams(%{teams: [team_id]})
+              working_times = Workingtimes.list_workingtimes_per_teams(%{teams: [team_id]})
 
               %{
                 team_id: team_id,
