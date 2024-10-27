@@ -13,6 +13,7 @@ import type { WorkingTimeType } from "@/types/api.type"
 import { useAuthStore } from "@/stores/auth.store"
 import { useRoute } from "vue-router"
 import Spinner from "../Spinner.vue"
+import { is } from "date-fns/locale"
 
 const route = useRoute()
 const { toast } = useToast()
@@ -20,6 +21,7 @@ const useAuth = useAuthStore()
 const workingTimeData = ref<WorkingTimeType[]>([])
 const isLoading = ref(true)
 const isEmployee: boolean = useAuth.isEmployee
+const isManager: boolean = useAuth.isManager
 
 // Function to handle working time deletion
 async function deleteWorkingTime(id: number) {
@@ -47,19 +49,29 @@ async function deleteWorkingTime(id: number) {
 // Function to fetch working times
 const fetchWorkingTimes = async () => {
   try {
-    const response = await fetchData("GET", `/workingtime`)
-    workingTimeData.value = response.data
-    console.log(workingTimeData)
-    if (isEmployee) {
-      workingTimeData.value = workingTimeData.value.map((entry) => ({
-        ...entry,
-        user: {
-          ...entry.user,
-          username: "me"
-        }
-      }))
+    let response
+
+    if (isManager) {
+      response = await fetchData("GET", `/teams/workingtimes`)
+      console.log(response)
+      workingTimeData.value = response.data.map((item) => item.working_times).flat()
+    } else {
+      response = await fetchData("GET", `/workingtime`)
+      workingTimeData.value = response.data
+      if (isEmployee) {
+        // Modify each entry's username to "me" if the user is an employee
+        workingTimeData.value = workingTimeData.value.map((entry) => ({
+          ...entry,
+          user: {
+            ...entry.user,
+            username: "me"
+          }
+        }))
+      }
     }
-  } catch (err: any) {
+
+    console.log(workingTimeData.value)
+  } catch (err) {
     toast({
       variant: "destructive",
       description: "Error fetching data"
@@ -149,7 +161,7 @@ const filterColumns = [
 <template>
   <div class="flex flex-col gap-2 w-full">
     <div v-if="isLoading" class="flex justify-center items-center h-full">
-      <Spinner/>
+      <Spinner />
     </div>
     <DataTable
       v-else
