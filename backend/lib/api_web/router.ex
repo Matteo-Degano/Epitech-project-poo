@@ -50,6 +50,7 @@ defmodule ApiWeb.Router do
     get("/chartmanager/:userID", ChartManagerController, :show)
 
     #  Teams
+    get("/teams/workingtimes", TeamController, :workingtimes)
     get("/teams/:id", TeamController, :show)
     get("/teams", TeamController, :index)
     post("/teams", TeamController, :create)

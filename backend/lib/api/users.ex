@@ -3,6 +3,7 @@ defmodule Api.Users do
   alias Api.Repo
   alias Api.Users.{User, Guardian}
   alias Api.UsersTeams
+  alias Api.Team
   alias Argon2
 
   def list_users() do
@@ -31,6 +32,15 @@ defmodule Api.Users do
 
     Repo.all(query)
     |> Repo.preload(:teams)
+  end
+
+  def get_user_teams(user) do
+    Repo.all(
+      from t in Team,
+      join: ut in assoc(t, :users),
+      where: ut.id == ^user.id,
+      preload: [:users]
+    )
   end
 
   def get_user!(id) do
