@@ -25,7 +25,7 @@ async function fetchTeams() {
 }
 
 onMounted(() => {
-    fetchTeams()
+  fetchTeams()
 })
 
 const columns: ColumnDef<Team>[] = [
@@ -33,12 +33,12 @@ const columns: ColumnDef<Team>[] = [
     accessorKey: "id",
     header: ({ column }) => {
       return h(
-        Button,
-        {
-          variant: "ghost",
-          onClick: () => column.toggleSorting(column.getIsSorted() === "asc")
-        },
-        () => ["ID", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+      Button,
+      {
+        variant: "ghost",
+        onClick: () => column.toggleSorting(column.getIsSorted() === "asc")
+      },
+      () => ["ID", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       )
     },
     cell: ({ row }) => h("div", { class: "text-left font-medium" }, row.getValue("id"))
@@ -47,12 +47,12 @@ const columns: ColumnDef<Team>[] = [
     accessorKey: "name",
     header: ({ column }) => {
       return h(
-        Button,
-        {
-          variant: "ghost",
-          onClick: () => column.toggleSorting(column.getIsSorted() === "asc")
-        },
-        () => ["Name", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+      Button,
+      {
+        variant: "ghost",
+        onClick: () => column.toggleSorting(column.getIsSorted() === "asc")
+      },
+      () => ["Name", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       )
     },
     cell: ({ row }) => h("div", { class: "text-left font-medium" }, row.getValue("name"))
@@ -62,33 +62,31 @@ const columns: ColumnDef<Team>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       return h("div", { class: "flex gap-4 float-right" }, [
-        h(TeamModal, {
-          mode: "update",
-          data: row.original,
-          onRefresh: fetchTeams
-        }),
-        h(DeleteTeamModal, { id: row.original.id, onRefresh: fetchTeams })
+      h(TeamModal, {
+        mode: "update",
+        data: row.original,
+        onRefresh: fetchTeams
+      }),
+      h(DeleteTeamModal, { id: row.original.id, onRefresh: fetchTeams })
       ])
     }
   }
-]
-
-const filterColumns = [
+  ]
+  
+  const filterColumns = [
   { column: "id", fieldName: "ID" },
   { column: "name", fieldName: "Name" }
-]
+  ]
 </script>
 
 <template>
-  <div v-if="isLoading" class="flex justify-center items-center h-full">
-    <p>Loading...</p>
-  </div>
-
-  <div v-else>
-    <div class="flex justify-end mb-4">
-      <TeamModal mode="create" :data="{}" @refresh="fetchTeams" />
+  <div class="flex flex-col gap-2 w-full">
+    <div v-if="isLoading" class="flex justify-center items-center h-full">
+      <Spinner/>
     </div>
-    <DataTable :columns="columns" :data="teamsData" :filters="filterColumns" />
-  </div>
-  
+    
+
+    <DataTable v-else :columns="columns" :data="teamsData" :filters="filterColumns" @refresh="fetchTeams" />
+</div>
+
 </template>

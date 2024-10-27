@@ -24,6 +24,7 @@ import { useRoute } from "vue-router"
 import type { WorkingTimeType } from "@/types/api.type"
 import UserModal from "../users/UserModal.vue"
 import { useAuthStore } from "@/stores/auth.store"
+import TeamsModal from "../teams/TeamsModal.vue"
 
 function valueUpdater<T extends Updater<any>>(updaterOrValue: T, ref: Ref) {
   ref.value = typeof updaterOrValue === "function" ? updaterOrValue(ref.value) : updaterOrValue
@@ -43,8 +44,10 @@ const sorting = ref<SortingState>([])
 const emit = defineEmits(["refresh"])
 const isWorkingTimesTable = route.path === "/working-times"
 const isUsersTable = route.path === "/users"
+const isTeamsTable = route.path === "/teams"
 const authStore = useAuthStore()
 const isEmployee: boolean = authStore.isEmployee
+const isManager: boolean = authStore.isManager
 
 function onRefresh() {
   emit("refresh")
@@ -87,6 +90,7 @@ const table = useVueTable({
     </div>
     <WorkingTime v-if="isWorkingTimesTable && !isEmployee" :mode="'create'" @refresh="onRefresh" />
     <UserModal v-if="isUsersTable" :mode="'create'" @refresh="onRefresh" :data="{}" :teams="props.teams"/>
+    <TeamsModal v-if="isTeamsTable && !isManager" :mode="'create'" @refresh="onRefresh" />
   </div>
 
   <div class="border rounded-md">
