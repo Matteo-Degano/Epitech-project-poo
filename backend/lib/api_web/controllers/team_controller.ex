@@ -4,6 +4,11 @@ defmodule ApiWeb.TeamController do
   alias Api.Teams
   alias Api.Teams.Team
   alias Api.Users
+  alias Api.Users.Guardian
+  alias Api.Plug.CheckCookie
+  alias Api.Roles
+  alias Api.Repo
+  alias Api.Workingtimes
 
   action_fallback ApiWeb.FallbackController
 
@@ -57,5 +62,47 @@ defmodule ApiWeb.TeamController do
       end
     end
   end
+
+  def workingtimes(conn, _params) do
+    {_, token} = CheckCookie.get_tokens(conn)
+
+    case Guardian.decode_and_verify(token) do
+      {:ok, token_data} ->
+        user_id = token_data["sub"]
+        current_user = Users.get_user!(user_id) |> Repo.preload(:teams)
+
+        role = Roles.get_role!(current_user.role_id)
+        IO.inspect(role.name, label: "role")
+
+        if role.name == "manager" or role.name == "admin" or role.name == "general_manager" do
+          team_ids = Enum.map(current_user.teams, & &1.id)
+          IO.inspect(team_ids, label: "team_ids")
+
+          working_times_by_team =
+            Enum.map(team_ids, fn team_id ->
+              working_times = Workingtimes.list_workingtimes_by_teams(%{teams: [team_id]})
+
+              %{
+                team_id: team_id,
+                working_times: working_times
+              }
+            end)
+
+          json(conn, working_times_by_team)
+        else
+          conn
+          |> put_status(:forbidden)
+          |> json(%{error: "Access forbidden: only managers can access this resource"})
+        end
+
+      {:error, _reason} ->
+        conn
+        |> put_status(:unauthorized)
+        |> json(%{error: "Invalid token"})
+    end
+  end
+
+
+
 
 end

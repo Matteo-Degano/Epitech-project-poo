@@ -37,6 +37,16 @@ defmodule Api.Teams do
   """
   def get_team!(id), do: Repo.get!(Team, id)
 
+
+  def get_teams_by_user_id(user_id) do
+    Repo.all(
+      from t in Team,
+      join: ut in assoc(t, :users),
+      where: ut.id == ^user_id,
+      preload: [:users]
+    )
+  end
+
   @doc """
   Creates a team.
 
