@@ -63,7 +63,6 @@ async function fetchUsers() {
     }
 }
 
-
 onMounted (async () => {
     await fetchUsers()
     isLoading.value = false
@@ -147,7 +146,7 @@ const filterColumns = [
 </script>
 
 <template>
-    <div>
+    <div @refresh="fetchUsers">
         <div v-if="isLoading" class="flex justify-center items-center h-full">
             <Spinner />
         </div>
