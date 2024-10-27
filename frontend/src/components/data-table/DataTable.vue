@@ -25,6 +25,7 @@ import type { WorkingTimeType } from "@/types/api.type"
 import UserModal from "../users/UserModal.vue"
 import { useAuthStore } from "@/stores/auth.store"
 import TeamsModal from "../teams/TeamsModal.vue"
+import AddTeamMember from "../teams/AddTeamMember.vue"
 
 function valueUpdater<T extends Updater<any>>(updaterOrValue: T, ref: Ref) {
   ref.value = typeof updaterOrValue === "function" ? updaterOrValue(ref.value) : updaterOrValue
@@ -36,6 +37,7 @@ const props = defineProps<{
   filters: { column: string; fieldName: string }[]
   workingTimeData?: WorkingTimeType[]
   teams?: Team[]
+  teamId?: number
 }>()
 
 const route = useRoute()
@@ -91,6 +93,7 @@ const table = useVueTable({
     <WorkingTime v-if="isWorkingTimesTable && !isEmployee" :mode="'create'" @refresh="onRefresh" />
     <UserModal v-if="isUsersTable" :mode="'create'" @refresh="onRefresh" :data="{}" :teams="props.teams"/>
     <TeamsModal v-if="isTeamsTable && !isManager" :mode="'create'" @refresh="onRefresh" />
+    <AddTeamMember v-if="isTeamsTable && isManager" :mode="'create'" @refresh="onRefresh" :data="props.data" :teamId="props.teamId"/>
   </div>
 
   <div class="border rounded-md">

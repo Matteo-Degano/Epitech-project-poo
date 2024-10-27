@@ -146,7 +146,7 @@ const filterColumns = [
 </script>
 
 <template>
-    <div @refresh="fetchUsers">
+    <div>
         <div v-if="isLoading" class="flex justify-center items-center h-full">
             <Spinner />
         </div>
@@ -154,7 +154,7 @@ const filterColumns = [
         <div v-else class="flex flex-col gap-4 w-full">
             <div v-for="team in teamMembers" :key="team.name" class="flex flex-col gap-2 w-full">
                 <h2 class="text-xl font-semibold mb-4">{{ team.name }} Team</h2>
-                <DataTable :columns="columns(team.id)" :data="team.members" :filters="filterColumns" @refresh="fetchUsers"/>
+                <DataTable :columns="columns(team.id)" :data="team.members" :filters="filterColumns" @refresh="fetchUsers" :teamId="team.id"/>
             </div>
         </div>
     </div>
