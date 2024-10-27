@@ -10,25 +10,14 @@ import { fetchData } from "@/services/api";
 import { toast } from "../ui/toast/use-toast";
 import { teams } from "@/lib/formSchemas/signin.form";
 import Spinner from "../Spinner.vue";
+import type { User } from "@/types/api.type"
+import type { Team } from "@/types/api.type"
 
 const isLoading = ref(true)
 
 const usersData = ref<User[]>([])
 const teamsData = ref<Team[]>([])
 const emit = defineEmits(["close", "refresh"])
-
-type User = {
-  id: number
-  username: string
-  email: string
-  role_id: number
-  teams: Team[]
-}
-
-type Team = {
-  id: number
-  name: string
-}
 
 async function fetchUsers() {
   try {

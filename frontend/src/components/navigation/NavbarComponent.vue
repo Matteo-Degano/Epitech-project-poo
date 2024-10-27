@@ -10,7 +10,7 @@ import {
 import CurrentTime from "./CurrentTime.vue"
 import ClockManager from "../ClockManager.vue"
 import { useAuthStore } from "@/stores/auth.store"
-import { House, Clock, Users, ChartSpline, LogOut, Settings } from "lucide-vue-next"
+import { House, Clock, Users, ChartSpline, LogOut, Settings, BookUser } from "lucide-vue-next"
 import { useRoute, useRouter } from "vue-router"
 import DeleteAccount from "../users/DeleteAccount.vue"
 
@@ -59,6 +59,14 @@ const admin = 4
         <router-link to="/users" :class="['nav-link', { 'text-primary': isActive('/users') }]">
           <NavigationMenuLink as="div">
             <div class="flex gap-1 items-center"><Users :size="18" /> Users</div>
+          </NavigationMenuLink>
+        </router-link>
+      </NavigationMenuItem>
+
+      <NavigationMenuItem v-if="role === admin || role === generalManager">
+        <router-link to="/teams" :class="['nav-link', { 'text-primary': isActive('/teams') }]">
+          <NavigationMenuLink as="div">
+            <div class="flex gap-1 items-center"><BookUser :size="18" /> Teams</div>
           </NavigationMenuLink>
         </router-link>
       </NavigationMenuItem>
