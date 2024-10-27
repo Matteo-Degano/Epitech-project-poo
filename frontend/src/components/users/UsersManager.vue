@@ -1,22 +1,23 @@
 <script setup lang="ts">
 import { h, onMounted, ref } from "vue"
 import DataTable from "@/components/data-table/DataTable.vue"
-import type { ColumnDef } from "@tanstack/vue-table";
-import UserModal from "@/components/users/UserModal.vue";
-import { Button } from "../ui/button";
-import { ArrowUpDown } from "lucide-vue-next";
-import DeleteUserModal from "./DeleteUserModal.vue";
-import { fetchData } from "@/services/api";
-import Spinner from "../Spinner.vue";
+import type { ColumnDef } from "@tanstack/vue-table"
+import UserModal from "@/components/users/UserModal.vue"
+import { Button } from "../ui/button"
+import { ArrowUpDown } from "lucide-vue-next"
+import DeleteUserModal from "./DeleteUserModal.vue"
+import { fetchData } from "@/services/api"
+import { toast } from "../ui/toast/use-toast"
+import { teams } from "@/lib/formSchemas/signin.form"
+import Spinner from "../Spinner.vue"
 import type { User } from "@/types/api.type"
 import type { Team } from "@/types/api.type"
-import { useAuthStore } from "@/stores/auth.store";
+import { useAuthStore } from "@/stores/auth.store"
 
 const isLoading = ref(true)
 
 const usersData = ref<User[]>([])
 const teamsData = ref<Team[]>([])
-const authStore = useAuthStore()
 
 async function fetchUsers() {
   try {
@@ -29,8 +30,10 @@ async function fetchUsers() {
       }
     })
 
-    if(authStore.user.role_id === 3) {
-      usersData.value = usersData.value.filter(user => user.role_id !== 4 && user.role_id !== 3 && user.id !== authStore.user.id)
+    if (authStore.user.role_id === 3) {
+      usersData.value = usersData.value.filter(
+        (user) => user.role_id !== 4 && user.role_id !== 3 && user.id !== authStore.user.id
+      )
     }
   } catch (error) {
     console.log(error)
@@ -133,7 +136,7 @@ const columns: ColumnDef<User>[] = [
           teams: teamsData.value,
           onRefresh: fetchUsers
         }),
-        h(DeleteUserModal, { id: row.original.id, onRefresh: fetchUsers })
+        h(DeleteUserModal, { id: row.original.id })
       ])
     }
   }
@@ -150,10 +153,10 @@ const filterColumns = [
 <template>
   <div class="flex flex-col gap-2 w-full">
     <div v-if="isLoading" class="flex justify-center items-center h-full">
-        <Spinner/>
+      <Spinner />
     </div>
-    
-    <DataTable 
+
+    <DataTable
       v-else
       :columns="columns"
       :data="usersData"
