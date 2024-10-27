@@ -47,7 +47,7 @@ const columns: ColumnDef<WorkingTimeType>[] = [
             <DataTable
             @refresh="fetchWorkingTimes"
             :columns="columns"
-            :data="props.data"
+            :data="props.data.slice(0, 5)"
             :filters="[]"
             />
         </div>

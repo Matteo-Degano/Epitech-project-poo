@@ -130,7 +130,7 @@ const columns: ColumnDef<User>[] = [
           teams: teamsData.value,
           onRefresh: fetchUsers
         }),
-        h(DeleteUserModal, { id: row.original.id, onRefresh: fetchUsers })
+        h(DeleteUserModal, { id: row.original.id})
       ])
     }
   }
