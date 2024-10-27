@@ -197,11 +197,11 @@ defmodule ApiWeb.ChartManagerController do
 
     data = [
       %{
-        name: "Jours travaillés",
+        name: "Worked Days",
         value: length(days_worked)
       },
       %{
-        name: "Jours non travaillés",
+        name: "Non-Worked Days",
         value: length(all_dates) - length(days_worked) - length(weekends)
       },
       %{

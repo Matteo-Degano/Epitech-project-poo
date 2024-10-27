@@ -11,7 +11,10 @@ import { useToast } from "../ui/toast/use-toast"
 import { formatDateTime } from "@/utils/dateFormat"
 import type { WorkingTimeType } from "@/types/api.type"
 import { useAuthStore } from "@/stores/auth.store"
+import { useRoute } from "vue-router"
+import Spinner from "../Spinner.vue"
 
+const route = useRoute()
 const { toast } = useToast()
 const useAuth = useAuthStore()
 const workingTimeData = ref<WorkingTimeType[]>([])
@@ -137,22 +140,22 @@ const columns = computed<ColumnDef<WorkingTimeType>[]>(() => {
 })
 
 const filterColumns = [
+  ...(!isEmployee ? [{ column: "user.username", fieldName: "User" }] : []),
   { column: "start", fieldName: "Start" },
-  { column: "end", fieldName: "End" },
-  ...(!isEmployee ? [{ column: "user.username", fieldName: "User" }] : [])
+  { column: "end", fieldName: "End" }
 ]
 </script>
 
 <template>
   <div class="flex flex-col gap-2 w-full">
     <div v-if="isLoading" class="flex justify-center items-center h-full">
-      <p>Loading...</p>
+      <Spinner/>
     </div>
     <DataTable
       v-else
       @refresh="fetchWorkingTimes"
       :columns="columns"
-      :data="workingTimeData"
+      :data="route.path === '/working-times' ? workingTimeData : workingTimeData.slice(0, 5)"
       :filters="filterColumns"
     />
   </div>

@@ -22,6 +22,8 @@ import {
 import WorkingTime from "../workingTime/WorkingTime.vue"
 import { useRoute } from "vue-router"
 import type { WorkingTimeType } from "@/types/api.type"
+import UserModal from "../users/UserModal.vue"
+import { useAuthStore } from "@/stores/auth.store"
 
 function valueUpdater<T extends Updater<any>>(updaterOrValue: T, ref: Ref) {
   ref.value = typeof updaterOrValue === "function" ? updaterOrValue(ref.value) : updaterOrValue
@@ -32,6 +34,7 @@ const props = defineProps<{
   data: TData[]
   filters: { column: string; fieldName: string }[]
   workingTimeData?: WorkingTimeType[]
+  teams?: Team[]
 }>()
 
 const route = useRoute()
@@ -40,6 +43,8 @@ const sorting = ref<SortingState>([])
 const emit = defineEmits(["refresh"])
 const isWorkingTimesTable = route.path === "/working-times"
 const isUsersTable = route.path === "/users"
+const authStore = useAuthStore()
+const isEmployee: boolean = authStore.isEmployee
 
 function onRefresh() {
   emit("refresh")
@@ -80,7 +85,8 @@ const table = useVueTable({
         @update:model-value="table.getColumn(filter.column)?.setFilterValue($event)"
       />
     </div>
-    <WorkingTime v-if="isWorkingTimesTable" :mode="'create'" @refresh="onRefresh" />
+    <WorkingTime v-if="isWorkingTimesTable && !isEmployee" :mode="'create'" @refresh="onRefresh" />
+    <UserModal v-if="isUsersTable" :mode="'create'" @refresh="onRefresh" :data="{}" :teams="props.teams"/>
   </div>
 
   <div class="border rounded-md">
@@ -116,5 +122,5 @@ const table = useVueTable({
       </TableBody>
     </Table>
   </div>
-  <DataTablePagination :table="table" />
+  <DataTablePagination v-if="props.data.length > 10" :table="table" />
 </template>
