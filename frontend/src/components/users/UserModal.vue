@@ -11,29 +11,18 @@ import {
 } from "@/components/ui/dialog"
 import { CirclePlus } from "lucide-vue-next"
 import { signupFormSchema } from "@/lib/formSchemas/signin.form"
+import { updateFormSchema } from "@/lib/formSchemas/update.form"
 import { Form, Field, ErrorMessage } from "vee-validate"
 import { toTypedSchema } from "@vee-validate/zod"
 import {fetchData} from "@/services/api"
 import { Button } from "@/components/ui/button"
 import { useAuthStore } from "@/stores/auth.store"
 import { useToast } from "@/components/ui/toast/use-toast"
+import { User, Team } from "@/types/api.type"
 
 const { toast } = useToast()
 const authStore = useAuthStore()
 const emit = defineEmits(["close", "refresh"])
-
-type Team = {
-  id: number
-  name: string
-}
-
-type User = {
-  id: number
-  username: string
-  email: string
-  role_id: number
-  teams: Team[]
-}
 
 const props = defineProps<{
   mode: string 
@@ -109,6 +98,8 @@ const onSubmit = (values) => {
   submitForm(body)
 }
 
+const validationSchema = props.mode === "create" ? signupFormSchema : updateFormSchema
+
 const inputStyle="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 
 </script>
@@ -135,7 +126,7 @@ const inputStyle="flex h-10 w-full rounded-md border border-input bg-background 
         </DialogDescription>
       </DialogHeader>
       
-      <Form v-slot="{errors}" :validation-schema="toTypedSchema(signupFormSchema)" @submit="onSubmit" class="flex flex-col w-full gap-6 p-2" :initialValues="initialValues" :validateOnMount="true">
+      <Form v-slot="{errors}" :validation-schema="toTypedSchema(validationSchema)" @submit="onSubmit" class="flex flex-col w-full gap-6 p-2" :initialValues="initialValues" :validateOnMount="true">
         <label for="username" class="font-medium">Username</label>
         <Field type="text" name="username" :class="inputStyle"/>
         <ErrorMessage name="username" class="text-[#ef4444] font-medium"/>
