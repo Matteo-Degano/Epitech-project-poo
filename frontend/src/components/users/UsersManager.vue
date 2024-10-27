@@ -7,17 +7,16 @@ import { Button } from "../ui/button";
 import { ArrowUpDown } from "lucide-vue-next";
 import DeleteUserModal from "./DeleteUserModal.vue";
 import { fetchData } from "@/services/api";
-import { toast } from "../ui/toast/use-toast";
-import { teams } from "@/lib/formSchemas/signin.form";
 import Spinner from "../Spinner.vue";
 import type { User } from "@/types/api.type"
 import type { Team } from "@/types/api.type"
+import { useAuthStore } from "@/stores/auth.store";
 
 const isLoading = ref(true)
 
 const usersData = ref<User[]>([])
 const teamsData = ref<Team[]>([])
-const emit = defineEmits(["close", "refresh"])
+const authStore = useAuthStore()
 
 async function fetchUsers() {
   try {
@@ -29,6 +28,10 @@ async function fetchUsers() {
         teams_string: user.teams.map((team) => team.name).join(", ")
       }
     })
+
+    if(authStore.user.role_id === 3) {
+      usersData.value = usersData.value.filter(user => user.role_id !== 4 && user.role_id !== 3 && user.id !== authStore.user.id)
+    }
   } catch (error) {
     console.log(error)
   } finally {
@@ -130,7 +133,7 @@ const columns: ColumnDef<User>[] = [
           teams: teamsData.value,
           onRefresh: fetchUsers
         }),
-        h(DeleteUserModal, { id: row.original.id})
+        h(DeleteUserModal, { id: row.original.id, onRefresh: fetchUsers })
       ])
     }
   }

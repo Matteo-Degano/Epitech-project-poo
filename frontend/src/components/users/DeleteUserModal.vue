@@ -14,16 +14,15 @@ import {
 import { toast } from "../ui/toast/use-toast";
 import { fetchData } from "@/services/api";
 
-// Props
 const props = defineProps({
   id: Number, 
 })
 
 const emit = defineEmits(["close", "refresh"])
 
-async function deleteUser(id: number) {
+async function deleteUser() {
   try {
-    const response = await fetchData("DELETE", `/users/${id}`)
+    const response = await fetchData("DELETE", `/users/${props.id}`)
     if (response.status === 204) {
       toast({
           description: `User successfully deleted !`
@@ -61,7 +60,7 @@ const isModalOpen = ref(false)
       <p>Are you sure you want to delete this user?</p>
       <DialogFooter>
         <DialogClose as-child>
-            <Button variant="destructive" @click="deleteUser(props.id); isModalOpen = false">Delete</Button>
+            <Button variant="destructive" @click="deleteUser(); isModalOpen = false">Delete</Button>
         </DialogClose>
         <DialogClose as-child>
             <Button variant="secondary" @click="isModalOpen = false">Cancel</Button>
