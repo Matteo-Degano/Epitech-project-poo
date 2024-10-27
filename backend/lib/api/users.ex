@@ -34,6 +34,14 @@ defmodule Api.Users do
     |> Repo.preload(:teams)
   end
 
+  def get_users_by_role(role_id) do
+    from(u in User,
+      where: u.role_id == ^role_id
+    )
+    |> Repo.all()
+  end
+
+
   def get_user_teams(user) do
     Repo.all(
       from t in Team,
