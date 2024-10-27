@@ -130,7 +130,7 @@ const columns = (id): ColumnDef<User>[] => [
         enableHiding: false,
         cell: ({ row }) => {
             return h("div", { class: "flex gap-4 float-right" }, [
-                h(RemoveFromTeam, { teamId: id, user: row.original })
+                h(RemoveFromTeam, { teamId: id, user: row.original, onRefresh: fetchUsers })
             ]);
         }
     }
