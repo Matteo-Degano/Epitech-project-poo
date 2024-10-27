@@ -32,7 +32,11 @@ export const signupFormSchema = z
       .string()
       .min(6, "Confirm password must be at least 6 characters")
       .max(20, "Confirm password cannot exceed 20 characters")
-      .and(noSpecialChars)
+      .and(noSpecialChars),
+    role: z.number(),
+    teams: z
+        .array(z.number())
+        .min(1, "You must select at least one team"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
