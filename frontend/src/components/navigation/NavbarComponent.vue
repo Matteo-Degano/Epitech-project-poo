@@ -43,25 +43,25 @@ const admin = 4
             </NavigationMenuLink>
           </router-link>
         </NavigationMenuItem>
-        
+
         <NavigationMenuItem>
           <router-link
-          to="/working-times"
-          :class="['nav-link', { 'text-primary': isActive('/working-times') }]"
+            to="/working-times"
+            :class="['nav-link', { 'text-primary': isActive('/working-times') }]"
           >
-          <NavigationMenuLink as="div">
-            <div class="flex gap-1 items-center"><Clock :size="18" /> Working Hours</div>
-          </NavigationMenuLink>
-        </router-link>
-      </NavigationMenuItem>
-      
-      <NavigationMenuItem v-if="role === admin || role === generalManager">
-        <router-link to="/users" :class="['nav-link', { 'text-primary': isActive('/users') }]">
-          <NavigationMenuLink as="div">
-            <div class="flex gap-1 items-center"><Users :size="18" /> Users</div>
-          </NavigationMenuLink>
-        </router-link>
-      </NavigationMenuItem>
+            <NavigationMenuLink as="div">
+              <div class="flex gap-1 items-center"><Clock :size="18" /> Working Hours</div>
+            </NavigationMenuLink>
+          </router-link>
+        </NavigationMenuItem>
+
+        <NavigationMenuItem v-if="role === admin || role === generalManager">
+          <router-link to="/users" :class="['nav-link', { 'text-primary': isActive('/users') }]">
+            <NavigationMenuLink as="div">
+              <div class="flex gap-1 items-center"><Users :size="18" /> Users</div>
+            </NavigationMenuLink>
+          </router-link>
+        </NavigationMenuItem>
 
       <NavigationMenuItem v-if="role != employee">
         <router-link to="/teams" :class="['nav-link', { 'text-primary': isActive('/teams') }]">
@@ -104,6 +104,6 @@ const admin = 4
         <CurrentTime />
         <ClockManager />
       </div>
-  </div>
-</NavigationMenu>
+    </div>
+  </NavigationMenu>
 </template>
