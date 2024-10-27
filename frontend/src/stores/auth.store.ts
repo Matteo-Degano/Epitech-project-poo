@@ -85,6 +85,7 @@ export const useAuthStore = defineStore("auth", {
     isLoggedIn: (state) => !!state.user,
     hasRole: (state) => (roleId: number) => state.role === roleId,
     isInTeam: (state) => (teamId: number) => state.teams.includes(teamId),
-    isEmployee: (state) => state.role === 1
+    isEmployee: (state) => state.role === 1,
+    isManager: (state) => state.role === 2
   }
 })

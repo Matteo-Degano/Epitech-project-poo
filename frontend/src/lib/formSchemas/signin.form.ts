@@ -33,7 +33,7 @@ export const signupFormSchema = z
       .min(6, "Confirm password must be at least 6 characters")
       .max(20, "Confirm password cannot exceed 20 characters")
       .and(noSpecialChars),
-    role: z.number(),
+    role: z.union([z.string(), z.number()]),
     teams: z
         .array(z.number())
         .min(1, "You must select at least one team"),

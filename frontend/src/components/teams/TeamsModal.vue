@@ -9,6 +9,7 @@ import {
   DialogTrigger,
   DialogDescription
 } from "@/components/ui/dialog"
+import { CirclePlus } from "lucide-vue-next"
 import { Form, Field, ErrorMessage } from "vee-validate"
 import { z } from "zod"
 import { toTypedSchema } from "@vee-validate/zod"
@@ -90,9 +91,10 @@ const inputStyle = "flex h-10 w-full rounded-md border border-input bg-backgroun
 <template>
   <Dialog>
     <DialogTrigger>
-      <Button>
-        {{ props.mode === "create" ? "Create Team" : "Update" }}
+      <Button v-if="props.mode === 'create'" class="flex gap-2 bg-green-600 hover:bg-green-500">
+        <CirclePlus />Add a new team
       </Button>
+      <Button v-if="props.mode === 'update'">Update</Button>
     </DialogTrigger>
     <DialogContent class="max-h-[90dvh] overflow-y-auto">
       <DialogHeader>

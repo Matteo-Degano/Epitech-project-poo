@@ -63,46 +63,43 @@ const admin = 4
           </router-link>
         </NavigationMenuItem>
 
-        <NavigationMenuItem v-if="role === admin || role === generalManager">
-          <router-link to="/teams" :class="['nav-link', { 'text-primary': isActive('/teams') }]">
-            <NavigationMenuLink as="div">
-              <div class="flex gap-1 items-center"><BookUser :size="18" /> Teams</div>
-            </NavigationMenuLink>
-          </router-link>
-        </NavigationMenuItem>
-
-        <NavigationMenuItem>
-          <router-link to="/charts" :class="['nav-link', { 'text-primary': isActive('/charts') }]">
-            <NavigationMenuLink as="div">
-              <div class="flex gap-1 items-center"><ChartSpline :size="18" /> Charts</div>
-            </NavigationMenuLink>
-          </router-link>
-        </NavigationMenuItem>
-
-        <NavigationMenuItem>
-          <NavigationMenuTrigger class="p-0 font-normal text-base hover:text-black hover:bg-white">
-            <div class="flex gap-1 items-center"><Settings :size="18" /> Account</div>
-          </NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul class="w-60 p-4 grid gap-3">
-              <li>
-                <NavigationMenuLink>
-                  <button
-                    @click="logoutHandler"
-                    class="flex gap-2 items-center rounded-md p-3 hover:bg-accent text-red-600 cursor-pointer"
-                  >
-                    <LogOut :size="18" /> Logout
-                  </button>
-                </NavigationMenuLink>
-              </li>
-              <li>
-                <DeleteAccount />
-              </li>
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-      </NavigationMenuList>
-
+      <NavigationMenuItem v-if="role != employee">
+        <router-link to="/teams" :class="['nav-link', { 'text-primary': isActive('/teams') }]">
+          <NavigationMenuLink as="div">
+            <div class="flex gap-1 items-center"><BookUser :size="18" /> Teams</div>
+          </NavigationMenuLink>
+        </router-link>
+      </NavigationMenuItem>
+      
+      <NavigationMenuItem>
+        <router-link to="/charts" :class="['nav-link', { 'text-primary': isActive('/charts') }]">
+          <NavigationMenuLink as="div">
+            <div class="flex gap-1 items-center"><ChartSpline :size="18" /> Charts</div>
+          </NavigationMenuLink>
+        </router-link>
+      </NavigationMenuItem>
+      
+      <NavigationMenuItem>
+        <NavigationMenuTrigger class="p-0 font-normal text-base	hover:text-black hover:bg-white">
+          <div class="flex gap-1 items-center"><Settings :size="18" /> Account</div>
+        </NavigationMenuTrigger>
+        <NavigationMenuContent>
+          <ul class="w-60 p-4 grid gap-3">
+            <li>
+              <NavigationMenuLink class="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent focus:bg-accent focus:text-accent-foreground text-red-600">
+                <button @click="logoutHandler">
+                  <div class="flex gap-1 items-center"><LogOut :size="18" /> Logout</div>
+                </button>
+              </NavigationMenuLink>
+            </li>
+            <li>
+              <DeleteAccount/>
+            </li>
+          </ul>
+        </NavigationMenuContent>
+      </NavigationMenuItem>
+    </NavigationMenuList>
+    
       <div class="flex items-center gap-4">
         <CurrentTime />
         <ClockManager />
