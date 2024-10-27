@@ -93,77 +93,77 @@ onMounted(() => {
 <template>
     <Dialog>
         <DialogTrigger as-child>
-            <Button class="flex gap-2 bg-green-600 hover:bg-green-500"
-            ><CirclePlus />Add a member
-        </Button>
-    </DialogTrigger>
-    <DialogContent class="max-w-md">
-        <DialogHeader>
-            <DialogTitle>Add member</DialogTitle>
-        </DialogHeader>
-        <DialogDescription>Add a member to this team</DialogDescription>
-        
-        <div class="flex justify-between items-center">
-            <Label> User: </Label>
-            <Popover v-model:open="open">
-                <PopoverTrigger as-child>
-                    <Button
-                    variant="outline"
-                    role="combobox"
-                    :aria-expanded="open"
-                    class="w-[200px] justify-between"
-                    >
-                    {{
-                        selectedUser
-                        ? usersList.find((user) => user.username === selectedUser)?.username
-                        : "Select a user..."
-                    }}
-                        <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                </PopoverTrigger>
-                <PopoverContent class="w-[200px] p-0">
-                    <Command v-model="selectedUser">
-                        <CommandInput placeholder="Search user..." />
-                        <CommandEmpty>No users found.</CommandEmpty>
-                        <CommandList>
-                            <CommandGroup>
-                                <CommandItem
-                                v-for="user in usersList"
-                                :key="user.id"
-                                :value="user.username"
-                                @select="open = false"
-                                >
-                                {{ user.username }}
-                                    <Check
-                                    :class="
-                                    cn(
-                                    'ml-auto h-4 w-4',
-                                    selectedUser.value === user.username ? 'opacity-100' : 'opacity-0'
-                                    )
-                                    "
-                                    />
-                                </CommandItem>
-                            </CommandGroup>
-                        </CommandList>
-                    </Command>
-                </PopoverContent>
-            </Popover>
-        </div>
+            <Button class="flex gap-2 bg-green-600 hover:bg-green-500">
+                <CirclePlus />Add a member
+            </Button>
+        </DialogTrigger>
+        <DialogContent class="max-w-md">
+            <DialogHeader>
+                <DialogTitle>Add member</DialogTitle>
+            </DialogHeader>
+            <DialogDescription>Add a member to this team</DialogDescription>
+            
+            <div class="flex justify-between items-center">
+                <Label> User: </Label>
+                <Popover v-model:open="open">
+                    <PopoverTrigger as-child>
+                        <Button
+                        variant="outline"
+                        role="combobox"
+                        :aria-expanded="open"
+                        class="w-[200px] justify-between"
+                        >
+                        {{
+                            selectedUser
+                            ? usersList.find((user) => user.username === selectedUser)?.username
+                            : "Select a user..."
+                        }}
+                            <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent class="w-[200px] p-0">
+                        <Command v-model="selectedUser">
+                            <CommandInput placeholder="Search user..." />
+                            <CommandEmpty>No users found.</CommandEmpty>
+                            <CommandList>
+                                <CommandGroup>
+                                    <CommandItem
+                                    v-for="user in usersList"
+                                    :key="user.id"
+                                    :value="user.username"
+                                    @select="open = false"
+                                    >
+                                    {{ user.username }}
+                                        <Check
+                                        :class="
+                                        cn(
+                                        'ml-auto h-4 w-4',
+                                        selectedUser.value === user.username ? 'opacity-100' : 'opacity-0'
+                                        )
+                                        "
+                                        />
+                                    </CommandItem>
+                                </CommandGroup>
+                            </CommandList>
+                        </Command>
+                    </PopoverContent>
+                </Popover>
+            </div>
 
-<DialogFooter>
-    <DialogClose as-child>
-        <Button type="button" variant="destructive">Cancel</Button>
-    </DialogClose>
-    <DialogClose as-child>
-        <Button
-        type="button"
-        class="bg-green-600 hover:bg-green-500"
-        @click="submitTeamMember"
-        >
-        Add Member
-    </Button>
-</DialogClose>
-</DialogFooter>
-</DialogContent>
-</Dialog>
+            <DialogFooter>
+                <DialogClose as-child>
+                    <Button type="button" variant="destructive">Cancel</Button>
+                </DialogClose>
+                <DialogClose as-child>
+                    <Button
+                    type="button"
+                    class="bg-green-600 hover:bg-green-500"
+                    @click="submitTeamMember"
+                    >
+                    Add Member
+                    </Button>
+                </DialogClose>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
 </template>
