@@ -3,6 +3,8 @@ defmodule ApiWeb.AuthController do
 
   alias Api.{Users, Users.Guardian}
 
+  action_fallback(ApiWeb.FallbackController)
+
   def refresh(conn, _params) do
     refresh_token = Map.get(conn.cookies, "refresh_token")
 
@@ -21,8 +23,9 @@ defmodule ApiWeb.AuthController do
 
     conn
     |> put_resp_cookie("access_token", access_token,
-      # secure: true,
-      max_age: 8 * 60 * 60
+      secure: true,
+      max_age: 8 * 60 * 60,
+      same_site: "None"
     )
     |> put_status(200)
     |> json(%{message: "Tokens refreshed."})
@@ -36,8 +39,8 @@ defmodule ApiWeb.AuthController do
 
   def logout(conn, _params) do
     conn
-    |> put_resp_cookie("access_token", "", max_age: 0)
-    |> put_resp_cookie("refresh_token", "", max_age: 0)
+    |> put_resp_cookie("access_token", "", max_age: 0, same_site: "None")
+    |> put_resp_cookie("refresh_token", "", max_age: 0, same_site: "None")
     |> put_status(200)
     |> json(%{message: "Cookies removed."})
   end
@@ -75,11 +78,12 @@ defmodule ApiWeb.AuthController do
     |> put_resp_cookie("access_token", access_token,
       # secure: true,
       max_age: 8 * 60 * 60
+      # same_site: "None"
     )
     |> put_resp_cookie("refresh_token", refresh_token,
       # secure: true,
-      same_site: "Strict",
       max_age: 7 * 24 * 60 * 60
+      # same_site: "None"
     )
     |> json(response)
   end

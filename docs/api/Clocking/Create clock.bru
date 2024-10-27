@@ -1,0 +1,22 @@
+meta {
+  name: Create clock
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/clocks/:user
+  body: json
+  auth: none
+}
+
+params:path {
+  user: 5
+}
+
+body:json {
+  {
+    "status": false,
+    "time": "2024-10-24 09:08:57"
+  }
+}

@@ -1,68 +1,168 @@
 <script setup lang="ts">
-import { h, reactive } from "vue";
+import { h, onMounted, ref } from "vue"
 import DataTable from "@/components/data-table/DataTable.vue"
-import type { ColumnDef } from "@tanstack/vue-table";
-import UserModal from "@/components/users/UserModal.vue";
+import type { ColumnDef } from "@tanstack/vue-table"
+import UserModal from "@/components/users/UserModal.vue"
+import { Button } from "../ui/button"
+import { ArrowUpDown } from "lucide-vue-next"
+import DeleteUserModal from "./DeleteUserModal.vue"
+import { fetchData } from "@/services/api"
+import { toast } from "../ui/toast/use-toast"
+import { teams } from "@/lib/formSchemas/signin.form"
+import Spinner from "../Spinner.vue"
+import type { User } from "@/types/api.type"
+import type { Team } from "@/types/api.type"
+import { useAuthStore } from "@/stores/auth.store"
 
-type UserType = {
-    id: number
-    username: string
-    email: string
-    role_id: number
-    team_id: number[]
+const isLoading = ref(true)
+
+const usersData = ref<User[]>([])
+const teamsData = ref<Team[]>([])
+
+async function fetchUsers() {
+  try {
+    const response = await fetchData("GET", "/users")
+    usersData.value = response.data.map((user: User) => {
+      return {
+        ...user,
+        role_string: idToStringRole(user.role_id),
+        teams_string: user.teams.map((team) => team.name).join(", ")
+      }
+    })
+
+    if (authStore.user.role_id === 3) {
+      usersData.value = usersData.value.filter(
+        (user) => user.role_id !== 4 && user.role_id !== 3 && user.id !== authStore.user.id
+      )
+    }
+  } catch (error) {
+    console.log(error)
+  } finally {
+    isLoading.value = false
+  }
 }
 
-// Sample data
-const data: UserType[] = reactive([
-  {
-    id: 1,
-    username: "John Doe",
-    email: "john.doe@mail.com",
-    role_id: 1,
-    team_id: [1, 2]
-  },
-  {
-    id: 2,
-    username: "Paul Dupont",
-    email: "paul.dupont@mail.com",
-    role_id: 2,
-    team_id: [2]
+onMounted(async () => {
+  try {
+    const response = await fetchData("GET", "/teams")
+    teamsData.value = response.data.data
+  } catch (error) {
+    console.log(error)
   }
-])
 
-const columns: ColumnDef<UserType>[] = [
+  await fetchUsers()
+})
+
+function idToStringRole(id: number) {
+  switch (id) {
+    case 1:
+      return "Employee"
+    case 2:
+      return "Manager"
+    case 3:
+      return "General manager"
+    case 4:
+      return "Admin"
+    default:
+      return "Unknown"
+  }
+}
+
+const columns: ColumnDef<User>[] = [
   {
-    accessorKey: 'username',
-    header: () => h('div', { class: 'text-left' }, 'Name'),
-    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, row.getValue('username')),
+    accessorKey: "username",
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc")
+        },
+        () => ["Name", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+      )
+    },
+    cell: ({ row }) => h("div", { class: "text-left font-medium" }, row.getValue("username"))
   },
   {
-    accessorKey: 'email',
-    header: () => h('div', { class: 'text-left' }, 'Email'),
-    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, row.getValue('email')),
+    accessorKey: "email",
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc")
+        },
+        () => ["Email", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+      )
+    },
+    cell: ({ row }) => h("div", { class: "text-left font-medium" }, row.getValue("email"))
   },
   {
-    accessorKey: 'role_id',
-    header: () => h('div', { class: 'text-left' }, 'Role'),
-    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, row.getValue('role_id')),
+    accessorKey: "role_string",
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc")
+        },
+        () => ["Role", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+      )
+    },
+    cell: ({ row }) => h("div", { class: "text-left font-medium" }, row.getValue("role_string"))
   },
   {
-    accessorKey: 'team_id',
-    header: () => h('div', { class: 'text-left' }, 'Teams'),
-    cell: ({ row }) => h('div', { class: 'text-left font-medium' }, (row.getValue('team_id') as number[]).join(", ")),
+    accessorKey: "teams_string",
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc")
+        },
+        () => ["Teams", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+      )
+    },
+    cell: ({ row }) => h("div", { class: "text-left font-medium" }, row.getValue("teams_string"))
   },
   {
-    id: 'actions',
+    id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      return h('div', { class: 'relative' }, h(UserModal, { data : row.original, mode: 'update' }))
+      return h("div", { class: "flex gap-4 float-right" }, [
+        h(UserModal, {
+          mode: "update",
+          data: row.original,
+          teams: teamsData.value,
+          onRefresh: fetchUsers
+        }),
+        h(DeleteUserModal, { id: row.original.id })
+      ])
     }
   }
 ]
 
+const filterColumns = [
+  { column: "username", fieldName: "name" },
+  { column: "email", fieldName: "email" },
+  { column: "role_string", fieldName: "role" },
+  { column: "teams_string", fieldName: "team" }
+]
 </script>
 
 <template>
-  <h1>Users</h1>
-    <DataTable :columns="columns" :data="data"/>
+  <div class="flex flex-col gap-2 w-full">
+    <div v-if="isLoading" class="flex justify-center items-center h-full">
+      <Spinner />
+    </div>
+
+    <DataTable
+      v-else
+      :columns="columns"
+      :data="usersData"
+      :filters="filterColumns"
+      :teams="teamsData"
+      @refresh="fetchUsers"
+    />
+  </div>
 </template>

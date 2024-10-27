@@ -1,14 +1,14 @@
 import router from "@/router"
 import { fetchData } from "@/services/api"
-import type { APIResponse } from "@/types/api.type"
+import type { APIResponse, User } from "@/types/api.type"
 import { defineStore } from "pinia"
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
-    // Initialize user, role, team, email, and username from sessionStorage
+    // Initialize user data from sessionStorage
     user: JSON.parse(sessionStorage.getItem("user") || "null"),
     role: parseInt(sessionStorage.getItem("role") || "0"),
-    team: parseInt(sessionStorage.getItem("team") || "0"),
+    teams: JSON.parse(sessionStorage.getItem("teams") || "[]"),
     email: sessionStorage.getItem("email") || "",
     username: sessionStorage.getItem("username") || "",
     userId: parseInt(sessionStorage.getItem("userId") || "0")
@@ -23,22 +23,22 @@ export const useAuthStore = defineStore("auth", {
         }
 
         console.log("Login response", response)
-        const user = response.data
+        const user: User = response.data
 
         console.log("Login successful", user)
-        // Store user, role_id, team_id, email, and username in Pinia
+        // Store user data in the store
         this.user = user
         this.userId = user.id
         this.role = user.role_id
-        this.team = user.team_id
+        this.teams = user.teams
         this.email = user.email
         this.username = user.username
 
-        // Persist user, role_id, team_id, email, and username in sessionStorage
+        // Persist user data in sessionStorage
         sessionStorage.setItem("user", JSON.stringify(user))
         sessionStorage.setItem("userId", user.id.toString())
         sessionStorage.setItem("role", user.role_id.toString())
-        sessionStorage.setItem("team", user.team_id.toString())
+        sessionStorage.setItem("teams", JSON.stringify(user.teams))
         sessionStorage.setItem("email", user.email)
         sessionStorage.setItem("username", user.username)
 
@@ -56,16 +56,16 @@ export const useAuthStore = defineStore("auth", {
 
       this.user = null
       this.role = 0
-      this.team = 0
+      this.teams = []
       this.userId = 0
       this.email = ""
       this.username = ""
 
-      // Remove user, role_id, team_id, email, and username from sessionStorage
+      // Remove user data from sessionStorage
       sessionStorage.removeItem("user")
       sessionStorage.removeItem("userId")
       sessionStorage.removeItem("role")
-      sessionStorage.removeItem("team")
+      sessionStorage.removeItem("teams")
       sessionStorage.removeItem("email")
       sessionStorage.removeItem("username")
       router.push("/login")
@@ -76,14 +76,16 @@ export const useAuthStore = defineStore("auth", {
     // Getters for each state value
     getUser: (state) => state.user,
     getRole: (state) => state.role,
-    getTeam: (state) => state.team,
+    getTeams: (state) => state.teams,
     getEmail: (state) => state.email,
     getUsername: (state) => state.username,
     getUserId: (state) => state.userId,
 
     // Additional computed getters
-    isLoggedIn: (state) => !!state.user, // Check if user is logged in
-    hasRole: (state) => (roleId: number) => state.role === roleId, // Check role
-    isInTeam: (state) => (teamId: number) => state.team === teamId // Check team
+    isLoggedIn: (state) => !!state.user,
+    hasRole: (state) => (roleId: number) => state.role === roleId,
+    isInTeam: (state) => (teamId: number) => state.teams.includes(teamId),
+    isEmployee: (state) => state.role === 1,
+    isManager: (state) => state.role === 2
   }
 })

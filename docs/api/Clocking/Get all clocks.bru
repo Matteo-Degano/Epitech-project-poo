@@ -1,0 +1,15 @@
+meta {
+  name: Get all clocks
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/clocks/:user
+  body: none
+  auth: none
+}
+
+params:path {
+  user: 5
+}

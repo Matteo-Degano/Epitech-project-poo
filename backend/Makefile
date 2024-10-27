@@ -27,3 +27,7 @@ install: ## Install dependecies
 
 test: ## Run tests
 	docker exec -it backend mix test;
+
+seeder:
+	make force-migrate
+	docker exec -it backend mix run priv/repo/seeds.exs

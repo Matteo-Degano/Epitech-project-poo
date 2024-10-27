@@ -21,7 +21,8 @@ const onSubmit = handleSubmit(async (values) => {
   const response = await authStore.login(values.email, values.password)
   if (response.status === 200) {
     toast({
-      description: `Welcome back ${authStore.username} !`
+      description: `Welcome back ${authStore.username} !`,
+      variant: "basic"
     })
   } else {
     toast({
@@ -37,7 +38,7 @@ const { value: password } = useField<string>("password")
 </script>
 
 <template>
-  <form class="flex flex-col w-full gap-6 p-2" @submit.prevent="onSubmit">
+  <form class="flex flex-col max-w-lg w-full gap-6 p-2" @submit.prevent="onSubmit">
     <FormField v-slot="{ componentField, errors }" name="email">
       <FormItem>
         <FormLabel>Email</FormLabel>

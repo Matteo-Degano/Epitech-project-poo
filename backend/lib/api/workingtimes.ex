@@ -1,8 +1,11 @@
 defmodule Api.Workingtimes do
   import Ecto.Query, warn: false
+
   alias Api.Repo
 
+  alias Api.Users.User
   alias Api.Workingtimes.Workingtime
+  alias Api.UsersTeams
 
   def list_workingtimes() do
     Repo.all(Workingtime)
@@ -28,6 +31,84 @@ defmodule Api.Workingtimes do
 
     Repo.all(query)
   end
+
+  def list_workingtimes_per_teams(attrs \\ %{}) do
+    user_query =
+      if attrs do
+        team_query = from(t in UsersTeams, where: t.team_id in ^attrs.teams, select: t.user_id)
+
+        from(u in User,
+          where: u.id in subquery(team_query),
+          where: u.role_id in [1, 2]
+        )
+      else
+        from(u in User,
+          where: u.role_id in [1, 2]
+        )
+      end
+
+    users = Repo.all(user_query)
+    user_ids = Enum.map(users, & &1.id)
+
+    workingtime_query =
+      from(w in Workingtime,
+        where: w.user_id in ^user_ids
+      )
+
+    workingtimes = Repo.all(workingtime_query)
+
+    Enum.map(workingtimes, fn w ->
+      user = Enum.find(users, fn u -> u.id == w.user_id end)
+      %{
+        id: w.id,
+        start: w.start,
+        end: w.end,
+        inserted_at: w.inserted_at,
+        updated_at: w.updated_at,
+        user: %{
+          id: user.id,
+          username: user.username,
+          role_id: user.role_id
+        }
+      }
+    end)
+  end
+
+
+  def list_workingtimes_by_teams(attrs \\ %{}) do
+    user_query =
+      if attrs do
+        team_query = from(t in UsersTeams, where: t.team_id in ^attrs.teams, select: t.user_id)
+
+        from(u in User,
+          where: u.id in subquery(team_query)
+        )
+      else
+        from(u in User)
+      end
+
+    users = Repo.all(user_query)
+    user_ids = Enum.map(users, fn u -> u.id end)
+
+    workingtime_query =
+      from(w in Workingtime,
+        where: w.user_id in ^user_ids
+      )
+
+    workingtimes = Repo.all(workingtime_query)
+
+    Enum.map(workingtimes, fn w ->
+      %{
+        id: w.id,
+        start: w.start,
+        end: w.end,
+        inserted_at: w.inserted_at,
+        updated_at: w.updated_at,
+        user: find_and_format_user(users, w.user_id)
+      }
+    end)
+  end
+
 
   def get_workingtime!(id) do
     Repo.get!(Workingtime, id)
@@ -55,5 +136,15 @@ defmodule Api.Workingtimes do
 
   def change_workingtime(%Workingtime{} = workingtime, attrs \\ %{}) do
     Workingtime.changeset(workingtime, attrs)
+  end
+
+  defp find_and_format_user(users, id) do
+    user = Enum.find(users, fn u -> id == u.id end)
+
+    %{
+      id: user.id,
+      username: user.username,
+      email: user.email
+    }
   end
 end
