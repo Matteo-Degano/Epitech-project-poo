@@ -13,7 +13,6 @@ import type { WorkingTimeType } from "@/types/api.type"
 import { useAuthStore } from "@/stores/auth.store"
 import { useRoute } from "vue-router"
 import Spinner from "../Spinner.vue"
-import { is } from "date-fns/locale"
 
 const route = useRoute()
 const { toast } = useToast()
@@ -22,6 +21,7 @@ const workingTimeData = ref<WorkingTimeType[]>([])
 const isLoading = ref(true)
 const isEmployee: boolean = useAuth.isEmployee
 const isManager: boolean = useAuth.isManager
+const userId = useAuth.userId
 
 // Function to handle working time deletion
 async function deleteWorkingTime(id: number) {
@@ -55,6 +55,7 @@ const fetchWorkingTimes = async () => {
       response = await fetchData("GET", `/teams/workingtimes`)
       console.log(response)
       workingTimeData.value = response.data.map((item) => item.working_times).flat()
+      console.log(workingTimeData)
     } else {
       response = await fetchData("GET", `/workingtime`)
       workingTimeData.value = response.data
@@ -140,10 +141,13 @@ const columns = computed<ColumnDef<WorkingTimeType>[]>(() => {
     baseColumns.push({
       id: "actions",
       cell: ({ row }) => {
-        return h("div", { class: "flex gap-4 float-right" }, [
-          h(WorkingTime, { mode: "update", data: row.original, id: row.original.id }),
-          h(DeleteWorkingTimeModal, { id: row.original.id, function: deleteWorkingTime })
-        ])
+        const showActions = row.original.user.id !== userId
+        return showActions
+          ? h("div", { class: "flex gap-4 float-right" }, [
+              h(WorkingTime, { mode: "update", data: row.original, id: row.original.id }),
+              h(DeleteWorkingTimeModal, { id: row.original.id, function: deleteWorkingTime })
+            ])
+          : null
       }
     })
   }
