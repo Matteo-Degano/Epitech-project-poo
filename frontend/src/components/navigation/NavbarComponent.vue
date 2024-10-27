@@ -63,7 +63,7 @@ const admin = 4
         </router-link>
       </NavigationMenuItem>
 
-      <NavigationMenuItem v-if="role === admin || role === generalManager">
+      <NavigationMenuItem v-if="role != employee">
         <router-link to="/teams" :class="['nav-link', { 'text-primary': isActive('/teams') }]">
           <NavigationMenuLink as="div">
             <div class="flex gap-1 items-center"><BookUser :size="18" /> Teams</div>

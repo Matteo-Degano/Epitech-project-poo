@@ -53,7 +53,7 @@ const routes = [
       {
         path: "teams",
         component: TeamsView,
-        meta: { requiresAuth: true, roles: [generalManager, admin] }
+        meta: { requiresAuth: true, roles: [manager, generalManager, admin] }
       }
     ]
   }
