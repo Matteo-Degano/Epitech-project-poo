@@ -49,7 +49,6 @@ const fetchUsers = async () => {
         usersList.value = response.data.filter((user: User) => {
             return !props.data.some((teamUser: User) => teamUser.id === user.id) && user.role_id !== 3 && user.role_id !== 4 && user.id !== authStore.user.id
         })
-
     } catch (err: any) {
         toast({
             variant: "destructive",
@@ -75,6 +74,8 @@ const submitTeamMember = async () => {
         toast({
             description: "User added to team"
         })
+        await fetchUsers()
+        selectedUser.value = ""
         emit("refresh")
     } catch (err: any) {
         toast({
@@ -117,37 +118,37 @@ onMounted(() => {
                         ? usersList.find((user) => user.username === selectedUser)?.username
                         : "Select a user..."
                     }}
-                    <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-            </PopoverTrigger>
-            <PopoverContent class="w-[200px] p-0">
-                <Command v-model="selectedUser">
-                    <CommandInput placeholder="Search user..." />
-                    <CommandEmpty>No users found.</CommandEmpty>
-                    <CommandList>
-                        <CommandGroup>
-                            <CommandItem
-                            v-for="user in usersList"
-                            :key="user.id"
-                            :value="user.username"
-                            @select="open = false"
-                            >
-                            {{ user.username }}
-                            <Check
-                            :class="
-                            cn(
-                            'ml-auto h-4 w-4',
-                            selectedUser.value === user.username ? 'opacity-100' : 'opacity-0'
-                            )
-                            "
-                            />
-                        </CommandItem>
-                    </CommandGroup>
-                </CommandList>
-            </Command>
-        </PopoverContent>
-    </Popover>
-</div>
+                        <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent class="w-[200px] p-0">
+                    <Command v-model="selectedUser">
+                        <CommandInput placeholder="Search user..." />
+                        <CommandEmpty>No users found.</CommandEmpty>
+                        <CommandList>
+                            <CommandGroup>
+                                <CommandItem
+                                v-for="user in usersList"
+                                :key="user.id"
+                                :value="user.username"
+                                @select="open = false"
+                                >
+                                {{ user.username }}
+                                    <Check
+                                    :class="
+                                    cn(
+                                    'ml-auto h-4 w-4',
+                                    selectedUser.value === user.username ? 'opacity-100' : 'opacity-0'
+                                    )
+                                    "
+                                    />
+                                </CommandItem>
+                            </CommandGroup>
+                        </CommandList>
+                    </Command>
+                </PopoverContent>
+            </Popover>
+        </div>
 
 <DialogFooter>
     <DialogClose as-child>
