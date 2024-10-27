@@ -146,7 +146,7 @@ const filterColumns = [
 </script>
 
 <template>
-    <div @refresh="fetchUsers">
+    <div>
         <div v-if="isLoading" class="flex justify-center items-center h-full">
             <Spinner />
         </div>
