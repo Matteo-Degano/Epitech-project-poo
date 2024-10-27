@@ -84,6 +84,11 @@ defmodule Api.Users do
 
   defp associate_teams(_, _), do: :ok
 
+  def team_has_users?(team_id) do
+    from(ut in UsersTeams, where: ut.team_id == ^team_id)
+    |> Repo.exists?()
+  end
+
   def update_user(%User{} = user, attrs) do
     team_ids = Map.get(attrs, "team_ids", nil)
 

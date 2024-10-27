@@ -3,6 +3,7 @@ defmodule ApiWeb.TeamController do
 
   alias Api.Teams
   alias Api.Teams.Team
+  alias Api.Users
 
   action_fallback ApiWeb.FallbackController
 
@@ -46,8 +47,15 @@ defmodule ApiWeb.TeamController do
   def delete(conn, %{"id" => id}) do
     team = Teams.get_team!(id)
 
-    with {:ok, %Team{}} <- Teams.delete_team(team) do
-      send_resp(conn, :no_content, "")
+    if Api.Users.team_has_users?(team.id) do
+      conn
+      |> put_status(:forbidden)
+      |> json(%{error: "Cannot delete team with associated users"})
+    else
+      with {:ok, %Team{}} <- Teams.delete_team(team) do
+        send_resp(conn, :no_content, "")
+      end
     end
   end
+
 end

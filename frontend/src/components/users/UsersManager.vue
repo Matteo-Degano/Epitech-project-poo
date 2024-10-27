@@ -7,25 +7,14 @@ import { Button } from "../ui/button"
 import { ArrowUpDown } from "lucide-vue-next"
 import DeleteUserModal from "./DeleteUserModal.vue"
 import { fetchData } from "@/services/api"
+import type { User } from "@/types/api.type"
+import type { Team } from "@/types/api.type"
 
 const isLoading = ref(true)
 
 const usersData = ref<User[]>([])
 const teamsData = ref<Team[]>([])
 const emit = defineEmits(["close", "refresh"])
-
-type User = {
-  id: number
-  username: string
-  email: string
-  role_id: number
-  teams: Team[]
-}
-
-type Team = {
-  id: number
-  name: string
-}
 
 async function fetchUsers() {
   try {

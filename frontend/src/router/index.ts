@@ -11,6 +11,7 @@ import WorkingTimesView from "@/views/WorkingTimesView.vue"
 import NavbarLayout from "@/components/navigation/NavbarLayout.vue"
 import UsersView from "@/views/UsersView.vue"
 import ChartsView from "@/views/ChartsView.vue"
+import TeamsView from "@/views/TeamsView.vue"
 
 // Define roles
 const employee = 1
@@ -43,6 +44,11 @@ const routes = [
         path: "charts",
         component: ChartsView,
         meta: { requiresAuth: true, roles: [employee, manager, generalManager, admin] }
+      },
+      {
+        path: "teams",
+        component: TeamsView,
+        meta: { requiresAuth: true, roles: [manager, generalManager, admin] }
       }
     ]
   }
