@@ -35,7 +35,7 @@ defmodule ApiWeb.ClocksController do
           workingtime_params = %{
             user_id: conn.params["user"],
             start: user_clock.time,
-            end: NaiveDateTime.utc_now()
+            end: NaiveDateTime.add(NaiveDateTime.local_now(), 3600)
           }
 
           Clocks.update_clocks(user_clock, %{status: false})
