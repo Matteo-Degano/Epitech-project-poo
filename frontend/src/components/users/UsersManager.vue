@@ -18,6 +18,7 @@ const isLoading = ref(true)
 
 const usersData = ref<User[]>([])
 const teamsData = ref<Team[]>([])
+const authStore = useAuthStore()
 
 async function fetchUsers() {
   try {
@@ -30,9 +31,10 @@ async function fetchUsers() {
       }
     })
 
+    console.log(authStore.user)
     if (authStore.user.role_id === 3) {
       usersData.value = usersData.value.filter(
-        (user) => user.role_id !== 4 && user.role_id !== 3 && user.id !== authStore.user.id
+        user => user.role_id !== 4 && user.role_id !== 3 && user.id !== authStore.user.id
       )
     }
   } catch (error) {
