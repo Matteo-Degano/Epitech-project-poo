@@ -1,12 +1,11 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { fetchData } from '../service/api';
 import WorkingTimeTable from '@/components/WorkingTimeTable';
 import { PaperProvider } from 'react-native-paper';
-
-
+import { useNavigation } from '@react-navigation/native';
 
 export interface workingtimeModel {
     id: number
@@ -17,65 +16,82 @@ export interface workingtimeModel {
 
 const Workingtimes = ()=>{
 
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [start, setStart] = useState('');
-    const [end, setEnd] = useState('');
-    const [page, setPage] = useState(1);
-    const [limit] = useState(10); 
     const [userId,setUserId] = useState<number>()
     const [workingTimeData,setWorkingTimeData] = useState<workingtimeModel[]>([]);
-
+    const navigation = useNavigation();
 
     const getUserId = async ()=>{
         
         const storedUserId = await AsyncStorage.getItem('userId'); 
 
         if(storedUserId){
-            console.log(storedUserId);
           setUserId(Number(storedUserId))
         }
     }
 
-    const LoadWorkingTime = async ()=>{
-        const response = await fetchData("GET",`/workingtime/${userId}`);
-        console.log(response);
 
-        if(response){
-            //console.log(response.data.data);
-            setWorkingTimeData(response.data.data)
+    const LoadWorkingTime = async () => {
+
+      try {
+        const response = await fetchData("GET", `/workingtime/${userId}`);
+        try {
+          setWorkingTimeData(response.data.data);
+        } catch (jsonError) {
+          console.error("JSON Parsing Error:", jsonError);
+
         }
-    }
+      } catch (error) {
+        console.error("Error fetching working time:", error);
+      }
+    };
 
     useEffect(() => {
         getUserId()
       }, []);
 
     useEffect(()=>{
+
        
-        console.log("userId");
         if(userId){
            LoadWorkingTime();
         }
 
     },[userId])
 
-    useEffect(()=>{
-        console.log("-----------------");
-        console.log(workingTimeData);
-    },[workingTimeData])
+    useEffect(() => {
+      const unsubscribe = navigation.addListener('focus', () => {
+        if(userId){
+          LoadWorkingTime()
+        }
+      });
   
-      
+      return unsubscribe;
+    }, [navigation]);
 
     return (
-       
-        <View>
-            {workingTimeData.length > 0 && <WorkingTimeTable  workingTimeData={workingTimeData} />}
-        </View>
-    //      <PaperProvider></PaperProvider>
+        <PaperProvider>
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
+                <View style={styles.container}>
+                    {workingTimeData && <WorkingTimeTable workingTimeData={workingTimeData} loadWorkingTime={LoadWorkingTime} />}
+                </View>
+            </ScrollView>
+        </PaperProvider>
       )
 }
+
+
+const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 10, 
+    },
+    scrollContainer: {
+      flexGrow: 1, 
+      paddingBottom: 20,
+    },
+  });
 
 
 export default Workingtimes;

@@ -1,9 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { fetchData } from '../app/service/api';
 
-// Helper function to format time (HH:MM:SS)
+
 function formatTime(elapsedTime) {
   const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
   const minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
@@ -113,23 +113,38 @@ const Clock = () => {
     };
   }, [userId]); // Only depend on userId
 
+  const borderColor = isClockRunning ? '#6200ee' : 'black';
+
   return (
-    <View style={styles.container}>
-      {!isClockRunning ? (
-        <Button style={styles.button} title={time} onPress={startClock} />
-      ) : (
-        <Button title={time} onPress={handleStopClock} color="green" />
-      )}
+    <View style={clockStyles.container}>
+      <TouchableOpacity
+        style={[clockStyles.button, { borderColor }]} // Apply conditional border color
+        onPress={isClockRunning ? handleStopClock : startClock}
+      >
+        <Text style={clockStyles.buttonText}>{time}</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const clockStyles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f0f8ff',   
+    marginVertical: 20,
+  },
+  button: {
+    borderRadius: 5,
+    padding: 10,
+    alignItems: 'center',
+    width: '85%',
+    backgroundColor: '#954aff',
+    borderWidth: 7,
+    borderBlockColor:'#ffffff'
+  },
+  buttonText: {
+    fontSize: 18, // Increased text size
+    color: '#ffffff',
+    fontWeight: 'bold',
   },
 });
 
