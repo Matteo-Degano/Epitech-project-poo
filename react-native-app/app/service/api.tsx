@@ -1,37 +1,28 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-async function extractTokens(response) {
+async function extractTokens(response: Response) {
+ 
+   const setCookie = response.headers.get('set-cookie');
+   if (setCookie) {
+      const refresh_token = setCookie.split("refresh_token=")[1].split(";")[0];
+      const access_token = setCookie.split("access_token=")[1].split(";")[0];
 
-   console.log(response);   
-   // console.log(JSON.stringify(response,null,4)); //headers.map.set-cookie
-    let setCookie  = response.headers.map['set-cookie']
-    // console.log(setCookie);
-    //access_token = chaine.split("ACCESS-TOKEN=")[1].split(";")[0]
-    let refresh_token = setCookie.split("refresh_token=")[1].split(";")[0]
-    // console.log(refresh_token);
-    let access_token = setCookie.split("access_token=")[1].split(";")[0]
-    // console.log(access_token);
-
-
-    await AsyncStorage.setItem('refresh_token',refresh_token);
-    await AsyncStorage.setItem('access_token',access_token);
-  };
+      await AsyncStorage.setItem('refresh_token', refresh_token);
+      await AsyncStorage.setItem('access_token', access_token);
+   }
+};
 
 
-export async function fetchData(method: "GET" | "POST" | "PUT" | "DELETE",endpoint: string,body?: any): Promise<any> {
+export async function fetchData(method: "GET" | "POST" | "PUT" | "DELETE", endpoint: string,body?: any): Promise<any> {
     
     try {
-
-        console.log("---------- 0 ---------");
         let access_token:string | null = null;
         let headers: HeadersInit | null = null;
 
         if(endpoint != '/login'){
            const refresh_token = await AsyncStorage.getItem('refresh_token');
            access_token = await AsyncStorage.getItem('access_token');
-
-           console.log(access_token);
 
            headers = {
             'Accept': 'application/json',
@@ -49,36 +40,36 @@ export async function fetchData(method: "GET" | "POST" | "PUT" | "DELETE",endpoi
               }
         }
 
-      console.log("---------- 1 ---------");
-      console.log(headers);
-
       const response = await fetch(`http://10.15.192.16:4000/api${endpoint}`, {
-        method,
-        headers,
-        body: method !== "GET" ? JSON.stringify(body) : null,
-        credentials: "include" 
-      })
+            method,
+            headers,
+            body: method !== "GET" && method !== "DELETE" ? JSON.stringify(body) : null,
+            credentials: "include" 
+          })
+
   
       if(endpoint == '/login'){
-        console.log("---------- 2 ---------");
-         extractTokens(response)
-      }
+           extractTokens(response)
+        }
 
 
       if (!response.ok) {
-        console.log("erreur");
-        const errorData = await response.json()
-        throw new Error(errorData.error || "An error occurred")
-      }
+            const errorData = await response.text(); 
+            throw new Error(errorData || "An error occurred");
+        }
 
-      const json = await response.json()
+        let json: any;
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            json = await response.json();
+        } else {
+            json = {}; 
+        }
 
-     //console.log(JSON.stringify(json));
-
-      return {
-        data: json,
-        status: response.status
-      }
+        return {
+          data: json,
+          status: response.status
+        }
     } catch (error) {
       console.error("Fetch error:", error)
       throw error

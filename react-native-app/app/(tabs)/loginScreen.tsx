@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchData } from '../service/api';
 
 
-const LoginScreen = () => {
+const LoginScreen = ({onLogin} : { onLogin: Function }) => {
 
   const navigation = useNavigation(); 
 
@@ -17,16 +17,11 @@ const LoginScreen = () => {
 
     if (username && password) {
       try {
-        console.log("login");
-
         const response = await fetchData("POST",'/login', { email: username, password });
-
-        console.log(response);
 
         if (response.status == "200") {
           
           const data = await response.data;
-          console.log("response ok");
 
           await AsyncStorage.setItem('username',data.username);
           await AsyncStorage.setItem('email',data.email);
@@ -34,8 +29,7 @@ const LoginScreen = () => {
           await AsyncStorage.setItem('roleId',data.role_id.toString());
           await AsyncStorage.setItem('teams', JSON.stringify(data.teams));
 
-          console.log("redirect to home");
-          navigation.navigate('Home'); //  Home screen
+          onLogin(data.role_id);
 
         } else {
           const errorData = await response.json();
@@ -66,10 +60,10 @@ const LoginScreen = () => {
           onChangeText={setPassword}
           secureTextEntry
         />
-      </View>
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -102,6 +96,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 5,
     alignItems: 'center',
+    width: 300,
   },
   buttonText: {
     color: '#fff',
